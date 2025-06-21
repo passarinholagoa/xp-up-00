@@ -3,34 +3,44 @@ import React from 'react';
 import { Plus, Zap, Trophy, ShoppingBag, Settings } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useGame } from '@/contexts/GameContext';
 
 export const QuickActions = () => {
+  const { createNewQuest, openAchievements, openShop, openSettings, gameState } = useGame();
+
   const actions = [
     {
       icon: Plus,
       label: 'Nova Quest',
       description: 'Criar nova tarefa',
-      variant: 'default' as const
+      variant: 'default' as const,
+      onClick: createNewQuest
     },
     {
       icon: Trophy,
       label: 'Conquistas',
       description: 'Ver progresso',
-      variant: 'outline' as const
+      variant: 'outline' as const,
+      onClick: openAchievements
     },
     {
       icon: ShoppingBag,
       label: 'Loja',
       description: 'Comprar itens',
-      variant: 'outline' as const
+      variant: 'outline' as const,
+      onClick: openShop
     },
     {
       icon: Settings,
       label: 'Configurações',
       description: 'Ajustar perfil',
-      variant: 'outline' as const
+      variant: 'outline' as const,
+      onClick: openSettings
     }
   ];
+
+  const xpRemaining = gameState.maxXp - gameState.xp;
+  const xpPercentage = (gameState.xp / gameState.maxXp) * 100;
 
   return (
     <div className="space-y-6">
@@ -49,6 +59,7 @@ export const QuickActions = () => {
                   key={index}
                   variant={action.variant}
                   className="w-full justify-start h-auto p-4 text-left"
+                  onClick={action.onClick}
                 >
                   <div className="flex items-center gap-3">
                     <Icon className="h-5 w-5" />
@@ -73,19 +84,19 @@ export const QuickActions = () => {
           
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Nível 12</span>
-              <span>Nível 13</span>
+              <span>Nível {gameState.level}</span>
+              <span>Nível {gameState.level + 1}</span>
             </div>
             <div className="progress-bar">
               <div 
                 className="progress-fill bg-xp-gradient"
-                style={{ width: '62%' }}
+                style={{ width: `${xpPercentage}%` }}
               >
                 <div className="absolute inset-0 bg-white/20 animate-pulse" />
               </div>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              755 XP restantes
+              {xpRemaining.toLocaleString()} XP restantes
             </p>
           </div>
         </div>
@@ -103,7 +114,7 @@ export const QuickActions = () => {
               </div>
               <div className="flex-1">
                 <div className="text-sm font-medium">Streak Master</div>
-                <div className="text-xs text-muted-foreground">7 dias consecutivos</div>
+                <div className="text-xs text-muted-foreground">{gameState.streak} dias consecutivos</div>
               </div>
             </div>
           </div>

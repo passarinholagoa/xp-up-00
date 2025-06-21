@@ -4,8 +4,11 @@ import { Plus, Minus, Flame, Coins, Zap } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useGame } from '@/contexts/GameContext';
 
 export const HabitsList = () => {
+  const { completeHabit } = useGame();
+
   const habits = [
     {
       id: 1,
@@ -43,6 +46,10 @@ export const HabitsList = () => {
       case 'hard': return 'bg-quest-epic/20 text-quest-epic';
       default: return 'bg-muted/20 text-muted-foreground';
     }
+  };
+
+  const handleHabitAction = (habit: typeof habits[0]) => {
+    completeHabit(habit.id, habit.isPositive);
   };
 
   return (
@@ -83,6 +90,7 @@ export const HabitsList = () => {
                 <Button 
                   size="sm" 
                   className="bg-quest-gradient hover:opacity-90 glow-effect"
+                  onClick={() => handleHabitAction(habit)}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -91,6 +99,7 @@ export const HabitsList = () => {
                   size="sm" 
                   variant="destructive"
                   className="hover:opacity-90"
+                  onClick={() => handleHabitAction(habit)}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>

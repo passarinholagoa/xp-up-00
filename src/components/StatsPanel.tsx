@@ -2,29 +2,32 @@
 import React from 'react';
 import { Heart, Zap, Coins, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useGame } from '@/contexts/GameContext';
 
 export const StatsPanel = () => {
+  const { gameState } = useGame();
+
   const stats = [
     {
       icon: Heart,
       label: 'Pontos de Vida',
-      value: 85,
-      max: 100,
+      value: gameState.hp,
+      max: gameState.maxHp,
       color: 'hp-high',
       gradient: 'hp-gradient'
     },
     {
       icon: Zap,
       label: 'Experiência',
-      value: 1245,
-      max: 2000,
+      value: gameState.xp,
+      max: gameState.maxXp,
       color: 'xp-bar',
       gradient: 'xp-gradient'
     },
     {
       icon: Coins,
       label: 'Moedas de Ouro',
-      value: 342,
+      value: gameState.coins,
       max: null,
       color: 'quest-legendary',
       gradient: 'legendary-gradient'
@@ -32,7 +35,7 @@ export const StatsPanel = () => {
     {
       icon: TrendingUp,
       label: 'Sequência',
-      value: 7,
+      value: gameState.streak,
       max: null,
       color: 'quest-primary',
       gradient: 'quest-gradient'
