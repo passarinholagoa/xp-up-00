@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,26 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Gaming themed colors
+				quest: {
+					primary: '#8B5CF6',
+					secondary: '#A855F7',
+					accent: '#C084FC',
+					legendary: '#FBBF24',
+					epic: '#8B5CF6',
+					rare: '#06B6D4',
+					common: '#6B7280'
+				},
+				hp: {
+					high: '#10B981',
+					medium: '#F59E0B',
+					low: '#EF4444',
+					critical: '#DC2626'
+				},
+				xp: {
+					bar: '#3B82F6',
+					glow: '#60A5FA'
 				}
 			},
 			borderRadius: {
@@ -84,11 +105,41 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-glow': {
+					'0%, 100%': {
+						boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+					},
+					'50%': {
+						boxShadow: '0 0 30px rgba(139, 92, 246, 0.6)'
+					}
+				},
+				'level-up': {
+					'0%': {
+						transform: 'scale(1)',
+						opacity: '1'
+					},
+					'50%': {
+						transform: 'scale(1.1)',
+						opacity: '0.8'
+					},
+					'100%': {
+						transform: 'scale(1)',
+						opacity: '1'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+				'level-up': 'level-up 0.5s ease-in-out'
+			},
+			backgroundImage: {
+				'quest-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+				'hp-gradient': 'linear-gradient(90deg, #10B981 0%, #059669 100%)',
+				'xp-gradient': 'linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%)',
+				'legendary-gradient': 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)'
 			}
 		}
 	},
