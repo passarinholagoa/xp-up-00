@@ -72,8 +72,8 @@ export const DailiesList = () => {
             <div className="flex items-center gap-4">
               <Checkbox 
                 checked={completed} 
+                disabled={completed}
                 className="data-[state=checked]:bg-quest-primary data-[state=checked]:border-quest-primary"
-                readOnly
               />
               
               <div className="flex-1 space-y-2">
