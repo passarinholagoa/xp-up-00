@@ -55,7 +55,7 @@ export const ShopSection = ({ shopItems, achievements, gameState, onBuyItem }: S
           </TabsTrigger>
         </TabsList>
 
-        <div className="h-[400px]">
+        <div className="h-[440px]">
           <TabsContent value="frame" className="mt-0 h-full">
             <ShopCategoryContent 
               category="frame" 
