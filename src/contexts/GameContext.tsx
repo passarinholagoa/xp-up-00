@@ -14,10 +14,12 @@ interface GameState {
 
 interface GameContextType {
   gameState: GameState;
+  isNewQuestModalOpen: boolean;
   completeHabit: (habitId: number, isPositive: boolean) => void;
   completeDaily: (dailyId: number) => void;
   completeTodo: (todoId: number) => void;
   createNewQuest: () => void;
+  closeNewQuestModal: () => void;
   openShop: () => void;
   openAchievements: () => void;
   openSettings: () => void;
@@ -39,6 +41,7 @@ interface GameProviderProps {
 
 export const GameProvider = ({ children }: GameProviderProps) => {
   const { toast } = useToast();
+  const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
   const [gameState, setGameState] = useState<GameState>({
     hp: 85,
     maxHp: 100,
@@ -117,11 +120,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const createNewQuest = () => {
-    toast({
-      title: "Nova Quest",
-      description: "Funcionalidade em desenvolvimento...",
-      className: "bg-yellow-500/10 border-yellow-500/50"
-    });
+    setIsNewQuestModalOpen(true);
+  };
+
+  const closeNewQuestModal = () => {
+    setIsNewQuestModalOpen(false);
   };
 
   const openShop = () => {
@@ -151,10 +154,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   return (
     <GameContext.Provider value={{
       gameState,
+      isNewQuestModalOpen,
       completeHabit,
       completeDaily,
       completeTodo,
       createNewQuest,
+      closeNewQuestModal,
       openShop,
       openAchievements,
       openSettings

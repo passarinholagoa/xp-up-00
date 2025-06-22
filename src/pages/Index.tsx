@@ -5,8 +5,12 @@ import { HeroSection } from '../components/HeroSection';
 import { StatsPanel } from '../components/StatsPanel';
 import { TaskDashboard } from '../components/TaskDashboard';
 import { QuickActions } from '../components/QuickActions';
+import { NewQuestModal } from '../components/NewQuestModal';
+import { useGame } from '../contexts/GameContext';
 
 const Index = () => {
+  const { isNewQuestModalOpen, closeNewQuestModal } = useGame();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -27,6 +31,11 @@ const Index = () => {
           </div>
         </div>
       </main>
+
+      <NewQuestModal 
+        isOpen={isNewQuestModalOpen} 
+        onClose={closeNewQuestModal} 
+      />
     </div>
   );
 };
