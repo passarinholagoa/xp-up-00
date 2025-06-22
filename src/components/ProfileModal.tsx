@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGame } from '@/contexts/GameContext';
 import { ShopItem } from '@/types/profile';
 import { Edit, User, Frame, Palette, Image, UserCircle } from 'lucide-react';
@@ -313,23 +314,23 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                       </TabsTrigger>
                     </TabsList>
 
-                    <div className="overflow-y-auto max-h-96 pr-2">
-                      <TabsContent value="frame">
+                    <ScrollArea className="h-[400px] w-full pr-4">
+                      <TabsContent value="frame" className="mt-0">
                         <ShopCategoryContent category="frame" />
                       </TabsContent>
 
-                      <TabsContent value="color">
+                      <TabsContent value="color" className="mt-0">
                         <ShopCategoryContent category="color" />
                       </TabsContent>
 
-                      <TabsContent value="background">
+                      <TabsContent value="background" className="mt-0">
                         <ShopCategoryContent category="background" />
                       </TabsContent>
 
-                      <TabsContent value="avatar">
+                      <TabsContent value="avatar" className="mt-0">
                         <ShopCategoryContent category="avatar" />
                       </TabsContent>
-                    </div>
+                    </ScrollArea>
                   </Tabs>
                 </div>
               </TabsContent>
