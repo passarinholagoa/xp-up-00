@@ -48,8 +48,12 @@ export const HabitsList = () => {
     }
   };
 
-  const handleHabitAction = (habit: typeof habits[0]) => {
-    completeHabit(habit.id, habit.isPositive);
+  const handlePositiveAction = (habit: typeof habits[0]) => {
+    completeHabit(habit.id, true);
+  };
+
+  const handleNegativeAction = (habit: typeof habits[0]) => {
+    completeHabit(habit.id, false);
   };
 
   return (
@@ -87,19 +91,32 @@ export const HabitsList = () => {
             
             <div className="flex items-center gap-2">
               {habit.isPositive ? (
-                <Button 
-                  size="sm" 
-                  className="bg-quest-gradient hover:opacity-90 glow-effect"
-                  onClick={() => handleHabitAction(habit)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                <>
+                  {/* Botão de + para hábitos positivos */}
+                  <Button 
+                    size="sm" 
+                    className="bg-quest-gradient hover:opacity-90 glow-effect"
+                    onClick={() => handlePositiveAction(habit)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  {/* Botão de - para falhar no hábito positivo */}
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    className="hover:opacity-90"
+                    onClick={() => handleNegativeAction(habit)}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                </>
               ) : (
+                /* Apenas botão de - para hábitos negativos */
                 <Button 
                   size="sm" 
                   variant="destructive"
                   className="hover:opacity-90"
-                  onClick={() => handleHabitAction(habit)}
+                  onClick={() => handleNegativeAction(habit)}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
