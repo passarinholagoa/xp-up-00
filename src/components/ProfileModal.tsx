@@ -71,19 +71,19 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'legendary': return 'bg-yellow-500 text-yellow-900 border-yellow-500';
-      case 'epic': return 'bg-purple-500 text-purple-900 border-purple-500';
-      case 'rare': return 'bg-blue-500 text-blue-900 border-blue-500';
-      default: return 'bg-gray-500 text-gray-900 border-gray-500';
+      case 'legendary': return 'bg-yellow-500 text-black';
+      case 'epic': return 'bg-purple-500 text-white';
+      case 'rare': return 'bg-blue-500 text-white';
+      default: return 'bg-gray-500 text-white';
     }
   };
 
   const getItemCardBorder = (rarity: string) => {
     switch (rarity) {
-      case 'legendary': return 'border-yellow-500 bg-yellow-500/10';
-      case 'epic': return 'border-purple-500 bg-purple-500/10';
-      case 'rare': return 'border-blue-500 bg-blue-500/10';
-      default: return 'border-gray-600 bg-gray-800/50';
+      case 'legendary': return 'border-yellow-500/50 bg-yellow-500/5';
+      case 'epic': return 'border-purple-500/50 bg-purple-500/5';
+      case 'rare': return 'border-blue-500/50 bg-blue-500/5';
+      default: return 'border-gray-600/50 bg-gray-800/20';
     }
   };
 
@@ -92,9 +92,9 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     
     if (items.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-          <div className="text-4xl mb-4">📦</div>
-          <p className="text-lg">Nenhum item disponível nesta categoria</p>
+        <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+          <div className="text-2xl mb-2">📦</div>
+          <p>Nenhum item disponível</p>
         </div>
       );
     }
@@ -107,71 +107,69 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     }[category] || category;
 
     const categoryIcon = {
-      'frame': <Frame className="h-5 w-5" />,
-      'color': <Palette className="h-5 w-5" />,
-      'background': <Image className="h-5 w-5" />,
-      'avatar': <UserCircle className="h-5 w-5" />
+      'frame': <Frame className="h-4 w-4" />,
+      'color': <Palette className="h-4 w-4" />,
+      'background': <Image className="h-4 w-4" />,
+      'avatar': <UserCircle className="h-4 w-4" />
     }[category];
 
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3 mb-8">
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 mb-4">
           {categoryIcon}
-          <h3 className="text-2xl font-bold text-white">
-            {categoryName}
-          </h3>
-          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 px-3 py-1">
+          <h3 className="text-lg font-bold text-white">{categoryName}</h3>
+          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-xs">
             {items.length} itens
           </Badge>
         </div>
         
-        <div className="space-y-4">
+        <div className="space-y-3">
           {items.map(item => {
             const canBuy = canBuyItem(item);
             const missingReqs = getMissingRequirements(item);
             
             return (
-              <Card key={item.id} className={`p-6 ${getItemCardBorder(item.rarity)} border-2 transition-all hover:shadow-lg`}>
+              <Card key={item.id} className={`p-4 ${getItemCardBorder(item.rarity)} border transition-all hover:shadow-md`}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <div className="text-4xl">{item.icon}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <h4 className="font-bold text-white text-xl">{item.name}</h4>
-                        <Badge className={`text-sm font-semibold px-3 py-1 ${getRarityColor(item.rarity)}`}>
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="text-2xl">{item.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold text-white text-sm truncate">{item.name}</h4>
+                        <Badge className={`text-xs px-2 py-1 ${getRarityColor(item.rarity)}`}>
                           {item.rarity}
                         </Badge>
                       </div>
-                      <p className="text-gray-300 mb-4 text-base">
+                      <p className="text-gray-300 text-xs mb-2 line-clamp-1">
                         {item.description}
                       </p>
-                      <div className="flex items-center gap-6 text-base">
-                        <span className="flex items-center gap-2 text-yellow-400 font-semibold">
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="flex items-center gap-1 text-yellow-400 font-medium">
                           {item.price} 💰
                         </span>
                         {item.xpRequired && (
-                          <span className="flex items-center gap-2 text-blue-400 font-semibold">
+                          <span className="flex items-center gap-1 text-blue-400 font-medium">
                             {item.xpRequired.toLocaleString()} XP
                           </span>
                         )}
                         {item.achievementRequired && (
-                          <span className="flex items-center gap-2 text-purple-400 font-semibold">
+                          <span className="flex items-center gap-1 text-purple-400 font-medium text-xs truncate">
                             "{achievements.find(a => a.id === item.achievementRequired)?.title}" 🏆
                           </span>
                         )}
                       </div>
                       {missingReqs.length > 0 && (
-                        <div className="text-sm text-red-400 mt-3 font-medium">
+                        <div className="text-xs text-red-400 mt-1 font-medium">
                           Faltam: {missingReqs.join(', ')}
                         </div>
                       )}
                     </div>
                   </div>
                   <Button
-                    size="lg"
+                    size="sm"
                     onClick={() => handleBuyItem(item)}
                     disabled={!canBuy}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-base font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-xs font-medium disabled:bg-gray-600 disabled:cursor-not-allowed shrink-0"
                   >
                     Comprar
                   </Button>
@@ -186,33 +184,30 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-hidden bg-gray-950 border-gray-800 p-0">
-        <DialogHeader className="p-8 pb-0">
-          <DialogTitle className="flex items-center gap-3 text-3xl text-white font-bold">
-            <User className="h-8 w-8" />
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden bg-gray-950 border-gray-800 p-0">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle className="flex items-center gap-2 text-xl text-white font-bold">
+            <User className="h-5 w-5" />
             Perfil Personalizável
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 p-8 pt-4 h-full">
+        <div className="flex gap-6 p-6 pt-4 h-full">
           {/* Preview Section */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-white">Pré-visualização</h3>
-            <Card className="p-6 bg-gray-900/50 border-gray-800">
-              <div className={`relative p-6 rounded-lg ${tempProfile.backgroundColor} ${tempProfile.frameBorder}`}>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl">
+          <div className="w-80 space-y-4">
+            <h3 className="text-base font-bold text-white">Pré-visualização</h3>
+            <Card className="p-4 bg-gray-900/50 border-gray-800">
+              <div className={`relative p-4 rounded-lg ${tempProfile.backgroundColor} ${tempProfile.frameBorder}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-lg">
                     {tempProfile.avatar}
                   </div>
                   <div>
-                    <h4 className={`text-xl font-bold ${tempProfile.nameColor}`}>
+                    <h4 className={`text-base font-bold ${tempProfile.nameColor}`}>
                       {tempProfile.displayName || 'Aventureiro'}
                     </h4>
-                    <p className="text-sm text-gray-400">
-                      Nível {gameState.level} • {gameState.coins} moedas
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {gameState.totalXp.toLocaleString()} XP
+                    <p className="text-xs text-gray-300">
+                      Nível {gameState.level} • {gameState.coins} moedas • {gameState.totalXp.toLocaleString()} XP
                     </p>
                   </div>
                 </div>
@@ -221,51 +216,51 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div className="flex-1 min-w-0">
             <Tabs defaultValue="basic" className="w-full h-full">
-              <div className="mb-8">
-                <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-2 h-14">
+              <div className="mb-4">
+                <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-1 h-12">
                   <TabsTrigger 
                     value="basic" 
-                    className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-3 text-base font-semibold py-3"
+                    className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-2 text-sm font-medium py-2"
                   >
-                    <Edit className="h-5 w-5" />
+                    <Edit className="h-4 w-4" />
                     Básico
                   </TabsTrigger>
                   <TabsTrigger 
                     value="shop"
-                    className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-3 text-base font-semibold py-3"
+                    className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-2 text-sm font-medium py-2"
                   >
                     Loja
                   </TabsTrigger>
                 </TabsList>
               </div>
 
-              <TabsContent value="basic" className="space-y-6">
-                <Card className="p-8 bg-gray-900/50 border-gray-800 space-y-8">
-                  <h4 className="font-bold text-white text-2xl">Configurações Básicas</h4>
+              <TabsContent value="basic" className="space-y-4">
+                <Card className="p-6 bg-gray-900/50 border-gray-800 space-y-6">
+                  <h4 className="font-bold text-white text-lg">Configurações Básicas</h4>
                   
-                  <div className="space-y-3">
-                    <Label htmlFor="displayName" className="text-white text-base font-semibold">Nome de Exibição</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="displayName" className="text-white text-sm font-medium">Nome de Exibição</Label>
                     <Input
                       id="displayName"
                       value={tempProfile.displayName}
                       onChange={(e) => setTempProfile(prev => ({ ...prev, displayName: e.target.value }))}
                       placeholder="Digite seu nome"
-                      className="bg-gray-800 border-gray-700 text-white text-base py-3"
+                      className="bg-gray-800 border-gray-700 text-white"
                     />
                   </div>
 
-                  <div className="space-y-4">
-                    <Label className="text-white text-base font-semibold">Itens Possuídos</Label>
-                    <div className="grid grid-cols-4 gap-3">
+                  <div className="space-y-3">
+                    <Label className="text-white text-sm font-medium">Itens Possuídos</Label>
+                    <div className="grid grid-cols-6 gap-2">
                       {getOwnedItems('avatar').map(item => (
                         <Button
                           key={item.id}
                           variant={tempProfile.avatar === item.value ? "default" : "outline"}
-                          size="lg"
+                          size="sm"
                           onClick={() => setTempProfile(prev => ({ ...prev, avatar: item.value }))}
-                          className="text-2xl p-4 h-16"
+                          className="text-lg p-2 h-12 w-12"
                         >
                           {item.value}
                         </Button>
@@ -273,52 +268,52 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-4 pt-6">
-                    <Button variant="outline" onClick={onClose} className="border-gray-600 text-white px-6 py-3 text-base">
+                  <div className="flex justify-end gap-3 pt-4">
+                    <Button variant="outline" onClick={onClose} className="border-gray-600 text-white px-4 py-2">
                       Cancelar
                     </Button>
-                    <Button onClick={handleSaveChanges} className="bg-purple-600 hover:bg-purple-700 px-6 py-3 text-base">
+                    <Button onClick={handleSaveChanges} className="bg-purple-600 hover:bg-purple-700 px-4 py-2">
                       Salvar Alterações
                     </Button>
                   </div>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="shop">
-                <div className="space-y-6">
-                  <Tabs defaultValue="avatar" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4 bg-gray-900/80 border-gray-700 mb-8 h-16">
+              <TabsContent value="shop" className="h-full">
+                <div className="space-y-4 h-full">
+                  <Tabs defaultValue="frame" className="w-full h-full">
+                    <TabsList className="grid w-full grid-cols-4 bg-gray-900/80 border-gray-700 mb-4 h-12">
                       <TabsTrigger 
                         value="frame" 
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-2 py-3"
+                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
                       >
-                        <Frame className="h-5 w-5" />
-                        <span className="text-sm font-medium">Molduras</span>
+                        <Frame className="h-3 w-3" />
+                        <span className="text-xs">Molduras</span>
                       </TabsTrigger>
                       <TabsTrigger 
                         value="color"
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-2 py-3"
+                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
                       >
-                        <Palette className="h-5 w-5" />
-                        <span className="text-sm font-medium">Nomes</span>
+                        <Palette className="h-3 w-3" />
+                        <span className="text-xs">Nomes</span>
                       </TabsTrigger>
                       <TabsTrigger 
                         value="background"
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-2 py-3"
+                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
                       >
-                        <Image className="h-5 w-5" />
-                        <span className="text-sm font-medium">Fundos</span>
+                        <Image className="h-3 w-3" />
+                        <span className="text-xs">Fundos</span>
                       </TabsTrigger>
                       <TabsTrigger 
                         value="avatar"
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-2 py-3"
+                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
                       >
-                        <UserCircle className="h-5 w-5" />
-                        <span className="text-sm font-medium">Avatares</span>
+                        <UserCircle className="h-3 w-3" />
+                        <span className="text-xs">Avatares</span>
                       </TabsTrigger>
                     </TabsList>
 
-                    <div className="overflow-y-auto max-h-[600px] pr-4">
+                    <div className="overflow-y-auto max-h-96 pr-2">
                       <TabsContent value="frame">
                         <ShopCategoryContent category="frame" />
                       </TabsContent>
