@@ -1,11 +1,12 @@
+
 import React from 'react';
-import { Plus, Zap, Trophy, ShoppingBag, Settings, User } from 'lucide-react';
+import { Plus, Zap, Trophy, ShoppingBag, Settings } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useGame } from '@/contexts/GameContext';
 
 export const QuickActions = () => {
-  const { createNewQuest, openAchievements, openProfile, openSettings, gameState, profile } = useGame();
+  const { createNewQuest, openAchievements, openProfile, openSettings, gameState } = useGame();
 
   const actions = [
     {
@@ -47,39 +48,6 @@ export const QuickActions = () => {
 
   return (
     <div className="space-y-6">
-      {/* Profile Section - Now with customization preview */}
-      <Card className="quest-card">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-full bg-quest-gradient flex items-center justify-center text-2xl ${profile.frameBorder}`}>
-              {profile.avatar}
-            </div>
-            <div className="flex-1">
-              <h3 className={`font-semibold text-lg ${profile.nameColor}`}>
-                {profile.displayName}
-              </h3>
-              <p className="text-sm text-muted-foreground">Nível {gameState.level}</p>
-            </div>
-          </div>
-          
-          <Button
-            variant="outline"
-            className="w-full justify-start h-auto p-4 text-left hover:bg-primary/5 hover:border-primary/50"
-            onClick={openProfile}
-          >
-            <div className="flex items-center gap-3">
-              <User className="h-5 w-5" />
-              <div>
-                <div className="font-medium">Personalizar Perfil</div>
-                <div className="text-xs text-muted-foreground">
-                  Editar nome, avatar, cores e mais
-                </div>
-              </div>
-            </div>
-          </Button>
-        </div>
-      </Card>
-
       {/* Quick Actions */}
       <Card className="quest-card">
         <div className="space-y-4">
