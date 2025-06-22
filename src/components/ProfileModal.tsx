@@ -22,7 +22,7 @@ interface ProfileModalProps {
 }
 
 export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
-  const { gameState, profile, updateProfile, shopItems, buyShopItem } = useGame();
+  const { gameState, profile, updateProfile, shopItems, buyShopItem, achievements } = useGame();
   const [tempProfile, setTempProfile] = useState(profile);
 
   const handleSaveChanges = () => {
@@ -31,13 +31,56 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
   };
 
   const handleBuyItem = (item: ShopItem) => {
-    if (gameState.coins >= item.price && !item.owned) {
-      buyShopItem(item.id);
-    }
+    buyShopItem(item.id);
   };
 
   const getOwnedItems = (category: string) => {
     return shopItems.filter(item => item.category === category && item.owned);
+  };
+
+  const canBuyItem = (item: ShopItem) => {
+    const hasEnoughCoins = gameState.coins >= item.price;
+    const hasEnoughXp = !item.xpRequired || gameState.totalXp >= item.xpRequired;
+    const hasRequiredAchievement = !item.achievementRequired || 
+      achievements.find(a => a.id === item.achievementRequired)?.unlocked;
+    
+    return hasEnoughCoins && hasEnoughXp && hasRequiredAchievement && !item.owned;
+  };
+
+  const getRequirementsText = (item: ShopItem) => {
+    let requirements = [`${item.price} 💰`];
+    
+    if (item.xpRequired) {
+      requirements.push(`${item.xpRequired.toLocaleString()} XP`);
+    }
+    
+    if (item.achievementRequired) {
+      const achievement = achievements.find(a => a.id === item.achievementRequired);
+      requirements.push(`"${achievement?.title}" 🏆`);
+    }
+    
+    return requirements.join(' • ');
+  };
+
+  const getMissingRequirements = (item: ShopItem) => {
+    let missing = [];
+    
+    if (gameState.coins < item.price) {
+      missing.push(`${item.price - gameState.coins} moedas`);
+    }
+    
+    if (item.xpRequired && gameState.totalXp < item.xpRequired) {
+      missing.push(`${item.xpRequired - gameState.totalXp} XP`);
+    }
+    
+    if (item.achievementRequired) {
+      const achievement = achievements.find(a => a.id === item.achievementRequired);
+      if (!achievement?.unlocked) {
+        missing.push(`conquista "${achievement?.title}"`);
+      }
+    }
+    
+    return missing;
   };
 
   return (
@@ -65,7 +108,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                       {tempProfile.displayName || 'Seu Nome'}
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      Nível {gameState.level} • {gameState.coins} moedas
+                      Nível {gameState.level} • {gameState.coins} moedas • {gameState.totalXp.toLocaleString()} XP
                     </p>
                   </div>
                 </div>
@@ -155,34 +198,47 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                 <div className="space-y-4 max-h-80 overflow-y-auto">
                   {shopItems
                     .filter(item => !item.owned)
-                    .map(item => (
-                      <Card key={item.id} className={`p-4 ${RARITY_COLORS[item.rarity]}`}>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="text-2xl">{item.icon}</div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-medium">{item.name}</h4>
-                                <Badge variant="outline" className="text-xs">
-                                  {item.rarity}
-                                </Badge>
+                    .map(item => {
+                      const canBuy = canBuyItem(item);
+                      const missingReqs = getMissingRequirements(item);
+                      
+                      return (
+                        <Card key={item.id} className={`p-4 ${RARITY_COLORS[item.rarity]} ${!canBuy ? 'opacity-60' : ''}`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="text-2xl">{item.icon}</div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h4 className="font-medium">{item.name}</h4>
+                                  <Badge variant="outline" className="text-xs">
+                                    {item.rarity}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {item.description}
+                                </p>
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  Requisitos: {getRequirementsText(item)}
+                                </div>
+                                {missingReqs.length > 0 && (
+                                  <div className="text-xs text-red-500 mt-1">
+                                    Faltam: {missingReqs.join(', ')}
+                                  </div>
+                                )}
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {item.description}
-                              </p>
                             </div>
+                            <Button
+                              size="sm"
+                              onClick={() => handleBuyItem(item)}
+                              disabled={!canBuy}
+                              className="flex items-center gap-1"
+                            >
+                              Comprar
+                            </Button>
                           </div>
-                          <Button
-                            size="sm"
-                            onClick={() => handleBuyItem(item)}
-                            disabled={gameState.coins < item.price}
-                            className="flex items-center gap-1"
-                          >
-                            {item.price} 💰
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
+                        </Card>
+                      );
+                    })}
                 </div>
               </TabsContent>
             </Tabs>

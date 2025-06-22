@@ -574,7 +574,30 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
   const buyShopItem = (itemId: string) => {
     const item = shopItems.find(i => i.id === itemId);
-    if (!item || item.owned || gameState.coins < item.price) return;
+    if (!item || item.owned) return;
+
+    // Check if item meets all requirements
+    const hasEnoughCoins = gameState.coins >= item.price;
+    const hasEnoughXp = !item.xpRequired || gameState.totalXp >= item.xpRequired;
+    const hasRequiredAchievement = !item.achievementRequired || 
+      achievements.find(a => a.id === item.achievementRequired)?.unlocked;
+
+    if (!hasEnoughCoins || !hasEnoughXp || !hasRequiredAchievement) {
+      let missingRequirements = [];
+      if (!hasEnoughCoins) missingRequirements.push(`${item.price - gameState.coins} moedas`);
+      if (!hasEnoughXp) missingRequirements.push(`${item.xpRequired! - gameState.totalXp} XP`);
+      if (!hasRequiredAchievement) {
+        const achievement = achievements.find(a => a.id === item.achievementRequired);
+        missingRequirements.push(`conquista "${achievement?.title}"`);
+      }
+
+      toast({
+        title: "Requisitos não atendidos 🚫",
+        description: `Faltam: ${missingRequirements.join(', ')}`,
+        className: "bg-red-500/10 border-red-500/50"
+      });
+      return;
+    }
 
     setGameState(prev => ({
       ...prev,
