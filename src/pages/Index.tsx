@@ -6,10 +6,17 @@ import { StatsPanel } from '../components/StatsPanel';
 import { TaskDashboard } from '../components/TaskDashboard';
 import { QuickActions } from '../components/QuickActions';
 import { NewQuestModal } from '../components/NewQuestModal';
+import { AchievementsModal } from '../components/AchievementsModal';
 import { useGame } from '../contexts/GameContext';
 
 const Index = () => {
-  const { isNewQuestModalOpen, closeNewQuestModal } = useGame();
+  const { 
+    isNewQuestModalOpen, 
+    closeNewQuestModal,
+    isAchievementsModalOpen,
+    closeAchievements,
+    achievements
+  } = useGame();
 
   return (
     <div className="min-h-screen bg-background">
@@ -35,6 +42,12 @@ const Index = () => {
       <NewQuestModal 
         isOpen={isNewQuestModalOpen} 
         onClose={closeNewQuestModal} 
+      />
+
+      <AchievementsModal
+        isOpen={isAchievementsModalOpen}
+        onClose={closeAchievements}
+        achievements={achievements}
       />
     </div>
   );

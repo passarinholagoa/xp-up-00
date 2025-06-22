@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
 
 interface GameState {
   hp: number;
@@ -50,7 +51,9 @@ interface GameContextType {
   habits: Habit[];
   dailies: Daily[];
   todos: Todo[];
+  achievements: Achievement[];
   isNewQuestModalOpen: boolean;
+  isAchievementsModalOpen: boolean;
   completeHabit: (habitId: number, isPositive: boolean) => void;
   completeDaily: (dailyId: number) => void;
   completeTodo: (todoId: number) => void;
@@ -67,6 +70,7 @@ interface GameContextType {
   closeNewQuestModal: () => void;
   openShop: () => void;
   openAchievements: () => void;
+  closeAchievements: () => void;
   openSettings: () => void;
 }
 
@@ -114,8 +118,9 @@ const calculateLevelProgress = (totalXp: number, currentLevel: number) => {
 export const GameProvider = ({ children }: GameProviderProps) => {
   const { toast } = useToast();
   const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
+  const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
   
-  const initialTotalXp = 14400; // This gives us level 12 (sqrt(14400/100) = 12)
+  const initialTotalXp = 14400;
   const initialLevel = calculateLevel(initialTotalXp);
   const { currentLevelXp, maxLevelXp } = calculateLevelProgress(initialTotalXp, initialLevel);
   
@@ -128,6 +133,23 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     coins: 342,
     level: initialLevel,
     streak: 7
+  });
+
+  // Initialize achievements with some unlocked based on current state
+  const [achievements, setAchievements] = useState<Achievement[]>(() => {
+    return ACHIEVEMENTS.map(achievement => {
+      // Auto-unlock some achievements based on current game state
+      if (achievement.id === 'nivel-5' && initialLevel >= 5) {
+        return { ...achievement, unlocked: true, unlockedAt: new Date() };
+      }
+      if (achievement.id === 'nivel-10' && initialLevel >= 10) {
+        return { ...achievement, unlocked: true, unlockedAt: new Date() };
+      }
+      if (achievement.id === 'xp-master' && initialTotalXp >= 1000) {
+        return { ...achievement, unlocked: true, unlockedAt: new Date() };
+      }
+      return achievement;
+    });
   });
 
   const [habits, setHabits] = useState<Habit[]>([
@@ -229,6 +251,81 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   ]);
 
+  const checkAchievements = (context: string, data?: any) => {
+    setAchievements(prev => {
+      let updated = [...prev];
+      let newUnlocks = [];
+
+      // Check for first-time achievements
+      if (context === 'first-todo-completed' && !updated.find(a => a.id === 'primeira-missao')?.unlocked) {
+        const achievement = updated.find(a => a.id === 'primeira-missao');
+        if (achievement) {
+          achievement.unlocked = true;
+          achievement.unlockedAt = new Date();
+          newUnlocks.push(achievement);
+        }
+      }
+
+      if (context === 'first-daily-completed' && !updated.find(a => a.id === 'o-despertar')?.unlocked) {
+        const achievement = updated.find(a => a.id === 'o-despertar');
+        if (achievement) {
+          achievement.unlocked = true;
+          achievement.unlockedAt = new Date();
+          newUnlocks.push(achievement);
+        }
+      }
+
+      if (context === 'first-habit-created' && !updated.find(a => a.id === 'primeiro-habito')?.unlocked) {
+        const achievement = updated.find(a => a.id === 'primeiro-habito');
+        if (achievement) {
+          achievement.unlocked = true;
+          achievement.unlockedAt = new Date();
+          newUnlocks.push(achievement);
+        }
+      }
+
+      // Check level achievements
+      if (context === 'level-up' && data?.newLevel) {
+        const levelAchievements = [
+          { id: 'nivel-5', level: 5 },
+          { id: 'nivel-10', level: 10 }
+        ];
+
+        levelAchievements.forEach(({ id, level }) => {
+          if (data.newLevel >= level && !updated.find(a => a.id === id)?.unlocked) {
+            const achievement = updated.find(a => a.id === id);
+            if (achievement) {
+              achievement.unlocked = true;
+              achievement.unlockedAt = new Date();
+              newUnlocks.push(achievement);
+            }
+          }
+        });
+      }
+
+      // Check hard difficulty achievement
+      if (context === 'task-completed' && data?.difficulty === 'hard') {
+        const achievement = updated.find(a => a.id === 'tarefa-epica');
+        if (achievement && !achievement.unlocked) {
+          achievement.unlocked = true;
+          achievement.unlockedAt = new Date();
+          newUnlocks.push(achievement);
+        }
+      }
+
+      // Show toast for new achievements
+      newUnlocks.forEach(achievement => {
+        toast({
+          title: `🏆 CONQUISTA DESBLOQUEADA! 🏆`,
+          description: `${achievement.icon} ${achievement.title}: ${achievement.description}`,
+          className: "bg-quest-legendary/20 border-quest-legendary"
+        });
+      });
+
+      return updated;
+    });
+  };
+
   const updateGameStateXp = (xpGain: number) => {
     setGameState(prev => {
       const newTotalXp = prev.totalXp + xpGain;
@@ -237,6 +334,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       
       // Check for level up
       if (newLevel > prev.level) {
+        checkAchievements('level-up', { newLevel });
         toast({
           title: `🎉 LEVEL UP! 🎉`,
           description: `Parabéns! Você alcançou o nível ${newLevel}!`,
@@ -327,6 +425,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const addHabit = (habit: Omit<Habit, 'id'>) => {
     const newId = Math.max(...habits.map(h => h.id), 0) + 1;
     setHabits(prev => [...prev, { ...habit, id: newId }]);
+    
+    // Check for first habit achievement
+    if (habits.length === 0) {
+      checkAchievements('first-habit-created');
+    }
     
     toast({
       title: "Novo Hábito Criado! 🎯",
@@ -443,11 +546,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const openAchievements = () => {
-    toast({
-      title: "Conquistas",
-      description: "Suas conquistas serão exibidas aqui em breve!",
-      className: "bg-indigo-500/10 border-indigo-500/50"
-    });
+    setIsAchievementsModalOpen(true);
+  };
+
+  const closeAchievements = () => {
+    setIsAchievementsModalOpen(false);
   };
 
   const openSettings = () => {
@@ -464,7 +567,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       habits,
       dailies,
       todos,
+      achievements,
       isNewQuestModalOpen,
+      isAchievementsModalOpen,
       completeHabit,
       completeDaily,
       completeTodo,
@@ -481,6 +586,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       closeNewQuestModal,
       openShop,
       openAchievements,
+      closeAchievements,
       openSettings
     }}>
       {children}
