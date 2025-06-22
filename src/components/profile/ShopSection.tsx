@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShopCategoryContent } from './ShopCategoryContent';
 import { ShopItem } from '@/types/profile';
 import { Achievement } from '@/types/achievements';
@@ -56,8 +55,8 @@ export const ShopSection = ({ shopItems, achievements, gameState, onBuyItem }: S
           </TabsTrigger>
         </TabsList>
 
-        <ScrollArea className="h-[400px] w-full pr-4">
-          <TabsContent value="frame" className="mt-0">
+        <div className="h-[400px]">
+          <TabsContent value="frame" className="mt-0 h-full">
             <ShopCategoryContent 
               category="frame" 
               items={getShopItemsByCategory('frame')}
@@ -67,7 +66,7 @@ export const ShopSection = ({ shopItems, achievements, gameState, onBuyItem }: S
             />
           </TabsContent>
 
-          <TabsContent value="color" className="mt-0">
+          <TabsContent value="color" className="mt-0 h-full">
             <ShopCategoryContent 
               category="color" 
               items={getShopItemsByCategory('color')}
@@ -77,7 +76,7 @@ export const ShopSection = ({ shopItems, achievements, gameState, onBuyItem }: S
             />
           </TabsContent>
 
-          <TabsContent value="background" className="mt-0">
+          <TabsContent value="background" className="mt-0 h-full">
             <ShopCategoryContent 
               category="background" 
               items={getShopItemsByCategory('background')}
@@ -87,7 +86,7 @@ export const ShopSection = ({ shopItems, achievements, gameState, onBuyItem }: S
             />
           </TabsContent>
 
-          <TabsContent value="avatar" className="mt-0">
+          <TabsContent value="avatar" className="mt-0 h-full">
             <ShopCategoryContent 
               category="avatar" 
               items={getShopItemsByCategory('avatar')}
@@ -96,7 +95,7 @@ export const ShopSection = ({ shopItems, achievements, gameState, onBuyItem }: S
               onBuyItem={onBuyItem}
             />
           </TabsContent>
-        </ScrollArea>
+        </div>
       </Tabs>
     </div>
   );

@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShopItem } from '@/types/profile';
 import { Achievement } from '@/types/achievements';
 import { Frame, Palette, Image, UserCircle } from 'lucide-react';
@@ -94,7 +95,7 @@ export const ShopCategoryContent = ({
   }[category];
 
   return (
-    <div className="space-y-4">
+    <div className="h-full">
       <div className="flex items-center gap-2 mb-4">
         {categoryIcon}
         <h3 className="text-lg font-bold text-white">{categoryName}</h3>
@@ -103,61 +104,63 @@ export const ShopCategoryContent = ({
         </Badge>
       </div>
       
-      <div className="space-y-3">
-        {items.map(item => {
-          const canBuy = canBuyItem(item);
-          const missingReqs = getMissingRequirements(item);
-          
-          return (
-            <Card key={item.id} className={`p-4 ${getItemCardBorder(item.rarity)} border transition-all hover:shadow-md`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="text-2xl">{item.icon}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-white text-sm truncate">{item.name}</h4>
-                      <Badge className={`text-xs px-2 py-1 ${getRarityColor(item.rarity)}`}>
-                        {item.rarity}
-                      </Badge>
-                    </div>
-                    <p className="text-gray-300 text-xs mb-2 line-clamp-1">
-                      {item.description}
-                    </p>
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="flex items-center gap-1 text-yellow-400 font-medium">
-                        {item.price} 💰
-                      </span>
-                      {item.xpRequired && (
-                        <span className="flex items-center gap-1 text-blue-400 font-medium">
-                          {item.xpRequired.toLocaleString()} XP
-                        </span>
-                      )}
-                      {item.achievementRequired && (
-                        <span className="flex items-center gap-1 text-purple-400 font-medium text-xs truncate">
-                          "{achievements.find(a => a.id === item.achievementRequired)?.title}" 🏆
-                        </span>
-                      )}
-                    </div>
-                    {missingReqs.length > 0 && (
-                      <div className="text-xs text-red-400 mt-1 font-medium">
-                        Faltam: {missingReqs.join(', ')}
+      <ScrollArea className="h-[320px] w-full pr-4">
+        <div className="space-y-3">
+          {items.map(item => {
+            const canBuy = canBuyItem(item);
+            const missingReqs = getMissingRequirements(item);
+            
+            return (
+              <Card key={item.id} className={`p-4 ${getItemCardBorder(item.rarity)} border transition-all hover:shadow-md`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="text-2xl">{item.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold text-white text-sm truncate">{item.name}</h4>
+                        <Badge className={`text-xs px-2 py-1 ${getRarityColor(item.rarity)}`}>
+                          {item.rarity}
+                        </Badge>
                       </div>
-                    )}
+                      <p className="text-gray-300 text-xs mb-2 line-clamp-1">
+                        {item.description}
+                      </p>
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="flex items-center gap-1 text-yellow-400 font-medium">
+                          {item.price} 💰
+                        </span>
+                        {item.xpRequired && (
+                          <span className="flex items-center gap-1 text-blue-400 font-medium">
+                            {item.xpRequired.toLocaleString()} XP
+                          </span>
+                        )}
+                        {item.achievementRequired && (
+                          <span className="flex items-center gap-1 text-purple-400 font-medium text-xs truncate">
+                            "{achievements.find(a => a.id === item.achievementRequired)?.title}" 🏆
+                          </span>
+                        )}
+                      </div>
+                      {missingReqs.length > 0 && (
+                        <div className="text-xs text-red-400 mt-1 font-medium">
+                          Faltam: {missingReqs.join(', ')}
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  <Button
+                    size="sm"
+                    onClick={() => onBuyItem(item)}
+                    disabled={!canBuy}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-xs font-medium disabled:bg-gray-600 disabled:cursor-not-allowed shrink-0"
+                  >
+                    Comprar
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => onBuyItem(item)}
-                  disabled={!canBuy}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-xs font-medium disabled:bg-gray-600 disabled:cursor-not-allowed shrink-0"
-                >
-                  Comprar
-                </Button>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+              </Card>
+            );
+          })}
+        </div>
+      </ScrollArea>
     </div>
   );
 };
