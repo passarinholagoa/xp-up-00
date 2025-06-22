@@ -12,12 +12,57 @@ interface GameState {
   streak: number;
 }
 
+interface Habit {
+  id: number;
+  title: string;
+  streak: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  xpReward: number;
+  coinReward: number;
+  isPositive: boolean;
+}
+
+interface Daily {
+  id: number;
+  title: string;
+  completed: boolean;
+  dueTime: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  xpReward: number;
+  coinReward: number;
+  streak: number;
+}
+
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+  dueDate: string;
+  priority: 'low' | 'medium' | 'high';
+  difficulty: 'easy' | 'medium' | 'hard';
+  xpReward: number;
+  coinReward: number;
+  isOverdue: boolean;
+}
+
 interface GameContextType {
   gameState: GameState;
+  habits: Habit[];
+  dailies: Daily[];
+  todos: Todo[];
   isNewQuestModalOpen: boolean;
   completeHabit: (habitId: number, isPositive: boolean) => void;
   completeDaily: (dailyId: number) => void;
   completeTodo: (todoId: number) => void;
+  addHabit: (habit: Omit<Habit, 'id'>) => void;
+  addDaily: (daily: Omit<Daily, 'id'>) => void;
+  addTodo: (todo: Omit<Todo, 'id'>) => void;
+  updateHabit: (id: number, habit: Partial<Habit>) => void;
+  updateDaily: (id: number, daily: Partial<Daily>) => void;
+  updateTodo: (id: number, todo: Partial<Todo>) => void;
+  deleteHabit: (id: number) => void;
+  deleteDaily: (id: number) => void;
+  deleteTodo: (id: number) => void;
   createNewQuest: () => void;
   closeNewQuestModal: () => void;
   openShop: () => void;
@@ -52,10 +97,110 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     streak: 7
   });
 
+  const [habits, setHabits] = useState<Habit[]>([
+    {
+      id: 1,
+      title: 'Exercitar-se por 30 minutos',
+      streak: 12,
+      difficulty: 'medium',
+      xpReward: 15,
+      coinReward: 3,
+      isPositive: true
+    },
+    {
+      id: 2,
+      title: 'Ler por 20 minutos',
+      streak: 7,
+      difficulty: 'easy',
+      xpReward: 10,
+      coinReward: 2,
+      isPositive: true
+    },
+    {
+      id: 3,
+      title: 'Fumar',
+      streak: 0,
+      difficulty: 'hard',
+      xpReward: 0,
+      coinReward: 0,
+      isPositive: false
+    }
+  ]);
+
+  const [dailies, setDailies] = useState<Daily[]>([
+    {
+      id: 1,
+      title: 'Tomar 8 copos de água',
+      completed: false,
+      dueTime: '22:00',
+      difficulty: 'easy',
+      xpReward: 12,
+      coinReward: 2,
+      streak: 5
+    },
+    {
+      id: 2,
+      title: 'Meditar por 10 minutos',
+      completed: false,
+      dueTime: '07:00',
+      difficulty: 'medium',
+      xpReward: 18,
+      coinReward: 3,
+      streak: 3
+    },
+    {
+      id: 3,
+      title: 'Revisar metas do dia',
+      completed: false,
+      dueTime: '20:00',
+      difficulty: 'easy',
+      xpReward: 10,
+      coinReward: 2,
+      streak: 8
+    }
+  ]);
+
+  const [todos, setTodos] = useState<Todo[]>([
+    {
+      id: 1,
+      title: 'Finalizar relatório do projeto',
+      completed: false,
+      dueDate: '2024-06-22',
+      priority: 'high',
+      difficulty: 'hard',
+      xpReward: 25,
+      coinReward: 5,
+      isOverdue: false
+    },
+    {
+      id: 2,
+      title: 'Comprar presentes de aniversário',
+      completed: false,
+      dueDate: '2024-06-21',
+      priority: 'medium',
+      difficulty: 'easy',
+      xpReward: 8,
+      coinReward: 2,
+      isOverdue: true
+    },
+    {
+      id: 3,
+      title: 'Agendar consulta médica',
+      completed: false,
+      dueDate: '2024-06-20',
+      priority: 'high',
+      difficulty: 'easy',
+      xpReward: 15,
+      coinReward: 3,
+      isOverdue: false
+    }
+  ]);
+
   const completeHabit = (habitId: number, isPositive: boolean) => {
     if (isPositive) {
-      const xpGain = 15;
-      const coinGain = 3;
+      const habit = habits.find(h => h.id === habitId);
+      const xpGain = habit?.xpReward || 15;
+      const coinGain = habit?.coinReward || 3;
       
       setGameState(prev => ({
         ...prev,
@@ -86,8 +231,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const completeDaily = (dailyId: number) => {
-    const xpGain = 18;
-    const coinGain = 3;
+    const daily = dailies.find(d => d.id === dailyId);
+    const xpGain = daily?.xpReward || 18;
+    const coinGain = daily?.coinReward || 3;
     
     setGameState(prev => ({
       ...prev,
@@ -103,8 +249,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const completeTodo = (todoId: number) => {
-    const xpGain = 25;
-    const coinGain = 5;
+    const todo = todos.find(t => t.id === todoId);
+    const xpGain = todo?.xpReward || 25;
+    const coinGain = todo?.coinReward || 5;
     
     setGameState(prev => ({
       ...prev,
@@ -116,6 +263,108 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       title: "Quest Completada! 🏆",
       description: `+${xpGain} XP, +${coinGain} moedas`,
       className: "bg-purple-500/10 border-purple-500/50"
+    });
+  };
+
+  const addHabit = (habit: Omit<Habit, 'id'>) => {
+    const newId = Math.max(...habits.map(h => h.id), 0) + 1;
+    setHabits(prev => [...prev, { ...habit, id: newId }]);
+    
+    toast({
+      title: "Novo Hábito Criado! 🎯",
+      description: `"${habit.title}" foi adicionado à sua lista`,
+      className: "bg-green-500/10 border-green-500/50"
+    });
+  };
+
+  const addDaily = (daily: Omit<Daily, 'id'>) => {
+    const newId = Math.max(...dailies.map(d => d.id), 0) + 1;
+    setDailies(prev => [...prev, { ...daily, id: newId }]);
+    
+    toast({
+      title: "Nova Daily Criada! ⚡",
+      description: `"${daily.title}" foi adicionada à sua lista`,
+      className: "bg-blue-500/10 border-blue-500/50"
+    });
+  };
+
+  const addTodo = (todo: Omit<Todo, 'id'>) => {
+    const newId = Math.max(...todos.map(t => t.id), 0) + 1;
+    setTodos(prev => [...prev, { ...todo, id: newId }]);
+    
+    toast({
+      title: "Nova Quest Criada! 🎮",
+      description: `"${todo.title}" foi adicionada à sua lista`,
+      className: "bg-purple-500/10 border-purple-500/50"
+    });
+  };
+
+  const updateHabit = (id: number, updatedHabit: Partial<Habit>) => {
+    setHabits(prev => prev.map(habit => 
+      habit.id === id ? { ...habit, ...updatedHabit } : habit
+    ));
+    
+    toast({
+      title: "Hábito Atualizado! ✏️",
+      description: "As alterações foram salvas",
+      className: "bg-blue-500/10 border-blue-500/50"
+    });
+  };
+
+  const updateDaily = (id: number, updatedDaily: Partial<Daily>) => {
+    setDailies(prev => prev.map(daily => 
+      daily.id === id ? { ...daily, ...updatedDaily } : daily
+    ));
+    
+    toast({
+      title: "Daily Atualizada! ✏️",
+      description: "As alterações foram salvas",
+      className: "bg-blue-500/10 border-blue-500/50"
+    });
+  };
+
+  const updateTodo = (id: number, updatedTodo: Partial<Todo>) => {
+    setTodos(prev => prev.map(todo => 
+      todo.id === id ? { ...todo, ...updatedTodo } : todo
+    ));
+    
+    toast({
+      title: "Quest Atualizada! ✏️",
+      description: "As alterações foram salvas",
+      className: "bg-blue-500/10 border-blue-500/50"
+    });
+  };
+
+  const deleteHabit = (id: number) => {
+    const habit = habits.find(h => h.id === id);
+    setHabits(prev => prev.filter(h => h.id !== id));
+    
+    toast({
+      title: "Hábito Removido! 🗑️",
+      description: `"${habit?.title}" foi removido`,
+      className: "bg-red-500/10 border-red-500/50"
+    });
+  };
+
+  const deleteDaily = (id: number) => {
+    const daily = dailies.find(d => d.id === id);
+    setDailies(prev => prev.filter(d => d.id !== id));
+    
+    toast({
+      title: "Daily Removida! 🗑️",
+      description: `"${daily?.title}" foi removida`,
+      className: "bg-red-500/10 border-red-500/50"
+    });
+  };
+
+  const deleteTodo = (id: number) => {
+    const todo = todos.find(t => t.id === id);
+    setTodos(prev => prev.filter(t => t.id !== id));
+    
+    toast({
+      title: "Quest Removida! 🗑️",
+      description: `"${todo?.title}" foi removida`,
+      className: "bg-red-500/10 border-red-500/50"
     });
   };
 
@@ -154,10 +403,22 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   return (
     <GameContext.Provider value={{
       gameState,
+      habits,
+      dailies,
+      todos,
       isNewQuestModalOpen,
       completeHabit,
       completeDaily,
       completeTodo,
+      addHabit,
+      addDaily,
+      addTodo,
+      updateHabit,
+      updateDaily,
+      updateTodo,
+      deleteHabit,
+      deleteDaily,
+      deleteTodo,
       createNewQuest,
       closeNewQuestModal,
       openShop,

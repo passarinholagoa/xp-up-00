@@ -1,43 +1,26 @@
 
-import React from 'react';
-import { Plus, Minus, Flame, Coins, Zap } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Minus, Flame, Coins, Zap, Edit2, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useGame } from '@/contexts/GameContext';
+import { EditHabitModal } from './EditHabitModal';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export const HabitsList = () => {
-  const { completeHabit } = useGame();
-
-  const habits = [
-    {
-      id: 1,
-      title: 'Exercitar-se por 30 minutos',
-      streak: 12,
-      difficulty: 'medium',
-      xpReward: 15,
-      coinReward: 3,
-      isPositive: true
-    },
-    {
-      id: 2,
-      title: 'Ler por 20 minutos',
-      streak: 7,
-      difficulty: 'easy',
-      xpReward: 10,
-      coinReward: 2,
-      isPositive: true
-    },
-    {
-      id: 3,
-      title: 'Fumar',
-      streak: 0,
-      difficulty: 'hard',
-      xpReward: 0,
-      coinReward: 0,
-      isPositive: false
-    }
-  ];
+  const { habits, completeHabit, deleteHabit } = useGame();
+  const [editingHabit, setEditingHabit] = useState<typeof habits[0] | null>(null);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -54,6 +37,14 @@ export const HabitsList = () => {
 
   const handleNegativeAction = (habit: typeof habits[0]) => {
     completeHabit(habit.id, false);
+  };
+
+  const handleEdit = (habit: typeof habits[0]) => {
+    setEditingHabit(habit);
+  };
+
+  const handleDelete = (habitId: number) => {
+    deleteHabit(habitId);
   };
 
   return (
@@ -90,9 +81,9 @@ export const HabitsList = () => {
             </div>
             
             <div className="flex items-center gap-2">
+              {/* Botões de ação do hábito */}
               {habit.isPositive ? (
                 <>
-                  {/* Botão de + para hábitos positivos */}
                   <Button 
                     size="sm" 
                     className="bg-quest-gradient hover:opacity-90 glow-effect"
@@ -100,7 +91,6 @@ export const HabitsList = () => {
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
-                  {/* Botão de - para falhar no hábito positivo */}
                   <Button 
                     size="sm" 
                     variant="destructive"
@@ -111,7 +101,6 @@ export const HabitsList = () => {
                   </Button>
                 </>
               ) : (
-                /* Apenas botão de - para hábitos negativos */
                 <Button 
                   size="sm" 
                   variant="destructive"
@@ -121,10 +110,49 @@ export const HabitsList = () => {
                   <Minus className="h-4 w-4" />
                 </Button>
               )}
+              
+              {/* Botões de editar e apagar */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleEdit(habit)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="sm" variant="outline">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remover Hábito</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja remover "{habit.title}"? Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDelete(habit.id)}>
+                      Remover
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </Card>
       ))}
+      
+      {editingHabit && (
+        <EditHabitModal
+          habit={editingHabit}
+          isOpen={true}
+          onClose={() => setEditingHabit(null)}
+        />
+      )}
     </div>
   );
 };
