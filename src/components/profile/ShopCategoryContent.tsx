@@ -104,8 +104,8 @@ export const ShopCategoryContent = ({
         </Badge>
       </div>
       
-      <ScrollArea className="h-[360px] w-full pr-4">
-        <div className="space-y-3 pb-4">
+      <ScrollArea className="h-[380px] w-full pr-4">
+        <div className="space-y-3 pb-6">
           {items.map(item => {
             const canBuy = canBuyItem(item);
             const missingReqs = getMissingRequirements(item);
