@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useGame } from '@/contexts/GameContext';
 
 export const Header = () => {
-  const { gameState, createNewQuest, openSettings } = useGame();
+  const { gameState, createNewQuest, openProfile, profile } = useGame();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -25,8 +25,22 @@ export const Header = () => {
             </div>
           </div>
 
-          {/* Player Stats */}
+          {/* Player Profile & Stats */}
           <div className="hidden md:flex items-center gap-4">
+            {/* Profile Preview */}
+            <div 
+              className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all hover:bg-primary/10 ${profile.backgroundColor} ${profile.frameBorder}`}
+              onClick={openProfile}
+            >
+              <div className="w-8 h-8 rounded-full bg-quest-gradient flex items-center justify-center text-sm">
+                {profile.avatar}
+              </div>
+              <span className={`text-sm font-medium ${profile.nameColor}`}>
+                {profile.displayName}
+              </span>
+            </div>
+
+            {/* Stats */}
             <div className="flex items-center gap-2 stat-badge bg-hp-high/20 text-hp-high">
               <Heart className="h-4 w-4" />
               <span className="font-mono">{gameState.hp}/{gameState.maxHp}</span>
@@ -54,7 +68,7 @@ export const Header = () => {
               variant="outline" 
               size="sm" 
               className="hidden sm:flex"
-              onClick={openSettings}
+              onClick={openProfile}
             >
               Perfil
             </Button>

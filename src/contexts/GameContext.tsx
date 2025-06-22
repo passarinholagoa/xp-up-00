@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
+import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
 
 interface GameState {
   hp: number;
@@ -72,6 +73,13 @@ interface GameContextType {
   openAchievements: () => void;
   closeAchievements: () => void;
   openSettings: () => void;
+  profile: ProfileCustomization;
+  shopItems: ShopItem[];
+  isProfileModalOpen: boolean;
+  updateProfile: (newProfile: ProfileCustomization) => void;
+  buyShopItem: (itemId: string) => void;
+  openProfile: () => void;
+  closeProfile: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -119,6 +127,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const { toast } = useToast();
   const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
   const initialTotalXp = 14400;
   const initialLevel = calculateLevel(initialTotalXp);
@@ -150,6 +159,22 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       }
       return achievement;
     });
+  });
+
+  const [profile, setProfile] = useState<ProfileCustomization>({
+    displayName: 'Aventureiro',
+    avatar: '👤',
+    frameBorder: 'border-2 border-primary/50',
+    nameColor: 'text-foreground',
+    backgroundColor: 'bg-card'
+  });
+
+  const [shopItems, setShopItems] = useState<ShopItem[]>(() => {
+    // Initialize some items as owned for demonstration
+    return SHOP_ITEMS.map(item => ({
+      ...item,
+      owned: item.price <= 30 // Give some basic items for free
+    }));
   });
 
   const [habits, setHabits] = useState<Habit[]>([
@@ -537,12 +562,46 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     setIsNewQuestModalOpen(false);
   };
 
-  const openShop = () => {
+  const updateProfile = (newProfile: ProfileCustomization) => {
+    setProfile(newProfile);
+    
     toast({
-      title: "Loja",
-      description: "Em breve você poderá comprar itens épicos!",
-      className: "bg-orange-500/10 border-orange-500/50"
+      title: "Perfil Atualizado! ✨",
+      description: "Suas personalizações foram salvas",
+      className: "bg-quest-primary/10 border-quest-primary/50"
     });
+  };
+
+  const buyShopItem = (itemId: string) => {
+    const item = shopItems.find(i => i.id === itemId);
+    if (!item || item.owned || gameState.coins < item.price) return;
+
+    setGameState(prev => ({
+      ...prev,
+      coins: prev.coins - item.price
+    }));
+
+    setShopItems(prev => prev.map(i => 
+      i.id === itemId ? { ...i, owned: true } : i
+    ));
+
+    toast({
+      title: `${item.icon} Item Comprado!`,
+      description: `"${item.name}" foi adicionado ao seu inventário`,
+      className: `bg-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/10 border-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/50`
+    });
+  };
+
+  const openProfile = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const closeProfile = () => {
+    setIsProfileModalOpen(false);
+  };
+
+  const openShop = () => {
+    openProfile(); // Redirect to profile modal which now has the shop
   };
 
   const openAchievements = () => {
@@ -587,7 +646,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       openShop,
       openAchievements,
       closeAchievements,
-      openSettings
+      openSettings,
+      profile,
+      shopItems,
+      isProfileModalOpen,
+      updateProfile,
+      buyShopItem,
+      openProfile,
+      closeProfile,
     }}>
       {children}
     </GameContext.Provider>

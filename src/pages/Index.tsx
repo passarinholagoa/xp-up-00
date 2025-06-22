@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Header } from '../components/Header';
 import { HeroSection } from '../components/HeroSection';
@@ -8,6 +7,7 @@ import { QuickActions } from '../components/QuickActions';
 import { NewQuestModal } from '../components/NewQuestModal';
 import { AchievementsModal } from '../components/AchievementsModal';
 import { useGame } from '../contexts/GameContext';
+import { ProfileModal } from '../components/ProfileModal';
 
 const Index = () => {
   const { 
@@ -15,6 +15,8 @@ const Index = () => {
     closeNewQuestModal,
     isAchievementsModalOpen,
     closeAchievements,
+    isProfileModalOpen,
+    closeProfile,
     achievements
   } = useGame();
 
@@ -48,6 +50,11 @@ const Index = () => {
         isOpen={isAchievementsModalOpen}
         onClose={closeAchievements}
         achievements={achievements}
+      />
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={closeProfile}
       />
     </div>
   );
