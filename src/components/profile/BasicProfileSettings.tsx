@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { Profile, ShopItem } from '@/types/profile';
+import { ProfileCustomization, ShopItem } from '@/types/profile';
 
 interface BasicProfileSettingsProps {
-  tempProfile: Profile;
-  setTempProfile: React.Dispatch<React.SetStateAction<Profile>>;
+  tempProfile: ProfileCustomization;
+  setTempProfile: React.Dispatch<React.SetStateAction<ProfileCustomization>>;
   ownedAvatars: ShopItem[];
   onSave: () => void;
   onCancel: () => void;

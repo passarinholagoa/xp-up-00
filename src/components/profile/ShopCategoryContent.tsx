@@ -3,7 +3,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ShopItem, Achievement } from '@/types/profile';
+import { ShopItem } from '@/types/profile';
+import { Achievement } from '@/types/achievements';
 import { Frame, Palette, Image, UserCircle } from 'lucide-react';
 
 interface ShopCategoryContentProps {

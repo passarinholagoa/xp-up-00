@@ -1,10 +1,16 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Profile, GameState } from '@/types/profile';
+import { ProfileCustomization } from '@/types/profile';
+
+interface GameState {
+  level: number;
+  coins: number;
+  totalXp: number;
+}
 
 interface ProfilePreviewProps {
-  profile: Profile;
+  profile: ProfileCustomization;
   gameState: GameState;
 }
 

@@ -3,7 +3,8 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShopCategoryContent } from './ShopCategoryContent';
-import { ShopItem, Achievement } from '@/types/profile';
+import { ShopItem } from '@/types/profile';
+import { Achievement } from '@/types/achievements';
 import { Frame, Palette, Image, UserCircle } from 'lucide-react';
 
 interface ShopSectionProps {
