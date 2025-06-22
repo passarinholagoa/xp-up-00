@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -6,6 +5,7 @@ interface GameState {
   hp: number;
   maxHp: number;
   xp: number;
+  totalXp: number;
   maxXp: number;
   coins: number;
   level: number;
@@ -84,16 +84,49 @@ interface GameProviderProps {
   children: ReactNode;
 }
 
+// Function to calculate level from total XP (0-100 levels)
+const calculateLevel = (totalXp: number): number => {
+  if (totalXp === 0) return 0;
+  
+  // Exponential growth: each level requires more XP
+  // Level n requires approximately n^2 * 100 total XP
+  const level = Math.floor(Math.sqrt(totalXp / 100));
+  return Math.min(level, 100); // Cap at level 100
+};
+
+// Function to calculate XP needed for next level
+const calculateXpForNextLevel = (currentLevel: number): number => {
+  if (currentLevel >= 100) return 0;
+  return (currentLevel + 1) * (currentLevel + 1) * 100;
+};
+
+// Function to calculate current level XP and max XP for progress bar
+const calculateLevelProgress = (totalXp: number, currentLevel: number) => {
+  const currentLevelBaseXp = currentLevel * currentLevel * 100;
+  const nextLevelBaseXp = calculateXpForNextLevel(currentLevel);
+  
+  return {
+    currentLevelXp: totalXp - currentLevelBaseXp,
+    maxLevelXp: nextLevelBaseXp - currentLevelBaseXp
+  };
+};
+
 export const GameProvider = ({ children }: GameProviderProps) => {
   const { toast } = useToast();
   const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
+  
+  const initialTotalXp = 14400; // This gives us level 12 (sqrt(14400/100) = 12)
+  const initialLevel = calculateLevel(initialTotalXp);
+  const { currentLevelXp, maxLevelXp } = calculateLevelProgress(initialTotalXp, initialLevel);
+  
   const [gameState, setGameState] = useState<GameState>({
     hp: 85,
     maxHp: 100,
-    xp: 1245,
-    maxXp: 2000,
+    xp: currentLevelXp,
+    totalXp: initialTotalXp,
+    maxXp: maxLevelXp,
     coins: 342,
-    level: 12,
+    level: initialLevel,
     streak: 7
   });
 
@@ -196,15 +229,40 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   ]);
 
+  const updateGameStateXp = (xpGain: number) => {
+    setGameState(prev => {
+      const newTotalXp = prev.totalXp + xpGain;
+      const newLevel = calculateLevel(newTotalXp);
+      const { currentLevelXp, maxLevelXp } = calculateLevelProgress(newTotalXp, newLevel);
+      
+      // Check for level up
+      if (newLevel > prev.level) {
+        toast({
+          title: `🎉 LEVEL UP! 🎉`,
+          description: `Parabéns! Você alcançou o nível ${newLevel}!`,
+          className: "bg-quest-legendary/20 border-quest-legendary"
+        });
+      }
+      
+      return {
+        ...prev,
+        xp: currentLevelXp,
+        totalXp: newTotalXp,
+        maxXp: maxLevelXp,
+        level: newLevel
+      };
+    });
+  };
+
   const completeHabit = (habitId: number, isPositive: boolean) => {
     if (isPositive) {
       const habit = habits.find(h => h.id === habitId);
       const xpGain = habit?.xpReward || 15;
       const coinGain = habit?.coinReward || 3;
       
+      updateGameStateXp(xpGain);
       setGameState(prev => ({
         ...prev,
-        xp: Math.min(prev.xp + xpGain, prev.maxXp),
         coins: prev.coins + coinGain,
         hp: Math.min(prev.hp + 2, prev.maxHp)
       }));
@@ -235,9 +293,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     const xpGain = daily?.xpReward || 18;
     const coinGain = daily?.coinReward || 3;
     
+    updateGameStateXp(xpGain);
     setGameState(prev => ({
       ...prev,
-      xp: Math.min(prev.xp + xpGain, prev.maxXp),
       coins: prev.coins + coinGain
     }));
 
@@ -253,9 +311,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     const xpGain = todo?.xpReward || 25;
     const coinGain = todo?.coinReward || 5;
     
+    updateGameStateXp(xpGain);
     setGameState(prev => ({
       ...prev,
-      xp: Math.min(prev.xp + xpGain, prev.maxXp),
       coins: prev.coins + coinGain
     }));
 

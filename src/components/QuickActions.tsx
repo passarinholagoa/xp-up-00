@@ -40,7 +40,7 @@ export const QuickActions = () => {
   ];
 
   const xpRemaining = gameState.maxXp - gameState.xp;
-  const xpPercentage = (gameState.xp / gameState.maxXp) * 100;
+  const xpPercentage = gameState.maxXp > 0 ? (gameState.xp / gameState.maxXp) * 100 : 100;
 
   return (
     <div className="space-y-6">
@@ -80,12 +80,16 @@ export const QuickActions = () => {
       {/* Level Progress */}
       <Card className="quest-card">
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Próximo Nível</h3>
+          <h3 className="font-semibold text-lg">
+            {gameState.level >= 100 ? 'Nível Máximo!' : 'Próximo Nível'}
+          </h3>
           
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Nível {gameState.level}</span>
-              <span>Nível {gameState.level + 1}</span>
+              <span>
+                {gameState.level >= 100 ? 'MAX' : `Nível ${gameState.level + 1}`}
+              </span>
             </div>
             <div className="progress-bar">
               <div 
@@ -96,7 +100,10 @@ export const QuickActions = () => {
               </div>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              {xpRemaining.toLocaleString()} XP restantes
+              {gameState.level >= 100 
+                ? 'Você alcançou o nível máximo!' 
+                : `${xpRemaining.toLocaleString()} XP restantes`
+              }
             </p>
           </div>
         </div>
