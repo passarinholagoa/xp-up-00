@@ -38,6 +38,10 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     return shopItems.filter(item => item.category === category && item.owned);
   };
 
+  const getShopItemsByCategory = (category: string) => {
+    return shopItems.filter(item => item.category === category && !item.owned);
+  };
+
   const canBuyItem = (item: ShopItem) => {
     const hasEnoughCoins = gameState.coins >= item.price;
     const hasEnoughXp = !item.xpRequired || gameState.totalXp >= item.xpRequired;
@@ -81,6 +85,82 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     }
     
     return missing;
+  };
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case 'legendary': return 'text-yellow-400';
+      case 'epic': return 'text-purple-400';
+      case 'rare': return 'text-blue-400';
+      default: return 'text-gray-400';
+    }
+  };
+
+  const categoryNames = {
+    frame: 'Molduras',
+    color: 'Cores do Nome',
+    background: 'Fundos',
+    avatar: 'Avatares'
+  };
+
+  const ShopCategorySection = ({ category, title }: { category: string; title: string }) => {
+    const items = getShopItemsByCategory(category);
+    
+    if (items.length === 0) return null;
+
+    return (
+      <div className="space-y-3">
+        <h4 className="font-semibold text-lg flex items-center gap-2">
+          {title}
+          <Badge variant="outline" className="text-xs">
+            {items.length} itens
+          </Badge>
+        </h4>
+        <div className="space-y-2">
+          {items.map(item => {
+            const canBuy = canBuyItem(item);
+            const missingReqs = getMissingRequirements(item);
+            
+            return (
+              <Card key={item.id} className={`p-4 ${RARITY_COLORS[item.rarity]} ${!canBuy ? 'opacity-60' : ''}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">{item.icon}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h5 className="font-medium">{item.name}</h5>
+                        <Badge variant="outline" className={`text-xs ${getRarityColor(item.rarity)}`}>
+                          {item.rarity}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Requisitos: {getRequirementsText(item)}
+                      </div>
+                      {missingReqs.length > 0 && (
+                        <div className="text-xs text-red-500 mt-1">
+                          Faltam: {missingReqs.join(', ')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => handleBuyItem(item)}
+                    disabled={!canBuy}
+                    className="flex items-center gap-1"
+                  >
+                    Comprar
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -195,50 +275,11 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
               </TabsContent>
 
               <TabsContent value="shop" className="space-y-4">
-                <div className="space-y-4 max-h-80 overflow-y-auto">
-                  {shopItems
-                    .filter(item => !item.owned)
-                    .map(item => {
-                      const canBuy = canBuyItem(item);
-                      const missingReqs = getMissingRequirements(item);
-                      
-                      return (
-                        <Card key={item.id} className={`p-4 ${RARITY_COLORS[item.rarity]} ${!canBuy ? 'opacity-60' : ''}`}>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="text-2xl">{item.icon}</div>
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <h4 className="font-medium">{item.name}</h4>
-                                  <Badge variant="outline" className="text-xs">
-                                    {item.rarity}
-                                  </Badge>
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                  {item.description}
-                                </p>
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  Requisitos: {getRequirementsText(item)}
-                                </div>
-                                {missingReqs.length > 0 && (
-                                  <div className="text-xs text-red-500 mt-1">
-                                    Faltam: {missingReqs.join(', ')}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <Button
-                              size="sm"
-                              onClick={() => handleBuyItem(item)}
-                              disabled={!canBuy}
-                              className="flex items-center gap-1"
-                            >
-                              Comprar
-                            </Button>
-                          </div>
-                        </Card>
-                      );
-                    })}
+                <div className="space-y-6 max-h-80 overflow-y-auto pr-2">
+                  <ShopCategorySection category="frame" title={categoryNames.frame} />
+                  <ShopCategorySection category="color" title={categoryNames.color} />
+                  <ShopCategorySection category="background" title={categoryNames.background} />
+                  <ShopCategorySection category="avatar" title={categoryNames.avatar} />
                 </div>
               </TabsContent>
             </Tabs>
