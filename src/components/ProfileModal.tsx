@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGame } from '@/contexts/GameContext';
 import { ShopItem } from '@/types/profile';
-import { Edit, User, Frame, Palette, Image, UserCircle } from 'lucide-react';
+import { Edit, User } from 'lucide-react';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -39,8 +39,8 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     return shopItems.filter(item => item.category === category && item.owned);
   };
 
-  const getShopItemsByCategory = (category: string) => {
-    return shopItems.filter(item => item.category === category && !item.owned);
+  const getAllShopItems = () => {
+    return shopItems.filter(item => !item.owned);
   };
 
   const canBuyItem = (item: ShopItem) => {
@@ -142,49 +142,6 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     );
   };
 
-  const ShopCategoryContent = ({ category, items }: { category: string; items: ShopItem[] }) => {
-    if (items.length === 0) {
-      return (
-        <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-          <div className="text-2xl mb-2">📦</div>
-          <p>Nenhum item disponível</p>
-        </div>
-      );
-    }
-
-    const categoryName = {
-      'frame': 'Molduras',
-      'color': 'Nomes', 
-      'background': 'Fundos',
-      'avatar': 'Avatares'
-    }[category] || category;
-
-    const categoryIcon = {
-      'frame': <Frame className="h-4 w-4" />,
-      'color': <Palette className="h-4 w-4" />,
-      'background': <Image className="h-4 w-4" />,
-      'avatar': <UserCircle className="h-4 w-4" />
-    }[category];
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 mb-4">
-          {categoryIcon}
-          <h3 className="text-lg font-bold text-white">{categoryName}</h3>
-          <Badge variant="outline" className="bg-gray-800 text-gray-300 border-gray-600 text-xs">
-            {items.length} itens
-          </Badge>
-        </div>
-        
-        <div className="space-y-3">
-          {items.map(item => (
-            <ShopItemCard key={item.id} item={item} />
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden bg-gray-950 border-gray-800 p-0">
@@ -283,68 +240,22 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
 
               <TabsContent value="shop" className="h-full">
                 <div className="space-y-4 h-full">
-                  <Tabs defaultValue="frame" className="w-full h-full">
-                    <TabsList className="grid w-full grid-cols-4 bg-gray-900/80 border-gray-700 mb-4 h-12">
-                      <TabsTrigger 
-                        value="frame" 
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
-                      >
-                        <Frame className="h-3 w-3" />
-                        <span className="text-xs">Molduras</span>
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="color"
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
-                      >
-                        <Palette className="h-3 w-3" />
-                        <span className="text-xs">Nomes</span>
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="background"
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
-                      >
-                        <Image className="h-3 w-3" />
-                        <span className="text-xs">Fundos</span>
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="avatar"
-                        className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex flex-col items-center gap-1 py-2"
-                      >
-                        <UserCircle className="h-3 w-3" />
-                        <span className="text-xs">Avatares</span>
-                      </TabsTrigger>
-                    </TabsList>
-
-                    <ScrollArea className="h-[400px] w-full pr-4">
-                      <TabsContent value="frame" className="mt-0">
-                        <ShopCategoryContent 
-                          category="frame" 
-                          items={getShopItemsByCategory('frame')}
-                        />
-                      </TabsContent>
-
-                      <TabsContent value="color" className="mt-0">
-                        <ShopCategoryContent 
-                          category="color" 
-                          items={getShopItemsByCategory('color')}
-                        />
-                      </TabsContent>
-
-                      <TabsContent value="background" className="mt-0">
-                        <ShopCategoryContent 
-                          category="background" 
-                          items={getShopItemsByCategory('background')}
-                        />
-                      </TabsContent>
-
-                      <TabsContent value="avatar" className="mt-0">
-                        <ShopCategoryContent 
-                          category="avatar" 
-                          items={getShopItemsByCategory('avatar')}
-                        />
-                      </TabsContent>
-                    </ScrollArea>
-                  </Tabs>
+                  <h3 className="text-lg font-bold text-white">Loja</h3>
+                  
+                  <ScrollArea className="h-[400px] w-full pr-4">
+                    <div className="space-y-3">
+                      {getAllShopItems().length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                          <div className="text-2xl mb-2">📦</div>
+                          <p>Nenhum item disponível</p>
+                        </div>
+                      ) : (
+                        getAllShopItems().map(item => (
+                          <ShopItemCard key={item.id} item={item} />
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
                 </div>
               </TabsContent>
             </Tabs>
