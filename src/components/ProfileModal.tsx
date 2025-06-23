@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -143,14 +143,17 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden bg-gray-950 border-gray-800 p-0">
-        <DialogHeader className="p-6 pb-0">
-          <DialogTitle className="flex items-center gap-2 text-xl text-white font-bold">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent 
+        side="right" 
+        className="w-full sm:max-w-none max-w-none bg-gray-950 border-gray-800 p-0 overflow-hidden"
+      >
+        <SheetHeader className="p-6 pb-0">
+          <SheetTitle className="flex items-center gap-2 text-xl text-white font-bold">
             <User className="h-5 w-5" />
             Perfil Personalizável
-          </DialogTitle>
-        </DialogHeader>
+          </SheetTitle>
+        </SheetHeader>
 
         <div className="flex gap-6 p-6 pt-4 h-full">
           {/* Profile Preview */}
@@ -261,7 +264,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
             </Tabs>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
