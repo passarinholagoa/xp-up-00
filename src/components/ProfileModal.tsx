@@ -39,8 +39,8 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     return shopItems.filter(item => item.category === category && item.owned);
   };
 
-  const getAllShopItems = () => {
-    return shopItems.filter(item => !item.owned);
+  const getShopItemsByCategory = (category: string) => {
+    return shopItems.filter(item => item.category === category && !item.owned);
   };
 
   const canBuyItem = (item: ShopItem) => {
@@ -109,16 +109,16 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
               </p>
               <div className="flex items-center gap-3 text-xs">
                 <span className="flex items-center gap-1 text-yellow-400 font-medium">
-                  {item.price} 💰
+                  Requisitos: {item.price} 💰
                 </span>
                 {item.xpRequired && (
                   <span className="flex items-center gap-1 text-blue-400 font-medium">
-                    {item.xpRequired.toLocaleString()} XP
+                    • {item.xpRequired.toLocaleString()} XP
                   </span>
                 )}
                 {item.achievementRequired && (
                   <span className="flex items-center gap-1 text-purple-400 font-medium text-xs truncate">
-                    "{achievements.find(a => a.id === item.achievementRequired)?.title}" 🏆
+                    • "{achievements.find(a => a.id === item.achievementRequired)?.title}" 🏆
                   </span>
                 )}
               </div>
@@ -139,6 +139,25 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
           </Button>
         </div>
       </Card>
+    );
+  };
+
+  const CategoryTab = ({ category, label }: { category: string; label: string }) => {
+    const categoryItems = getShopItemsByCategory(category);
+    
+    return (
+      <div className="space-y-3">
+        {categoryItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+            <div className="text-2xl mb-2">📦</div>
+            <p>Nenhum item disponível</p>
+          </div>
+        ) : (
+          categoryItems.map(item => (
+            <ShopItemCard key={item.id} item={item} />
+          ))
+        )}
+      </div>
     );
   };
 
@@ -243,22 +262,39 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
 
               <TabsContent value="shop" className="h-full">
                 <div className="space-y-4 h-full">
-                  <h3 className="text-lg font-bold text-white">Loja</h3>
-                  
-                  <ScrollArea className="h-[400px] w-full pr-4">
-                    <div className="space-y-3">
-                      {getAllShopItems().length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-                          <div className="text-2xl mb-2">📦</div>
-                          <p>Nenhum item disponível</p>
-                        </div>
-                      ) : (
-                        getAllShopItems().map(item => (
-                          <ShopItemCard key={item.id} item={item} />
-                        ))
-                      )}
+                  <Tabs defaultValue="frames" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4 bg-gray-900/80 border-gray-700 p-1">
+                      <TabsTrigger value="frames" className="text-white data-[state=active]:bg-gray-700 text-xs">
+                        Molduras
+                      </TabsTrigger>
+                      <TabsTrigger value="colors" className="text-white data-[state=active]:bg-gray-700 text-xs">
+                        Cores do Nome
+                      </TabsTrigger>
+                      <TabsTrigger value="backgrounds" className="text-white data-[state=active]:bg-gray-700 text-xs">
+                        Fundos
+                      </TabsTrigger>
+                      <TabsTrigger value="avatars" className="text-white data-[state=active]:bg-gray-700 text-xs">
+                        Avatares
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <div className="mt-4">
+                      <ScrollArea className="h-[400px] w-full pr-4">
+                        <TabsContent value="frames" className="mt-0">
+                          <CategoryTab category="frame" label="Molduras" />
+                        </TabsContent>
+                        <TabsContent value="colors" className="mt-0">
+                          <CategoryTab category="color" label="Cores do Nome" />
+                        </TabsContent>
+                        <TabsContent value="backgrounds" className="mt-0">
+                          <CategoryTab category="background" label="Fundos" />
+                        </TabsContent>
+                        <TabsContent value="avatars" className="mt-0">
+                          <CategoryTab category="avatar" label="Avatares" />
+                        </TabsContent>
+                      </ScrollArea>
                     </div>
-                  </ScrollArea>
+                  </Tabs>
                 </div>
               </TabsContent>
             </Tabs>
