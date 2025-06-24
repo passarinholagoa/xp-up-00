@@ -51,10 +51,11 @@ export const HabitsList = () => {
     <div className="space-y-4">
       {habits.map((habit) => (
         <Card key={habit.id} className="quest-card">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-3">
-                <h3 className="font-semibold">{habit.title}</h3>
+          <div className="space-y-4">
+            {/* Header com título, dificuldade e streak */}
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="font-semibold text-base flex-1 min-w-0">{habit.title}</h3>
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <Badge className={getDifficultyColor(habit.difficulty)}>
                   {habit.difficulty}
                 </Badge>
@@ -65,82 +66,94 @@ export const HabitsList = () => {
                   </div>
                 )}
               </div>
-              
-              {habit.isPositive && (
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Zap className="h-3 w-3 text-xp-bar" />
-                    <span>+{habit.xpReward} XP</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Coins className="h-3 w-3 text-quest-legendary" />
-                    <span>+{habit.coinReward}</span>
-                  </div>
-                </div>
-              )}
             </div>
             
-            <div className="flex items-center gap-2">
-              {/* Botões de ação do hábito */}
-              {habit.isPositive ? (
-                <>
+            {/* Recompensas */}
+            {habit.isPositive && (
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Zap className="h-3 w-3 text-xp-bar" />
+                  <span>+{habit.xpReward} XP</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Coins className="h-3 w-3 text-quest-legendary" />
+                  <span>+{habit.coinReward}</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Botões de ação - Layout otimizado para mobile */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Botões principais de ação do hábito */}
+              <div className="flex gap-2 flex-1">
+                {habit.isPositive ? (
+                  <>
+                    <Button 
+                      size="default" 
+                      className="bg-quest-gradient hover:opacity-90 glow-effect flex-1 sm:flex-initial"
+                      onClick={() => handlePositiveAction(habit)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      <span className="sm:hidden">Completar</span>
+                    </Button>
+                    <Button 
+                      size="default" 
+                      variant="destructive"
+                      className="hover:opacity-90 flex-1 sm:flex-initial"
+                      onClick={() => handleNegativeAction(habit)}
+                    >
+                      <Minus className="h-4 w-4 mr-2" />
+                      <span className="sm:hidden">Falhar</span>
+                    </Button>
+                  </>
+                ) : (
                   <Button 
-                    size="sm" 
-                    className="bg-quest-gradient hover:opacity-90 glow-effect"
-                    onClick={() => handlePositiveAction(habit)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    size="sm" 
+                    size="default" 
                     variant="destructive"
-                    className="hover:opacity-90"
+                    className="hover:opacity-90 flex-1 sm:flex-initial"
                     onClick={() => handleNegativeAction(habit)}
                   >
-                    <Minus className="h-4 w-4" />
+                    <Minus className="h-4 w-4 mr-2" />
+                    <span className="sm:hidden">Marcar</span>
                   </Button>
-                </>
-              ) : (
-                <Button 
-                  size="sm" 
-                  variant="destructive"
-                  className="hover:opacity-90"
-                  onClick={() => handleNegativeAction(habit)}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-              )}
+                )}
+              </div>
               
               {/* Botões de editar e apagar */}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleEdit(habit)}
-              >
-                <Edit2 className="h-4 w-4" />
-              </Button>
-              
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button size="sm" variant="outline">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Remover Hábito</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Tem certeza que deseja remover "{habit.title}"? Esta ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDelete(habit.id)}>
-                      Remover
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <div className="flex gap-2 sm:ml-auto">
+                <Button
+                  size="default"
+                  variant="outline"
+                  className="flex-1 sm:flex-initial"
+                  onClick={() => handleEdit(habit)}
+                >
+                  <Edit2 className="h-4 w-4 mr-2 sm:mr-0" />
+                  <span className="sm:hidden">Editar</span>
+                </Button>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="default" variant="outline" className="flex-1 sm:flex-initial">
+                      <Trash2 className="h-4 w-4 mr-2 sm:mr-0" />
+                      <span className="sm:hidden">Remover</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Remover Hábito</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja remover "{habit.title}"? Esta ação não pode ser desfeita.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDelete(habit.id)}>
+                        Remover
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           </div>
         </Card>
