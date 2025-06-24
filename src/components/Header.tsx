@@ -23,7 +23,7 @@ export const Header = () => {
           <div className="flex items-center gap-3">
             <div className="relative">
               <img 
-                src="/lovable-uploads/88cf0038-6fd4-4fe2-a514-2cc60714a3a2.png" 
+                src="/lovable-uploads/ca6ef42b-de29-4a0e-a1e0-38f9c859e5e3.png" 
                 alt="XPJP Logo" 
                 className="h-10 w-10 object-contain"
               />
