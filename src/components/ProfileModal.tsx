@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Sheet,
@@ -10,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGame } from '@/contexts/GameContext';
 import { ShopItem } from '@/types/profile';
 import { Edit, User } from 'lucide-react';
-import { ProfilePreview } from './profile/ProfilePreview';
 import { ProfileBasicSettings } from './profile/ProfileBasicSettings';
 import { ProfileShop } from './profile/ProfileShop';
 
