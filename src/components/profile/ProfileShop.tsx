@@ -17,63 +17,68 @@ interface ProfileShopProps {
 
 export const ProfileShop = ({ shopItems, gameState, achievements, onBuyItem }: ProfileShopProps) => {
   return (
-    <div className="space-y-4 h-full">
-      <Tabs defaultValue="frames" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-gray-900/80 border-gray-700 p-1">
-          <TabsTrigger value="frames" className="text-white data-[state=active]:bg-gray-700 text-xs">
+    <div className="h-full flex flex-col">
+      <Tabs defaultValue="frames" className="w-full h-full flex flex-col">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-1 h-8 mb-4">
+          <TabsTrigger value="frames" className="text-white data-[state=active]:bg-gray-700 text-xs py-1">
             Molduras
           </TabsTrigger>
-          <TabsTrigger value="colors" className="text-white data-[state=active]:bg-gray-700 text-xs">
-            Cores do Nome
-          </TabsTrigger>
-          <TabsTrigger value="backgrounds" className="text-white data-[state=active]:bg-gray-700 text-xs">
-            Fundos
-          </TabsTrigger>
-          <TabsTrigger value="avatars" className="text-white data-[state=active]:bg-gray-700 text-xs">
-            Avatares
+          <TabsTrigger value="colors" className="text-white data-[state=active]:bg-gray-700 text-xs py-1">
+            Cores
           </TabsTrigger>
         </TabsList>
-
-        <div className="mt-4">
-          <ScrollArea className="h-[400px] w-full pr-4">
-            <TabsContent value="frames" className="mt-0">
-              <CategoryTab 
-                category="frame" 
-                shopItems={shopItems}
-                gameState={gameState}
-                achievements={achievements}
-                onBuyItem={onBuyItem}
-              />
-            </TabsContent>
-            <TabsContent value="colors" className="mt-0">
-              <CategoryTab 
-                category="color" 
-                shopItems={shopItems}
-                gameState={gameState}
-                achievements={achievements}
-                onBuyItem={onBuyItem}
-              />
-            </TabsContent>
-            <TabsContent value="backgrounds" className="mt-0">
-              <CategoryTab 
-                category="background" 
-                shopItems={shopItems}
-                gameState={gameState}
-                achievements={achievements}
-                onBuyItem={onBuyItem}
-              />
-            </TabsContent>
-            <TabsContent value="avatars" className="mt-0">
-              <CategoryTab 
-                category="avatar" 
-                shopItems={shopItems}
-                gameState={gameState}
-                achievements={achievements}
-                onBuyItem={onBuyItem}
-              />
-            </TabsContent>
-          </ScrollArea>
+        
+        <div className="grid grid-cols-2 gap-1 mb-4">
+          <TabsList className="grid w-full grid-cols-1 bg-gray-900/80 border-gray-700 p-1 h-8">
+            <TabsTrigger value="backgrounds" className="text-white data-[state=active]:bg-gray-700 text-xs py-1">
+              Fundos
+            </TabsTrigger>
+          </TabsList>
+          <TabsList className="grid w-full grid-cols-1 bg-gray-900/80 border-gray-700 p-1 h-8">
+            <TabsTrigger value="avatars" className="text-white data-[state=active]:bg-gray-700 text-xs py-1">
+              Avatares
+            </TabsTrigger>
+          </TabsList>
         </div>
+
+        <ScrollArea className="flex-1">
+          <TabsContent value="frames" className="mt-0">
+            <CategoryTab 
+              category="frame" 
+              shopItems={shopItems}
+              gameState={gameState}
+              achievements={achievements}
+              onBuyItem={onBuyItem}
+            />
+          </TabsContent>
+          <TabsContent value="colors" className="mt-0">
+            <CategoryTab 
+              category="color" 
+              shopItems={shopItems}
+              gameState={gameState}
+              achievements={achievements}
+              onBuyItem={onBuyItem}
+            />
+          </TabsContent>
+          <TabsContent value="backgrounds" className="mt-0">
+            <CategoryTab 
+              category="background" 
+              shopItems={shopItems}
+              gameState={gameState}
+              achievements={achievements}
+              onBuyItem={onBuyItem}
+            />
+          </TabsContent>
+          <TabsContent value="avatars" className="mt-0">
+            <CategoryTab 
+              category="avatar" 
+              shopItems={shopItems}
+              gameState={gameState}
+              achievements={achievements}
+              onBuyItem={onBuyItem}
+            />
+          </TabsContent>
+        </ScrollArea>
       </Tabs>
     </div>
   );

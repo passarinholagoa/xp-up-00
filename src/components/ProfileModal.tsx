@@ -40,39 +40,58 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent 
         side="right" 
-        className="w-full sm:max-w-none max-w-none bg-gray-950 border-gray-800 p-0 overflow-hidden"
+        className="w-full sm:max-w-2xl bg-gray-950 border-gray-800 p-0 overflow-hidden"
       >
-        <SheetHeader className="p-6 pb-0">
-          <SheetTitle className="flex items-center gap-2 text-xl text-white font-bold">
+        <SheetHeader className="p-4 pb-0">
+          <SheetTitle className="flex items-center gap-2 text-lg text-white font-bold">
             <User className="h-5 w-5" />
             Perfil Personalizável
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex gap-6 p-6 pt-4 h-full">
-          <ProfilePreview profile={tempProfile} gameState={gameState} />
-
-          <div className="flex-1 min-w-0">
-            <Tabs defaultValue="basic" className="w-full h-full">
-              <div className="mb-4">
-                <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-1 h-12">
-                  <TabsTrigger 
-                    value="basic" 
-                    className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-2 text-sm font-medium py-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Básico
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="shop"
-                    className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-2 text-sm font-medium py-2"
-                  >
-                    Loja
-                  </TabsTrigger>
-                </TabsList>
+        <div className="p-4 h-full flex flex-col">
+          {/* Preview - Mobile first, sempre visível no topo */}
+          <div className="mb-4">
+            <h3 className="text-sm font-bold text-white mb-3">Pré-visualização</h3>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
+              <div className={`relative p-3 rounded-lg ${tempProfile.backgroundColor} ${tempProfile.frameBorder}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-base">
+                    {tempProfile.avatar}
+                  </div>
+                  <div>
+                    <h4 className={`text-sm font-bold ${tempProfile.nameColor}`}>
+                      {tempProfile.displayName || 'Aventureiro'}
+                    </h4>
+                    <p className="text-xs text-gray-300">
+                      Nível {gameState.level} • {gameState.coins} moedas • {gameState.totalXp.toLocaleString()} XP
+                    </p>
+                  </div>
+                </div>
               </div>
+            </div>
+          </div>
 
-              <TabsContent value="basic" className="space-y-4">
+          {/* Tabs - Conteúdo principal */}
+          <div className="flex-1 min-h-0">
+            <Tabs defaultValue="basic" className="w-full h-full flex flex-col">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-1 h-10 mb-4">
+                <TabsTrigger 
+                  value="basic" 
+                  className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-2 text-xs font-medium py-1"
+                >
+                  <Edit className="h-3 w-3" />
+                  Básico
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="shop"
+                  className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white flex items-center gap-2 text-xs font-medium py-1"
+                >
+                  Loja
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="basic" className="flex-1 overflow-hidden">
                 <ProfileBasicSettings
                   tempProfile={tempProfile}
                   setTempProfile={setTempProfile}
@@ -85,7 +104,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="shop" className="h-full">
+              <TabsContent value="shop" className="flex-1 overflow-hidden">
                 <ProfileShop
                   shopItems={shopItems}
                   gameState={gameState}
