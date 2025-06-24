@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Shield, Crown, Coins, Heart, Zap, Menu, X } from 'lucide-react';
+import { Crown, Coins, Heart, Zap, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGame } from '@/contexts/GameContext';
 import {
@@ -22,7 +22,11 @@ export const Header = () => {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Shield className="h-8 w-8 text-primary" />
+              <img 
+                src="/lovable-uploads/88cf0038-6fd4-4fe2-a514-2cc60714a3a2.png" 
+                alt="XPJP Logo" 
+                className="h-10 w-10 object-contain"
+              />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-quest-legendary rounded-full animate-pulse" />
             </div>
             <div>
