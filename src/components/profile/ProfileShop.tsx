@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { CategoryTab } from './CategoryTab';
 import { ShopItem } from '@/types/profile';
 
@@ -17,8 +16,8 @@ interface ProfileShopProps {
 
 export const ProfileShop = ({ shopItems, gameState, achievements, onBuyItem }: ProfileShopProps) => {
   return (
-    <div className="h-full flex flex-col">
-      <Tabs defaultValue="frames" className="w-full h-full flex flex-col">
+    <div className="space-y-4">
+      <Tabs defaultValue="frames" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-1 h-8 mb-4">
           <TabsTrigger value="frames" className="text-white data-[state=active]:bg-gray-700 text-xs py-1">
             Molduras
@@ -41,7 +40,7 @@ export const ProfileShop = ({ shopItems, gameState, achievements, onBuyItem }: P
           </TabsList>
         </div>
 
-        <ScrollArea className="flex-1">
+        <div className="space-y-4">
           <TabsContent value="frames" className="mt-0">
             <CategoryTab 
               category="frame" 
@@ -78,7 +77,7 @@ export const ProfileShop = ({ shopItems, gameState, achievements, onBuyItem }: P
               onBuyItem={onBuyItem}
             />
           </TabsContent>
-        </ScrollArea>
+        </div>
       </Tabs>
     </div>
   );
