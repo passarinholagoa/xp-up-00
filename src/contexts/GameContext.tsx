@@ -157,6 +157,15 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       if (achievement.id === 'xp-master' && initialTotalXp >= 1000) {
         return { ...achievement, unlocked: true, unlockedAt: new Date() };
       }
+      if (achievement.id === 'primeira-missao') {
+        return { ...achievement, unlocked: true, unlockedAt: new Date() };
+      }
+      if (achievement.id === 'o-despertar') {
+        return { ...achievement, unlocked: true, unlockedAt: new Date() };
+      }
+      if (achievement.id === 'foco-total') {
+        return { ...achievement, unlocked: true, unlockedAt: new Date() };
+      }
       return achievement;
     });
   });
@@ -171,10 +180,18 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 
   const [shopItems, setShopItems] = useState<ShopItem[]>(() => {
     // Initialize some items as owned for demonstration
-    return SHOP_ITEMS.map(item => ({
-      ...item,
-      owned: item.price <= 30 // Give some basic items for free
-    }));
+    return SHOP_ITEMS.map(item => {
+      // Give basic items for free and some based on achievements
+      if (item.price <= 50) return { ...item, owned: true };
+      if (item.id === 'bg-praia-brasileira') return { ...item, owned: true };
+      if (item.id === 'color-verde-amarelo') return { ...item, owned: true };
+      if (item.id === 'frame-sertao') return { ...item, owned: true };
+      if (item.id === 'avatar-praiano') return { ...item, owned: true };
+      if (item.id === 'bg-floresta-amazonica' && initialLevel >= 5) return { ...item, owned: true };
+      if (item.id === 'frame-amazonia' && initialLevel >= 5) return { ...item, owned: true };
+      if (item.id === 'color-praiano' && initialLevel >= 5) return { ...item, owned: true };
+      return item;
+    });
   });
 
   const [habits, setHabits] = useState<Habit[]>([

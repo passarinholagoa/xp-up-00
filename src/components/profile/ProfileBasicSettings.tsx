@@ -10,6 +10,9 @@ interface ProfileBasicSettingsProps {
   tempProfile: ProfileCustomization;
   setTempProfile: (profile: ProfileCustomization) => void;
   ownedAvatars: ShopItem[];
+  ownedFrames: ShopItem[];
+  ownedColors: ShopItem[];
+  ownedBackgrounds: ShopItem[];
   onSave: () => void;
   onCancel: () => void;
 }
@@ -17,7 +20,10 @@ interface ProfileBasicSettingsProps {
 export const ProfileBasicSettings = ({ 
   tempProfile, 
   setTempProfile, 
-  ownedAvatars, 
+  ownedAvatars,
+  ownedFrames,
+  ownedColors,
+  ownedBackgrounds,
   onSave, 
   onCancel 
 }: ProfileBasicSettingsProps) => {
@@ -37,7 +43,7 @@ export const ProfileBasicSettings = ({
       </div>
 
       <div className="space-y-3">
-        <Label className="text-white text-sm font-medium">Itens Possuídos</Label>
+        <Label className="text-white text-sm font-medium">Avatares Possuídos</Label>
         <div className="grid grid-cols-6 gap-2">
           {ownedAvatars.map(item => (
             <Button
@@ -46,8 +52,87 @@ export const ProfileBasicSettings = ({
               size="sm"
               onClick={() => setTempProfile({ ...tempProfile, avatar: item.value })}
               className="text-lg p-2 h-12 w-12"
+              title={item.name}
             >
               {item.value}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <Label className="text-white text-sm font-medium">Molduras Possuídas</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant={tempProfile.frameBorder === 'border-2 border-primary/50' ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTempProfile({ ...tempProfile, frameBorder: 'border-2 border-primary/50' })}
+            className="text-xs p-2 h-8"
+          >
+            Padrão
+          </Button>
+          {ownedFrames.map(item => (
+            <Button
+              key={item.id}
+              variant={tempProfile.frameBorder === item.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTempProfile({ ...tempProfile, frameBorder: item.value })}
+              className="text-xs p-2 h-8 truncate"
+              title={item.name}
+            >
+              {item.icon} {item.name.split(' ')[1]}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <Label className="text-white text-sm font-medium">Cores de Nome Possuídas</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant={tempProfile.nameColor === 'text-foreground' ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTempProfile({ ...tempProfile, nameColor: 'text-foreground' })}
+            className="text-xs p-2 h-8"
+          >
+            Padrão
+          </Button>
+          {ownedColors.map(item => (
+            <Button
+              key={item.id}
+              variant={tempProfile.nameColor === item.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTempProfile({ ...tempProfile, nameColor: item.value })}
+              className="text-xs p-2 h-8 truncate"
+              title={item.name}
+            >
+              {item.icon} {item.name.split(' ')[1]}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <Label className="text-white text-sm font-medium">Fundos Possuídos</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant={tempProfile.backgroundColor === 'bg-card' ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTempProfile({ ...tempProfile, backgroundColor: 'bg-card' })}
+            className="text-xs p-2 h-8"
+          >
+            Padrão
+          </Button>
+          {ownedBackgrounds.map(item => (
+            <Button
+              key={item.id}
+              variant={tempProfile.backgroundColor === item.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTempProfile({ ...tempProfile, backgroundColor: item.value })}
+              className="text-xs p-2 h-8 truncate"
+              title={item.name}
+            >
+              {item.icon} {item.name.split(' ')[1]}
             </Button>
           ))}
         </div>

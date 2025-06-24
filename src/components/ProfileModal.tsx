@@ -77,6 +77,9 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                   tempProfile={tempProfile}
                   setTempProfile={setTempProfile}
                   ownedAvatars={getOwnedItems('avatar')}
+                  ownedFrames={getOwnedItems('frame')}
+                  ownedColors={getOwnedItems('color')}
+                  ownedBackgrounds={getOwnedItems('background')}
                   onSave={handleSaveChanges}
                   onCancel={onClose}
                 />
