@@ -30,8 +30,8 @@ export const Header = () => {
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-quest-legendary rounded-full animate-pulse" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-quest-accent bg-clip-text text-transparent">
-                TaskQuest
+              <h1 className="text-2xl font-bold text-[#FF6B35]">
+                XpUp
               </h1>
               <p className="text-xs text-muted-foreground">Gamifique suas tarefas</p>
             </div>
