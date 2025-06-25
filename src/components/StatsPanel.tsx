@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { useGame } from '@/contexts/GameContext';
 
 export const StatsPanel = () => {
-  const { gameState } = useGame();
+  const { gameState, settings } = useGame();
 
   const stats = [
     {
@@ -22,7 +22,8 @@ export const StatsPanel = () => {
       value: gameState.xp,
       max: gameState.maxXp,
       color: 'xp-bar',
-      gradient: 'xp-gradient'
+      gradient: 'xp-gradient',
+      isXp: true
     },
     {
       icon: Coins,
@@ -47,6 +48,7 @@ export const StatsPanel = () => {
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         const percentage = stat.max ? (stat.value / stat.max) * 100 : 100;
+        const isAnimatedXpBar = stat.isXp && settings.animatedXpBar;
         
         return (
           <Card key={index} className="quest-card">
@@ -63,10 +65,18 @@ export const StatsPanel = () => {
                 {stat.max && (
                   <div className="progress-bar">
                     <div 
-                      className={`progress-fill bg-${stat.gradient}`}
+                      className={`progress-fill bg-${stat.gradient} ${isAnimatedXpBar ? 'transition-all duration-500 ease-out' : ''}`}
                       style={{ width: `${percentage}%` }}
                     >
-                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      {isAnimatedXpBar && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
+                      )}
+                      {!isAnimatedXpBar && stat.isXp && (
+                        <div className="absolute inset-0 bg-white/20" />
+                      )}
+                      {!stat.isXp && (
+                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      )}
                     </div>
                   </div>
                 )}

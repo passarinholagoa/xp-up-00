@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -67,11 +68,12 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                     <Zap className="h-4 w-4" />
                     <div className="flex flex-col">
                       <Label className="text-sm">Barra de XP Animada</Label>
-                      {settingsLocks.animatedXpBar.isLocked && (
-                        <span className="text-xs text-muted-foreground">
-                          {settingsLocks.animatedXpBar.reason}
-                        </span>
-                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {settingsLocks.animatedXpBar.isLocked 
+                          ? settingsLocks.animatedXpBar.reason
+                          : 'Adiciona efeitos visuais à barra de experiência'
+                        }
+                      </span>
                     </div>
                     {settingsLocks.animatedXpBar.isLocked && (
                       <Lock className="h-3 w-3 text-yellow-400" />
@@ -88,7 +90,12 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Frame className="h-4 w-4" />
-                    <Label className="text-sm">Mostrar Moldura no Perfil</Label>
+                    <div className="flex flex-col">
+                      <Label className="text-sm">Mostrar Moldura no Perfil</Label>
+                      <span className="text-xs text-muted-foreground">
+                        Exibe moldura decorativa no seu perfil
+                      </span>
+                    </div>
                   </div>
                   <Switch
                     checked={tempSettings.showProfileFrame}
@@ -100,7 +107,12 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Image className="h-4 w-4" />
-                    <Label className="text-sm">Exibir Fundo no Perfil</Label>
+                    <div className="flex flex-col">
+                      <Label className="text-sm">Exibir Fundo no Perfil</Label>
+                      <span className="text-xs text-muted-foreground">
+                        Mostra imagem de fundo personalizada
+                      </span>
+                    </div>
                   </div>
                   <Switch
                     checked={tempSettings.showProfileBackground}
@@ -154,13 +166,11 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                         )}
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        Penalidades severas, mas XP e moedas aumentados
+                        {settingsLocks.hardcoreMode.isLocked 
+                          ? settingsLocks.hardcoreMode.reason
+                          : 'Penalidades severas, mas XP e moedas aumentados'
+                        }
                       </span>
-                      {settingsLocks.hardcoreMode.isLocked && (
-                        <span className="text-xs text-yellow-400">
-                          {settingsLocks.hardcoreMode.reason}
-                        </span>
-                      )}
                     </div>
                     {settingsLocks.hardcoreMode.isLocked && (
                       <Lock className="h-3 w-3 text-yellow-400" />
