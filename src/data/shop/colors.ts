@@ -106,7 +106,7 @@ export const colorItems: ShopItem[] = [
     xpRequired: 250,
     achievementRequired: 'o-despertar',
     category: 'color',
-    value: 'bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent',
+    value: 'bg-gradient-to-r from-yellow-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(255,255,0,0.8)]',
     icon: '⚡',
     rarity: 'rare',
     unlocked: false,
