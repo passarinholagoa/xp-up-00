@@ -3,8 +3,6 @@ export interface XpUpSettings {
   // Personalização Visual
   darkMode: boolean;
   animatedXpBar: boolean;
-  showProfileFrame: boolean;
-  showProfileBackground: boolean;
   
   // Notificações Globais
   globalNotifications: boolean;
@@ -17,8 +15,6 @@ export interface XpUpSettings {
 export const DEFAULT_SETTINGS: XpUpSettings = {
   darkMode: true,
   animatedXpBar: false, // Travado até nível 10
-  showProfileFrame: true,
-  showProfileBackground: true,
   globalNotifications: true,
   hardcoreMode: false, // Travado até nível 15
   vacationMode: false
@@ -43,8 +39,6 @@ export const getSettingsLocks = (level: number, achievements: any[]): Record<key
       requiredAchievement: 'xp-master',
       reason: 'Desbloqueie no Nível 10 ou com a conquista "XP Master"'
     },
-    showProfileFrame: { isLocked: false, reason: '' },
-    showProfileBackground: { isLocked: false, reason: '' },
     globalNotifications: { isLocked: false, reason: '' },
     hardcoreMode: { 
       isLocked: level < 15 && !hasTransformacao, 
