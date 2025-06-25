@@ -26,7 +26,7 @@ export const ProfileShop = ({ shopItems, gameState, achievements, onBuyItem }: P
           </TabsList>
           <TabsList className="grid w-full grid-cols-1 bg-gray-900/80 border-gray-700 p-1 h-8">
             <TabsTrigger value="colors" className="text-white data-[state=active]:bg-gray-700 text-xs py-1">
-              Cores
+              Nomes
             </TabsTrigger>
           </TabsList>
         </div>
