@@ -719,14 +719,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     setIsSettingsModalOpen(false);
   };
 
-  const openSettings = () => {
-    toast({
-      title: "Configurações",
-      description: "Painel de configurações em desenvolvimento...",
-      className: "bg-gray-500/10 border-gray-500/50"
-    });
-  };
-
   return (
     <GameContext.Provider value={{
       gameState,
