@@ -87,21 +87,12 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                     />
                   </div>
                   
-                  {/* Descrição detalhada da funcionalidade */}
+                  {/* Descrição sobre desbloqueio */}
                   {!settingsLocks.animatedXpBar.isLocked && (
-                    <div className="ml-6 p-3 bg-blue-900/20 border border-blue-800/30 rounded-lg">
-                      <div className="text-xs text-blue-300 space-y-1">
-                        <p className="font-medium">✨ Quando ativado, você verá:</p>
-                        <ul className="space-y-1 ml-2">
-                          <li>• Transições suaves ao ganhar XP</li>
-                          <li>• Efeitos de brilho na barra de progresso</li>
-                          <li>• Animações visuais aprimoradas</li>
-                          <li>• Pulsos de energia ao completar tarefas</li>
-                        </ul>
-                        <p className="text-blue-400 font-medium mt-2">
-                          🎯 Torna a experiência mais imersiva e recompensadora!
-                        </p>
-                      </div>
+                    <div className="ml-6 p-2 bg-green-900/20 border border-green-800/30 rounded-lg">
+                      <p className="text-xs text-green-300">
+                        🎉 Funcionalidade desbloqueada! Disponível a partir do nível 10 ou com a conquista "XP Master".
+                      </p>
                     </div>
                   )}
                 </div>
