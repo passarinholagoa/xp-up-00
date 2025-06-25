@@ -1,69 +1,45 @@
+
 import React from 'react';
-import { Header } from '../components/Header';
-import { HeroSection } from '../components/HeroSection';
-import { StatsPanel } from '../components/StatsPanel';
-import { TaskDashboard } from '../components/TaskDashboard';
-import { QuickActions } from '../components/QuickActions';
-import { NewQuestModal } from '../components/NewQuestModal';
-import { AchievementsModal } from '../components/AchievementsModal';
-import { useGame } from '../contexts/GameContext';
-import { ProfileModal } from '../components/ProfileModal';
-import { SettingsModal } from '../components/SettingsModal';
+import { Header } from '@/components/Header';
+import { StatsPanel } from '@/components/StatsPanel';
+import { TaskDashboard } from '@/components/TaskDashboard';
+import { QuickActions } from '@/components/QuickActions';
+import { NewQuestModal } from '@/components/NewQuestModal';
+import { AchievementsModal } from '@/components/AchievementsModal';
+import { ProfileModal } from '@/components/ProfileModal';
+import { SettingsModal } from '@/components/SettingsModal';
+import { useGame } from '@/contexts/GameContext';
 
 const Index = () => {
-  const { 
-    isNewQuestModalOpen, 
-    closeNewQuestModal,
-    isAchievementsModalOpen,
-    closeAchievements,
-    isProfileModalOpen,
-    closeProfile,
-    isSettingsModalOpen,
-    closeSettings,
-    achievements
-  } = useGame();
+  const { isNewQuestModalOpen, closeNewQuestModal, isAchievementsModalOpen, closeAchievements, isProfileModalOpen, closeProfile, isSettingsModalOpen, closeSettings } = useGame();
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        <HeroSection />
-        
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main content area */}
-          <div className="lg:col-span-3 space-y-6">
+          {/* Left Column - Stats */}
+          <div className="lg:col-span-1">
             <StatsPanel />
+          </div>
+          
+          {/* Middle Column - Tasks */}
+          <div className="lg:col-span-2">
+            <Header />
             <TaskDashboard />
           </div>
           
-          {/* Sidebar */}
-          <div className="space-y-6">
+          {/* Right Column - Actions */}
+          <div className="lg:col-span-1">
             <QuickActions />
           </div>
         </div>
-      </main>
+      </div>
 
-      <NewQuestModal 
-        isOpen={isNewQuestModalOpen} 
-        onClose={closeNewQuestModal} 
-      />
-
-      <AchievementsModal
-        isOpen={isAchievementsModalOpen}
-        onClose={closeAchievements}
-        achievements={achievements}
-      />
-
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={closeProfile}
-      />
-
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={closeSettings}
-      />
+      {/* Modals */}
+      <NewQuestModal isOpen={isNewQuestModalOpen} onClose={closeNewQuestModal} />
+      <AchievementsModal isOpen={isAchievementsModalOpen} onClose={closeAchievements} />
+      <ProfileModal isOpen={isProfileModalOpen} onClose={closeProfile} />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={closeSettings} />
     </div>
   );
 };
