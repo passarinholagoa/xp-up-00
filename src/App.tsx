@@ -1,72 +1,32 @@
 
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/sonner';
-import { GameProvider } from '@/contexts/GameContext';
-import { SettingsProvider } from '@/contexts/SettingsContext';
-import { NewQuestModal } from '@/components/NewQuestModal';
-import { AchievementsModal } from '@/components/AchievementsModal';
-import { ProfileModal } from '@/components/ProfileModal';
-import { SettingsModal } from '@/components/SettingsModal';
-import { useGame } from '@/contexts/GameContext';
-import Index from '@/pages/Index';
-import NotFound from '@/pages/NotFound';
-import './App.css';
+import React from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { GameProvider } from "@/contexts/GameContext";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 
-const AppContent = () => {
-  const { 
-    isNewQuestModalOpen, 
-    closeNewQuestModal,
-    isAchievementsModalOpen,
-    closeAchievements,
-    isProfileModalOpen,
-    closeProfile,
-    isSettingsModalOpen,
-    closeSettings
-  } = useGame();
+const queryClient = new QueryClient();
 
-  return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-      
-      <NewQuestModal 
-        isOpen={isNewQuestModalOpen} 
-        onClose={closeNewQuestModal} 
-      />
-      
-      <AchievementsModal 
-        isOpen={isAchievementsModalOpen} 
-        onClose={closeAchievements} 
-      />
-      
-      <ProfileModal 
-        isOpen={isProfileModalOpen} 
-        onClose={closeProfile} 
-      />
-
-      <SettingsModal 
-        isOpen={isSettingsModalOpen} 
-        onClose={closeSettings} 
-      />
-      
-      <Toaster />
-    </>
-  );
-};
-
-function App() {
-  return (
-    <SettingsProvider>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
       <GameProvider>
-        <AppContent />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </GameProvider>
-    </SettingsProvider>
-  );
-}
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;

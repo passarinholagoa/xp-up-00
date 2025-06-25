@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Crown, Coins, Heart, Zap, Menu, X, Settings } from 'lucide-react';
+import { Crown, Coins, Heart, Zap, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGame } from '@/contexts/GameContext';
 import {
@@ -11,7 +12,7 @@ import {
 } from '@/components/ui/sheet';
 
 export const Header = () => {
-  const { gameState, createNewQuest, openProfile, openSettings, profile } = useGame();
+  const { gameState, createNewQuest, openProfile, profile } = useGame();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -152,18 +153,6 @@ export const Header = () => {
                       >
                         Nova Quest
                       </Button>
-
-                      <Button 
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => {
-                          openSettings();
-                          setIsMenuOpen(false);
-                        }}
-                      >
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configurações
-                      </Button>
                     </div>
                   </div>
                 </SheetContent>
@@ -178,13 +167,6 @@ export const Header = () => {
                 onClick={openProfile}
               >
                 Perfil
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={openSettings}
-              >
-                <Settings className="h-4 w-4" />
               </Button>
               <Button 
                 size="sm" 

@@ -55,7 +55,6 @@ interface GameContextType {
   achievements: Achievement[];
   isNewQuestModalOpen: boolean;
   isAchievementsModalOpen: boolean;
-  isSettingsModalOpen: boolean;
   completeHabit: (habitId: number, isPositive: boolean) => void;
   completeDaily: (dailyId: number) => void;
   completeTodo: (todoId: number) => void;
@@ -74,7 +73,6 @@ interface GameContextType {
   openAchievements: () => void;
   closeAchievements: () => void;
   openSettings: () => void;
-  closeSettings: () => void;
   profile: ProfileCustomization;
   shopItems: ShopItem[];
   isProfileModalOpen: boolean;
@@ -130,7 +128,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   
   const initialTotalXp = 14400;
   const initialLevel = calculateLevel(initialTotalXp);
@@ -656,11 +653,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const openSettings = () => {
-    setIsSettingsModalOpen(true);
-  };
-
-  const closeSettings = () => {
-    setIsSettingsModalOpen(false);
+    toast({
+      title: "Configurações",
+      description: "Painel de configurações em desenvolvimento...",
+      className: "bg-gray-500/10 border-gray-500/50"
+    });
   };
 
   return (
@@ -672,7 +669,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       achievements,
       isNewQuestModalOpen,
       isAchievementsModalOpen,
-      isSettingsModalOpen,
       completeHabit,
       completeDaily,
       completeTodo,
@@ -691,7 +687,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       openAchievements,
       closeAchievements,
       openSettings,
-      closeSettings,
       profile,
       shopItems,
       isProfileModalOpen,
