@@ -71,14 +71,14 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-4">
           <DialogTitle className="text-xl font-bold bg-gradient-to-r from-primary to-quest-accent bg-clip-text text-transparent">
             Nova Quest
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Quest Type Selection */}
           <div className="space-y-3">
             <label className="text-sm font-medium">Tipo de Quest</label>
@@ -90,15 +90,15 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
                     key={type.type}
                     type="button"
                     onClick={() => setQuestType(type.type)}
-                    className={`p-3 rounded-lg border text-center transition-all ${
+                    className={`p-2 rounded-lg border text-center transition-all text-xs ${
                       questType === type.type 
                         ? 'border-primary bg-primary/10 text-primary' 
                         : 'border-border hover:border-primary/50'
                     }`}
                   >
-                    <Icon className="h-5 w-5 mx-auto mb-1" />
-                    <div className="text-xs font-medium">{type.label}</div>
-                    <div className="text-xs text-muted-foreground">{type.description}</div>
+                    <Icon className="h-4 w-4 mx-auto mb-1" />
+                    <div className="font-medium">{type.label}</div>
+                    <div className="text-xs text-muted-foreground leading-tight">{type.description}</div>
                   </button>
                 );
               })}
@@ -123,7 +123,7 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Adicione detalhes sobre sua quest..."
-              className="w-full min-h-[80px]"
+              className="w-full min-h-[60px] resize-none"
             />
           </div>
 
@@ -136,7 +136,7 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
                   key={diff.value}
                   type="button"
                   onClick={() => setDifficulty(diff.value)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  className={`px-3 py-2 rounded-full text-xs font-medium transition-all flex-1 ${
                     difficulty === diff.value 
                       ? diff.color
                       : 'bg-muted/20 text-muted-foreground hover:bg-muted/40'
@@ -171,7 +171,7 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
