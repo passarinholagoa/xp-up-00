@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Header } from '../components/Header';
 import { HeroSection } from '../components/HeroSection';
@@ -9,6 +10,7 @@ import { AchievementsModal } from '../components/AchievementsModal';
 import { useGame } from '../contexts/GameContext';
 import { ProfileModal } from '../components/ProfileModal';
 import { SettingsModal } from '../components/SettingsModal';
+import { useTheme } from '../hooks/useTheme';
 
 const Index = () => {
   const { 
@@ -23,8 +25,11 @@ const Index = () => {
     achievements
   } = useGame();
 
+  // Aplicar o tema
+  useTheme();
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background transition-colors duration-300">
       <Header />
       
       <main className="container mx-auto px-4 py-8 space-y-8">

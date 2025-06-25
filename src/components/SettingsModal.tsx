@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -44,9 +43,9 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-gray-900 border-gray-800 text-white">
+      <DialogContent className="max-w-md bg-card border-border text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-cyan-400 flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-primary flex items-center gap-2">
             <Zap className="h-5 w-5" />
             Configurações XpUp
           </DialogTitle>
@@ -55,7 +54,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
         <ScrollArea className="max-h-[70vh] pr-2">
           <div className="space-y-6">
             {/* Personalização Visual */}
-            <Card className="p-4 bg-gray-800/50 border-gray-700">
+            <Card className="p-4 bg-card/50 border-border">
               <div className="flex items-center gap-2 mb-4">
                 <Palette className="h-4 w-4 text-purple-400" />
                 <h3 className="font-semibold text-purple-400">Personalização Visual</h3>
@@ -81,7 +80,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                     <div className="flex flex-col">
                       <Label className="text-sm">Barra de XP Animada</Label>
                       {settingsLocks.animatedXpBar.isLocked && (
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           {settingsLocks.animatedXpBar.reason}
                         </span>
                       )}
@@ -124,7 +123,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             </Card>
 
             {/* Notificações Globais */}
-            <Card className="p-4 bg-gray-800/50 border-gray-700">
+            <Card className="p-4 bg-card/50 border-border">
               <div className="flex items-center gap-2 mb-4">
                 <Bell className="h-4 w-4 text-blue-400" />
                 <h3 className="font-semibold text-blue-400">Notificações Globais</h3>
@@ -135,7 +134,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                   <Bell className="h-4 w-4" />
                   <div className="flex flex-col">
                     <Label className="text-sm">Ativar Notificações</Label>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-muted-foreground">
                       Controla todas as notificações do sistema
                     </span>
                   </div>
@@ -148,7 +147,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             </Card>
 
             {/* Funcionalidades Gamificadas */}
-            <Card className="p-4 bg-gray-800/50 border-gray-700">
+            <Card className="p-4 bg-card/50 border-border">
               <div className="flex items-center gap-2 mb-4">
                 <Shield className="h-4 w-4 text-red-400" />
                 <h3 className="font-semibold text-red-400">Funcionalidades Gamificadas</h3>
@@ -166,7 +165,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                           <Badge variant="destructive" className="text-xs">ATIVO</Badge>
                         )}
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         Penalidades severas, mas XP e moedas aumentados
                       </span>
                       {settingsLocks.hardcoreMode.isLocked && (
@@ -197,7 +196,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                           <Badge variant="secondary" className="text-xs">PAUSADO</Badge>
                         )}
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         Pausa penalidades temporariamente
                       </span>
                     </div>
@@ -223,19 +222,19 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
           </div>
         </ScrollArea>
 
-        <Separator className="bg-gray-700" />
+        <Separator className="bg-border" />
 
         <div className="flex gap-3">
           <Button 
             variant="outline" 
             onClick={handleCancel}
-            className="flex-1 border-gray-600 text-white hover:bg-gray-800"
+            className="flex-1 border-border text-foreground hover:bg-accent"
           >
             Cancelar
           </Button>
           <Button 
             onClick={handleSave}
-            className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white"
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             Salvar Configurações
           </Button>
