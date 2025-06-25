@@ -7,16 +7,14 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Lock, X } from 'lucide-react';
 import { Achievement, ACHIEVEMENT_CATEGORIES } from '@/types/achievements';
-import { useGame } from '@/contexts/GameContext';
 
 interface AchievementsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  achievements: Achievement[];
 }
 
-export const AchievementsModal = ({ isOpen, onClose }: AchievementsModalProps) => {
-  const { achievements } = useGame();
-  
+export const AchievementsModal = ({ isOpen, onClose, achievements }: AchievementsModalProps) => {
   const groupedAchievements = achievements.reduce((acc, achievement) => {
     if (!acc[achievement.category]) {
       acc[achievement.category] = [];
