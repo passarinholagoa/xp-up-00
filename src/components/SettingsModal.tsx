@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGame } from '@/contexts/GameContext';
 import { XpUpSettings, getSettingsLocks } from '@/types/settings';
-import { Lock, Palette, Bell, Zap, Moon, Sun, Shield, Plane, Frame, Image } from 'lucide-react';
+import { Lock, Palette, Bell, Zap, Shield, Plane, Frame, Image } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -61,18 +61,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
               </div>
               
               <div className="space-y-4">
-                {/* Tema Escuro/Claro */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {tempSettings.darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                    <Label className="text-sm">Tema Escuro</Label>
-                  </div>
-                  <Switch
-                    checked={tempSettings.darkMode}
-                    onCheckedChange={() => handleToggle('darkMode')}
-                  />
-                </div>
-
                 {/* Barra de XP Animada */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
