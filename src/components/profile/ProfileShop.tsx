@@ -18,7 +18,7 @@ export const ProfileShop = ({ shopItems, gameState, achievements, onBuyItem }: P
   return (
     <div className="space-y-4">
       <Tabs defaultValue="frames" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-1 h-8 mb-4 gap-2">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-900/80 border-gray-700 p-1 h-8 mb-4 gap-1">
           <TabsTrigger value="frames" className="text-white data-[state=active]:bg-gray-700 text-xs py-1">
             Molduras
           </TabsTrigger>
