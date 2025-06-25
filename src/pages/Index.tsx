@@ -8,6 +8,7 @@ import { NewQuestModal } from '../components/NewQuestModal';
 import { AchievementsModal } from '../components/AchievementsModal';
 import { useGame } from '../contexts/GameContext';
 import { ProfileModal } from '../components/ProfileModal';
+import { SettingsModal } from '../components/SettingsModal';
 
 const Index = () => {
   const { 
@@ -17,6 +18,8 @@ const Index = () => {
     closeAchievements,
     isProfileModalOpen,
     closeProfile,
+    isSettingsModalOpen,
+    closeSettings,
     achievements
   } = useGame();
 
@@ -55,6 +58,11 @@ const Index = () => {
       <ProfileModal
         isOpen={isProfileModalOpen}
         onClose={closeProfile}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={closeSettings}
       />
     </div>
   );

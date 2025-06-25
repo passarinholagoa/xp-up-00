@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
 import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
+import { XpUpSettings, DEFAULT_SETTINGS } from '@/types/settings';
 
 interface GameState {
   hp: number;
@@ -80,6 +81,10 @@ interface GameContextType {
   buyShopItem: (itemId: string) => void;
   openProfile: () => void;
   closeProfile: () => void;
+  settings: XpUpSettings;
+  isSettingsModalOpen: boolean;
+  updateSettings: (newSettings: XpUpSettings) => void;
+  closeSettings: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -128,6 +133,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [settings, setSettings] = useState<XpUpSettings>(DEFAULT_SETTINGS);
   
   const initialTotalXp = 14400;
   const initialLevel = calculateLevel(initialTotalXp);
@@ -374,22 +381,29 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       const newLevel = calculateLevel(newTotalXp);
       const { currentLevelXp, maxLevelXp } = calculateLevelProgress(newTotalXp, newLevel);
       
+      // Apply hardcore mode multiplier if enabled
+      const finalXpGain = settings.hardcoreMode ? Math.floor(xpGain * 1.5) : xpGain;
+      const adjustedTotalXp = settings.hardcoreMode ? prev.totalXp + finalXpGain : newTotalXp;
+      const adjustedLevel = calculateLevel(adjustedTotalXp);
+      
       // Check for level up
-      if (newLevel > prev.level) {
-        checkAchievements('level-up', { newLevel });
-        toast({
-          title: `🎉 LEVEL UP! 🎉`,
-          description: `Parabéns! Você alcançou o nível ${newLevel}!`,
-          className: "bg-quest-legendary/20 border-quest-legendary"
-        });
+      if (adjustedLevel > prev.level) {
+        checkAchievements('level-up', { newLevel: adjustedLevel });
+        if (settings.globalNotifications) {
+          toast({
+            title: `🎉 LEVEL UP! 🎉`,
+            description: `Parabéns! Você alcançou o nível ${adjustedLevel}!`,
+            className: "bg-quest-legendary/20 border-quest-legendary"
+          });
+        }
       }
       
       return {
         ...prev,
         xp: currentLevelXp,
-        totalXp: newTotalXp,
+        totalXp: adjustedTotalXp,
         maxXp: maxLevelXp,
-        level: newLevel
+        level: adjustedLevel
       };
     });
   };
@@ -397,8 +411,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const completeHabit = (habitId: number, isPositive: boolean) => {
     if (isPositive) {
       const habit = habits.find(h => h.id === habitId);
-      const xpGain = habit?.xpReward || 15;
-      const coinGain = habit?.coinReward || 3;
+      const baseXpGain = habit?.xpReward || 15;
+      const baseCoinGain = habit?.coinReward || 3;
+      
+      // Apply hardcore mode multipliers
+      const xpGain = settings.hardcoreMode ? Math.floor(baseXpGain * 1.5) : baseXpGain;
+      const coinGain = settings.hardcoreMode ? Math.floor(baseCoinGain * 1.5) : baseCoinGain;
       
       updateGameStateXp(xpGain);
       setGameState(prev => ({
@@ -407,31 +425,52 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         hp: Math.min(prev.hp + 2, prev.maxHp)
       }));
 
-      toast({
-        title: "Hábito Completado! 🎉",
-        description: `+${xpGain} XP, +${coinGain} moedas, +2 HP`,
-        className: "bg-green-500/10 border-green-500/50"
-      });
+      if (settings.globalNotifications) {
+        toast({
+          title: "Hábito Completado! 🎉",
+          description: `+${xpGain} XP, +${coinGain} moedas, +2 HP${settings.hardcoreMode ? ' (Modo Hardcore)' : ''}`,
+          className: "bg-green-500/10 border-green-500/50"
+        });
+      }
     } else {
-      const hpLoss = 10;
+      // Apply vacation mode protection
+      if (settings.vacationMode) {
+        if (settings.globalNotifications) {
+          toast({
+            title: "Modo Férias Ativo ✈️",
+            description: "Nenhuma penalidade aplicada durante as férias!",
+            className: "bg-blue-500/10 border-blue-500/50"
+          });
+        }
+        return;
+      }
+
+      // Apply hardcore mode penalty multiplier
+      const hpLoss = settings.hardcoreMode ? 15 : 10;
       
       setGameState(prev => ({
         ...prev,
         hp: Math.max(prev.hp - hpLoss, 0)
       }));
 
-      toast({
-        title: "Hábito Negativo Registrado 😞",
-        description: `-${hpLoss} HP. Tente novamente!`,
-        className: "bg-red-500/10 border-red-500/50"
-      });
+      if (settings.globalNotifications) {
+        toast({
+          title: "Hábito Negativo Registrado 😞",
+          description: `-${hpLoss} HP${settings.hardcoreMode ? ' (Modo Hardcore)' : ''}. Tente novamente!`,
+          className: "bg-red-500/10 border-red-500/50"
+        });
+      }
     }
   };
 
   const completeDaily = (dailyId: number) => {
     const daily = dailies.find(d => d.id === dailyId);
-    const xpGain = daily?.xpReward || 18;
-    const coinGain = daily?.coinReward || 3;
+    const baseXpGain = daily?.xpReward || 18;
+    const baseCoinGain = daily?.coinReward || 3;
+    
+    // Apply hardcore mode multipliers
+    const xpGain = settings.hardcoreMode ? Math.floor(baseXpGain * 1.5) : baseXpGain;
+    const coinGain = settings.hardcoreMode ? Math.floor(baseCoinGain * 1.5) : baseCoinGain;
     
     updateGameStateXp(xpGain);
     setGameState(prev => ({
@@ -439,17 +478,23 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       coins: prev.coins + coinGain
     }));
 
-    toast({
-      title: "Daily Completada! ✨",
-      description: `+${xpGain} XP, +${coinGain} moedas`,
-      className: "bg-blue-500/10 border-blue-500/50"
-    });
+    if (settings.globalNotifications) {
+      toast({
+        title: "Daily Completada! ✨",
+        description: `+${xpGain} XP, +${coinGain} moedas${settings.hardcoreMode ? ' (Modo Hardcore)' : ''}`,
+        className: "bg-blue-500/10 border-blue-500/50"
+      });
+    }
   };
 
   const completeTodo = (todoId: number) => {
     const todo = todos.find(t => t.id === todoId);
-    const xpGain = todo?.xpReward || 25;
-    const coinGain = todo?.coinReward || 5;
+    const baseXpGain = todo?.xpReward || 25;
+    const baseCoinGain = todo?.coinReward || 5;
+    
+    // Apply hardcore mode multipliers
+    const xpGain = settings.hardcoreMode ? Math.floor(baseXpGain * 1.5) : baseXpGain;
+    const coinGain = settings.hardcoreMode ? Math.floor(baseCoinGain * 1.5) : baseCoinGain;
     
     updateGameStateXp(xpGain);
     setGameState(prev => ({
@@ -457,11 +502,13 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       coins: prev.coins + coinGain
     }));
 
-    toast({
-      title: "Quest Completada! 🏆",
-      description: `+${xpGain} XP, +${coinGain} moedas`,
-      className: "bg-purple-500/10 border-purple-500/50"
-    });
+    if (settings.globalNotifications) {
+      toast({
+        title: "Quest Completada! 🏆",
+        description: `+${xpGain} XP, +${coinGain} moedas${settings.hardcoreMode ? ' (Modo Hardcore)' : ''}`,
+        className: "bg-purple-500/10 border-purple-500/50"
+      });
+    }
   };
 
   const addHabit = (habit: Omit<Habit, 'id'>) => {
@@ -652,6 +699,26 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     setIsAchievementsModalOpen(false);
   };
 
+  const updateSettings = (newSettings: XpUpSettings) => {
+    setSettings(newSettings);
+    
+    if (settings.globalNotifications) {
+      toast({
+        title: "Configurações Atualizadas! ⚙️",
+        description: "Suas preferências foram salvas com sucesso",
+        className: "bg-cyan-500/10 border-cyan-500/50"
+      });
+    }
+  };
+
+  const openSettings = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  const closeSettings = () => {
+    setIsSettingsModalOpen(false);
+  };
+
   const openSettings = () => {
     toast({
       title: "Configurações",
@@ -694,6 +761,10 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       buyShopItem,
       openProfile,
       closeProfile,
+      settings,
+      isSettingsModalOpen,
+      updateSettings,
+      closeSettings,
     }}>
       {children}
     </GameContext.Provider>
