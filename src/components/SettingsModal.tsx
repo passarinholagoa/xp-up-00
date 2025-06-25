@@ -63,27 +63,47 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
               
               <div className="space-y-4">
                 {/* Barra de XP Animada */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    <div className="flex flex-col">
-                      <Label className="text-sm">Barra de XP Animada</Label>
-                      <span className="text-xs text-muted-foreground">
-                        {settingsLocks.animatedXpBar.isLocked 
-                          ? settingsLocks.animatedXpBar.reason
-                          : 'Adiciona efeitos visuais à barra de experiência'
-                        }
-                      </span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      <div className="flex flex-col">
+                        <Label className="text-sm">Barra de XP Animada</Label>
+                        <span className="text-xs text-muted-foreground">
+                          {settingsLocks.animatedXpBar.isLocked 
+                            ? settingsLocks.animatedXpBar.reason
+                            : 'Adiciona efeitos visuais à barra de experiência'
+                          }
+                        </span>
+                      </div>
+                      {settingsLocks.animatedXpBar.isLocked && (
+                        <Lock className="h-3 w-3 text-yellow-400" />
+                      )}
                     </div>
-                    {settingsLocks.animatedXpBar.isLocked && (
-                      <Lock className="h-3 w-3 text-yellow-400" />
-                    )}
+                    <Switch
+                      checked={tempSettings.animatedXpBar}
+                      onCheckedChange={() => handleToggle('animatedXpBar')}
+                      disabled={settingsLocks.animatedXpBar.isLocked}
+                    />
                   </div>
-                  <Switch
-                    checked={tempSettings.animatedXpBar}
-                    onCheckedChange={() => handleToggle('animatedXpBar')}
-                    disabled={settingsLocks.animatedXpBar.isLocked}
-                  />
+                  
+                  {/* Descrição detalhada da funcionalidade */}
+                  {!settingsLocks.animatedXpBar.isLocked && (
+                    <div className="ml-6 p-3 bg-blue-900/20 border border-blue-800/30 rounded-lg">
+                      <div className="text-xs text-blue-300 space-y-1">
+                        <p className="font-medium">✨ Quando ativado, você verá:</p>
+                        <ul className="space-y-1 ml-2">
+                          <li>• Transições suaves ao ganhar XP</li>
+                          <li>• Efeitos de brilho na barra de progresso</li>
+                          <li>• Animações visuais aprimoradas</li>
+                          <li>• Pulsos de energia ao completar tarefas</li>
+                        </ul>
+                        <p className="text-blue-400 font-medium mt-2">
+                          🎯 Torna a experiência mais imersiva e recompensadora!
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Mostrar Moldura */}
