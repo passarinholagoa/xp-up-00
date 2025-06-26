@@ -1,5 +1,4 @@
 
-
 export interface XpUpSettings {
   // Personalização Visual
   darkMode: boolean;
@@ -50,4 +49,3 @@ export const getSettingsLocks = (level: number, achievements: any[]): Record<key
     vacationMode: { isLocked: false, reason: '' }
   };
 };
-
