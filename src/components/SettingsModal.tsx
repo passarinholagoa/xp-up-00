@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGame } from '@/contexts/GameContext';
 import { XpUpSettings, getSettingsLocks } from '@/types/settings';
-import { Lock, Palette, Bell, Zap, Shield, Plane, Frame, Image } from 'lucide-react';
+import { Lock, Palette, Bell, Zap, Shield, Plane } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -95,40 +95,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                       </p>
                     </div>
                   )}
-                </div>
-
-                {/* Mostrar Moldura */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Frame className="h-4 w-4" />
-                    <div className="flex flex-col">
-                      <Label className="text-sm">Mostrar Moldura no Perfil</Label>
-                      <span className="text-xs text-muted-foreground">
-                        Exibe moldura decorativa no seu perfil
-                      </span>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={tempSettings.showProfileFrame}
-                    onCheckedChange={() => handleToggle('showProfileFrame')}
-                  />
-                </div>
-
-                {/* Exibir Fundo */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Image className="h-4 w-4" />
-                    <div className="flex flex-col">
-                      <Label className="text-sm">Exibir Fundo no Perfil</Label>
-                      <span className="text-xs text-muted-foreground">
-                        Mostra imagem de fundo personalizada
-                      </span>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={tempSettings.showProfileBackground}
-                    onCheckedChange={() => handleToggle('showProfileBackground')}
-                  />
                 </div>
               </div>
             </Card>
