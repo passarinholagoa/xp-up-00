@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Crown, Coins, Heart, Zap, Menu, X, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,6 @@ export const Header = () => {
                 alt="XPJP Logo" 
                 className="h-10 w-10 object-contain"
               />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-quest-legendary rounded-full animate-pulse" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">
