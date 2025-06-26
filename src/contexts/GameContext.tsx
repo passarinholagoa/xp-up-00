@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
@@ -638,7 +639,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const deleteTodo = (id: number) => {
-    const todo = todos.find(t => t.id === todoId);
+    const todo = todos.find(t => t.id === id);
     setTodos(prev => prev.filter(t => t.id !== id));
     
     // Only show notification if global notifications are enabled
