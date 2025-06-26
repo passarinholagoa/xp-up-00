@@ -1,3 +1,4 @@
+
 import { LucideIcon } from "lucide-react";
 
 export interface Achievement {
@@ -9,7 +10,24 @@ export interface Achievement {
   unlocked: boolean;
   unlockedAt?: Date;
   category: 'main' | 'side' | 'special';
+  progress?: number;
+  maxProgress?: number;
 }
+
+export const ACHIEVEMENT_CATEGORIES = {
+  main: {
+    title: 'Principais',
+    color: 'bg-quest-common/20 border-quest-common/50'
+  },
+  side: {
+    title: 'Secundárias',
+    color: 'bg-quest-uncommon/20 border-quest-uncommon/50'
+  },
+  special: {
+    title: 'Especiais',
+    color: 'bg-quest-legendary/20 border-quest-legendary/50'
+  }
+};
 
 export const ACHIEVEMENTS: Achievement[] = [
   {
