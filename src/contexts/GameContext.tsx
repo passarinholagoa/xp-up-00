@@ -362,14 +362,16 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         }
       }
 
-      // Show toast for new achievements
-      newUnlocks.forEach(achievement => {
-        toast({
-          title: `🏆 CONQUISTA DESBLOQUEADA! 🏆`,
-          description: `${achievement.icon} ${achievement.title}: ${achievement.description}`,
-          className: "bg-quest-legendary/20 border-quest-legendary"
+      // Show toast for new achievements only if global notifications are enabled
+      if (settings.globalNotifications) {
+        newUnlocks.forEach(achievement => {
+          toast({
+            title: `🏆 CONQUISTA DESBLOQUEADA! 🏆`,
+            description: `${achievement.icon} ${achievement.title}: ${achievement.description}`,
+            className: "bg-quest-legendary/20 border-quest-legendary"
+          });
         });
-      });
+      }
 
       return updated;
     });
@@ -386,7 +388,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       const adjustedTotalXp = settings.hardcoreMode ? prev.totalXp + finalXpGain : newTotalXp;
       const adjustedLevel = calculateLevel(adjustedTotalXp);
       
-      // Check for level up
+      // Check for level up and show notification only if global notifications are enabled
       if (adjustedLevel > prev.level) {
         checkAchievements('level-up', { newLevel: adjustedLevel });
         if (settings.globalNotifications) {
@@ -425,6 +427,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         hp: Math.min(prev.hp + 2, prev.maxHp)
       }));
 
+      // Only show notification if global notifications are enabled
       if (settings.globalNotifications) {
         toast({
           title: "Hábito Completado! 🎉",
@@ -453,6 +456,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         hp: Math.max(prev.hp - hpLoss, 0)
       }));
 
+      // Only show notification if global notifications are enabled
       if (settings.globalNotifications) {
         toast({
           title: "Hábito Negativo Registrado 😞",
@@ -478,6 +482,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       coins: prev.coins + coinGain
     }));
 
+    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Daily Completada! ✨",
@@ -502,6 +507,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       coins: prev.coins + coinGain
     }));
 
+    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Quest Completada! 🏆",
@@ -520,33 +526,42 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       checkAchievements('first-habit-created');
     }
     
-    toast({
-      title: "Novo Hábito Criado! 🎯",
-      description: `"${habit.title}" foi adicionado à sua lista`,
-      className: "bg-green-500/10 border-green-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Novo Hábito Criado! 🎯",
+        description: `"${habit.title}" foi adicionado à sua lista`,
+        className: "bg-green-500/10 border-green-500/50"
+      });
+    }
   };
 
   const addDaily = (daily: Omit<Daily, 'id'>) => {
     const newId = Math.max(...dailies.map(d => d.id), 0) + 1;
     setDailies(prev => [...prev, { ...daily, id: newId }]);
     
-    toast({
-      title: "Nova Daily Criada! ⚡",
-      description: `"${daily.title}" foi adicionada à sua lista`,
-      className: "bg-blue-500/10 border-blue-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Nova Daily Criada! ⚡",
+        description: `"${daily.title}" foi adicionada à sua lista`,
+        className: "bg-blue-500/10 border-blue-500/50"
+      });
+    }
   };
 
   const addTodo = (todo: Omit<Todo, 'id'>) => {
     const newId = Math.max(...todos.map(t => t.id), 0) + 1;
     setTodos(prev => [...prev, { ...todo, id: newId }]);
     
-    toast({
-      title: "Nova Quest Criada! 🎮",
-      description: `"${todo.title}" foi adicionada à sua lista`,
-      className: "bg-purple-500/10 border-purple-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Nova Quest Criada! 🎮",
+        description: `"${todo.title}" foi adicionada à sua lista`,
+        className: "bg-purple-500/10 border-purple-500/50"
+      });
+    }
   };
 
   const updateHabit = (id: number, updatedHabit: Partial<Habit>) => {
@@ -554,11 +569,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       habit.id === id ? { ...habit, ...updatedHabit } : habit
     ));
     
-    toast({
-      title: "Hábito Atualizado! ✏️",
-      description: "As alterações foram salvas",
-      className: "bg-blue-500/10 border-blue-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Hábito Atualizado! ✏️",
+        description: "As alterações foram salvas",
+        className: "bg-blue-500/10 border-blue-500/50"
+      });
+    }
   };
 
   const updateDaily = (id: number, updatedDaily: Partial<Daily>) => {
@@ -566,11 +584,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       daily.id === id ? { ...daily, ...updatedDaily } : daily
     ));
     
-    toast({
-      title: "Daily Atualizada! ✏️",
-      description: "As alterações foram salvas",
-      className: "bg-blue-500/10 border-blue-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Daily Atualizada! ✏️",
+        description: "As alterações foram salvas",
+        className: "bg-blue-500/10 border-blue-500/50"
+      });
+    }
   };
 
   const updateTodo = (id: number, updatedTodo: Partial<Todo>) => {
@@ -578,44 +599,56 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       todo.id === id ? { ...todo, ...updatedTodo } : todo
     ));
     
-    toast({
-      title: "Quest Atualizada! ✏️",
-      description: "As alterações foram salvas",
-      className: "bg-blue-500/10 border-blue-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Quest Atualizada! ✏️",
+        description: "As alterações foram salvas",
+        className: "bg-blue-500/10 border-blue-500/50"
+      });
+    }
   };
 
   const deleteHabit = (id: number) => {
     const habit = habits.find(h => h.id === id);
     setHabits(prev => prev.filter(h => h.id !== id));
     
-    toast({
-      title: "Hábito Removido! 🗑️",
-      description: `"${habit?.title}" foi removido`,
-      className: "bg-red-500/10 border-red-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Hábito Removido! 🗑️",
+        description: `"${habit?.title}" foi removido`,
+        className: "bg-red-500/10 border-red-500/50"
+      });
+    }
   };
 
   const deleteDaily = (id: number) => {
     const daily = dailies.find(d => d.id === id);
     setDailies(prev => prev.filter(d => d.id !== id));
     
-    toast({
-      title: "Daily Removida! 🗑️",
-      description: `"${daily?.title}" foi removida`,
-      className: "bg-red-500/10 border-red-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Daily Removida! 🗑️",
+        description: `"${daily?.title}" foi removida`,
+        className: "bg-red-500/10 border-red-500/50"
+      });
+    }
   };
 
   const deleteTodo = (id: number) => {
-    const todo = todos.find(t => t.id === id);
+    const todo = todos.find(t => t.id === todoId);
     setTodos(prev => prev.filter(t => t.id !== id));
     
-    toast({
-      title: "Quest Removida! 🗑️",
-      description: `"${todo?.title}" foi removida`,
-      className: "bg-red-500/10 border-red-500/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Quest Removida! 🗑️",
+        description: `"${todo?.title}" foi removida`,
+        className: "bg-red-500/10 border-red-500/50"
+      });
+    }
   };
 
   const createNewQuest = () => {
@@ -629,11 +662,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const updateProfile = (newProfile: ProfileCustomization) => {
     setProfile(newProfile);
     
-    toast({
-      title: "Perfil Atualizado! ✨",
-      description: "Suas personalizações foram salvas",
-      className: "bg-quest-primary/10 border-quest-primary/50"
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: "Perfil Atualizado! ✨",
+        description: "Suas personalizações foram salvas",
+        className: "bg-quest-primary/10 border-quest-primary/50"
+      });
+    }
   };
 
   const buyShopItem = (itemId: string) => {
@@ -655,11 +691,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         missingRequirements.push(`conquista "${achievement?.title}"`);
       }
 
-      toast({
-        title: "Requisitos não atendidos 🚫",
-        description: `Faltam: ${missingRequirements.join(', ')}`,
-        className: "bg-red-500/10 border-red-500/50"
-      });
+      // Only show notification if global notifications are enabled
+      if (settings.globalNotifications) {
+        toast({
+          title: "Requisitos não atendidos 🚫",
+          description: `Faltam: ${missingRequirements.join(', ')}`,
+          className: "bg-red-500/10 border-red-500/50"
+        });
+      }
       return;
     }
 
@@ -672,11 +711,14 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       i.id === itemId ? { ...i, owned: true } : i
     ));
 
-    toast({
-      title: `${item.icon} Item Comprado!`,
-      description: `"${item.name}" foi adicionado ao seu inventário`,
-      className: `bg-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/10 border-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/50`
-    });
+    // Only show notification if global notifications are enabled
+    if (settings.globalNotifications) {
+      toast({
+        title: `${item.icon} Item Comprado!`,
+        description: `"${item.name}" foi adicionado ao seu inventário`,
+        className: `bg-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/10 border-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/50`
+      });
+    }
   };
 
   const openProfile = () => {
@@ -702,7 +744,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   const updateSettings = (newSettings: XpUpSettings) => {
     setSettings(newSettings);
     
-    if (settings.globalNotifications) {
+    // Only show notification if global notifications are enabled (use the NEW settings)
+    if (newSettings.globalNotifications) {
       toast({
         title: "Configurações Atualizadas! ⚙️",
         description: "Suas preferências foram salvas com sucesso",
