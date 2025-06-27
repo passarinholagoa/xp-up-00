@@ -58,83 +58,94 @@ export const DailiesList = () => {
         
         return (
           <Card key={daily.id} className={`quest-card ${completed ? 'opacity-75' : ''}`}>
-            <div className="flex items-center gap-4">
-              <Checkbox 
-                checked={completed} 
-                disabled={completed}
-                className="data-[state=checked]:bg-quest-primary data-[state=checked]:border-quest-primary"
-              />
-              
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-3">
-                  <h3 className={`font-semibold ${completed ? 'line-through text-muted-foreground' : ''}`}>
-                    {daily.title}
-                  </h3>
-                  <Badge className={getDifficultyColor(daily.difficulty)}>
-                    {daily.difficulty}
-                  </Badge>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Clock className="h-3 w-3" />
-                    <span className="text-xs">{daily.dueTime}</span>
-                  </div>
-                </div>
+            <div className="space-y-4">
+              {/* Header com título, checkbox e badges */}
+              <div className="flex items-start gap-3">
+                <Checkbox 
+                  checked={completed} 
+                  disabled={completed}
+                  className="data-[state=checked]:bg-quest-primary data-[state=checked]:border-quest-primary mt-1 flex-shrink-0"
+                />
                 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Zap className="h-3 w-3 text-xp-bar" />
-                    <span>+{daily.xpReward} XP</span>
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <h3 className={`font-semibold text-base ${completed ? 'line-through text-muted-foreground' : ''}`}>
+                      {daily.title}
+                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge className={getDifficultyColor(daily.difficulty)}>
+                        {daily.difficulty}
+                      </Badge>
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        <span className="text-xs">{daily.dueTime}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Coins className="h-3 w-3 text-quest-legendary" />
-                    <span>+{daily.coinReward}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3 text-orange-400" />
-                    <span>{daily.streak} dias</span>
+                  
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                    <div className="flex items-center gap-1">
+                      <Zap className="h-3 w-3 text-xp-bar" />
+                      <span>+{daily.xpReward} XP</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Coins className="h-3 w-3 text-quest-legendary" />
+                      <span>+{daily.coinReward}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3 text-orange-400" />
+                      <span>{daily.streak} dias</span>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2">
+              {/* Botões de ação */}
+              <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-border/50">
                 {!completed && (
                   <Button 
                     size="sm" 
-                    className="bg-quest-gradient hover:opacity-90 glow-effect"
+                    className="bg-quest-gradient hover:opacity-90 glow-effect flex-1 sm:flex-initial"
                     onClick={() => handleCompleteDaily(daily)}
                   >
                     Completar
                   </Button>
                 )}
                 
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleEdit(daily)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button size="sm" variant="outline">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Remover Daily</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Tem certeza que deseja remover "{daily.title}"? Esta ação não pode ser desfeita.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDelete(daily.id)}>
-                        Remover
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <div className="flex gap-2 sm:ml-auto">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 sm:flex-initial"
+                    onClick={() => handleEdit(daily)}
+                  >
+                    <Edit2 className="h-4 w-4 sm:mr-0 mr-2" />
+                    <span className="sm:hidden">Editar</span>
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="outline" className="flex-1 sm:flex-initial">
+                        <Trash2 className="h-4 w-4 sm:mr-0 mr-2" />
+                        <span className="sm:hidden">Remover</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Remover Daily</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja remover "{daily.title}"? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete(daily.id)}>
+                          Remover
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
             </div>
           </Card>

@@ -66,15 +66,16 @@ export const TodosList = () => {
         
         return (
           <Card key={todo.id} className={`quest-card ${completed ? 'opacity-75' : ''} ${todo.isOverdue ? 'border-red-500/50' : ''}`}>
-            <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-3">
-                    <h3 className={`font-semibold ${completed ? 'line-through text-muted-foreground' : ''}`}>
+            <div className="space-y-4">
+              {/* Header com título e indicador de atraso */}
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className={`font-semibold text-base ${completed ? 'line-through text-muted-foreground' : ''}`}>
                       {todo.title}
                     </h3>
                     {todo.isOverdue && !completed && (
-                      <AlertTriangle className="h-4 w-4 text-red-400" />
+                      <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0" />
                     )}
                   </div>
                   
@@ -91,7 +92,7 @@ export const TodosList = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                     <div className="flex items-center gap-1">
                       <Zap className="h-3 w-3 text-xp-bar" />
                       <span>+{todo.xpReward} XP</span>
@@ -102,31 +103,37 @@ export const TodosList = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Botões de ação */}
+              <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-border/50">
+                {!completed && (
+                  <Button 
+                    size="sm" 
+                    className="bg-quest-gradient hover:opacity-90 glow-effect flex-1 sm:flex-initial"
+                    onClick={() => handleCompleteTodo(todo)}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Completar
+                  </Button>
+                )}
                 
-                <div className="flex items-center gap-2">
-                  {!completed && (
-                    <Button 
-                      size="sm" 
-                      className="bg-quest-gradient hover:opacity-90 glow-effect"
-                      onClick={() => handleCompleteTodo(todo)}
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Completar
-                    </Button>
-                  )}
-                  
+                <div className="flex gap-2 sm:ml-auto">
                   <Button
                     size="sm"
                     variant="outline"
+                    className="flex-1 sm:flex-initial"
                     onClick={() => handleEdit(todo)}
                   >
-                    <Edit2 className="h-4 w-4" />
+                    <Edit2 className="h-4 w-4 sm:mr-0 mr-2" />
+                    <span className="sm:hidden">Editar</span>
                   </Button>
                   
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button size="sm" variant="outline">
-                        <Trash2 className="h-4 w-4" />
+                      <Button size="sm" variant="outline" className="flex-1 sm:flex-initial">
+                        <Trash2 className="h-4 w-4 sm:mr-0 mr-2" />
+                        <span className="sm:hidden">Remover</span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
