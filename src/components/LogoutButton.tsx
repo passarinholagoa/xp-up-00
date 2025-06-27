@@ -21,11 +21,11 @@ export const LogoutButton = () => {
   return (
     <Button
       variant="outline"
-      size="sm"
+      size="lg"
       onClick={handleLogout}
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 h-12 px-4"
     >
-      <LogOut className="h-4 w-4" />
+      <LogOut className="h-5 w-5" />
       Sair
     </Button>
   );

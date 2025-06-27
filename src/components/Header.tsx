@@ -34,32 +34,34 @@ export const Header = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
-              size="sm" 
+              size="lg" 
               onClick={openAchievements}
-              className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10"
+              className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 h-12 w-12"
             >
-              <Trophy className="h-4 w-4" />
+              <Trophy className="h-6 w-6" />
             </Button>
             <Button 
               variant="ghost" 
-              size="sm" 
+              size="lg" 
               onClick={openProfile}
-              className="text-purple-300 hover:text-purple-200 hover:bg-purple-400/10"
+              className="text-purple-300 hover:text-purple-200 hover:bg-purple-400/10 h-12 w-12"
             >
-              <ShoppingBag className="h-4 w-4" />
+              <ShoppingBag className="h-6 w-6" />
             </Button>
             <Button 
               variant="ghost" 
-              size="sm" 
+              size="lg" 
               onClick={openSettings}
-              className="text-gray-300 hover:text-gray-200 hover:bg-gray-400/10"
+              className="text-gray-300 hover:text-gray-200 hover:bg-gray-400/10 h-12 w-12"
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-6 w-6" />
             </Button>
-            <LogoutButton />
+            <div className="ml-2">
+              <LogoutButton />
+            </div>
           </div>
         </div>
       </CardContent>
