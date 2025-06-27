@@ -10,7 +10,7 @@ import { LogoutButton } from '@/components/LogoutButton';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const Header = () => {
-  const { gameState, openAchievements, openProfile, openSettings } = useGame();
+  const { gameState, openAchievements, openProfile, openSettings, profile } = useGame();
   const { user } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -22,14 +22,19 @@ export const Header = () => {
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 border-2 border-primary/50">
-              <AvatarFallback className="bg-primary/20 text-primary font-bold text-lg">
-                {user?.name?.charAt(0) || '?'}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-xl font-bold text-white">{user?.name || 'Usuário'}</h2>
-              <p className="text-purple-200 text-sm">Nível {gameState.level}</p>
+            {/* Avatar customizado com perfil */}
+            <div className={`relative ${profile.backgroundColor} ${profile.frameBorder} p-3 rounded-lg`}>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl">
+                  {profile.avatar}
+                </div>
+                <div>
+                  <h2 className={`text-xl font-bold ${profile.nameColor}`}>
+                    {profile.displayName || user?.name || 'Aventureiro'}
+                  </h2>
+                  <p className="text-purple-200 text-sm">Nível {gameState.level}</p>
+                </div>
+              </div>
             </div>
           </div>
           
