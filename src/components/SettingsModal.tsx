@@ -2,15 +2,16 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGame } from '@/contexts/GameContext';
 import { XpUpSettings, getSettingsLocks } from '@/types/settings';
-import { Lock, Palette, Bell, Zap, Shield, Plane, CircleHelp } from 'lucide-react';
+import { Zap } from 'lucide-react';
+import { SettingsVisualSection } from '@/components/settings/SettingsVisualSection';
+import { SettingsNotificationSection } from '@/components/settings/SettingsNotificationSection';
+import { SettingsGameSection } from '@/components/settings/SettingsGameSection';
+import { SettingsInfoSection } from '@/components/settings/SettingsInfoSection';
+import { SettingsHelpSection } from '@/components/settings/SettingsHelpSection';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -42,11 +43,6 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
     onClose();
   };
 
-  const handleHelp = () => {
-    // Aqui você pode implementar a lógica de ajuda
-    console.log("Botão de ajuda clicado");
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md bg-card border-border text-foreground">
@@ -59,167 +55,29 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
 
         <ScrollArea className="max-h-[70vh] pr-2">
           <div className="space-y-6">
-            {/* Personalização Visual */}
-            <Card className="p-4 bg-card/50 border-border">
-              <div className="flex items-center gap-2 mb-4">
-                <Palette className="h-4 w-4 text-purple-400" />
-                <h3 className="font-semibold text-purple-400">Personalização Visual</h3>
-              </div>
-              
-              <div className="space-y-4">
-                {/* Barra de XP Animada */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-4 w-4" />
-                      <div className="flex flex-col">
-                        <Label className="text-sm">Barra de XP Animada</Label>
-                        <span className="text-xs text-muted-foreground">
-                          {settingsLocks.animatedXpBar.isLocked 
-                            ? settingsLocks.animatedXpBar.reason
-                            : 'Adiciona efeitos visuais à barra de experiência'
-                          }
-                        </span>
-                      </div>
-                      {settingsLocks.animatedXpBar.isLocked && (
-                        <Lock className="h-3 w-3 text-yellow-400" />
-                      )}
-                    </div>
-                    <Switch
-                      checked={tempSettings.animatedXpBar}
-                      onCheckedChange={() => handleToggle('animatedXpBar')}
-                      disabled={settingsLocks.animatedXpBar.isLocked}
-                    />
-                  </div>
-                  
-                  {/* Descrição sobre desbloqueio */}
-                  {!settingsLocks.animatedXpBar.isLocked && (
-                    <div className="ml-6 p-2 bg-green-900/20 border border-green-800/30 rounded-lg">
-                      <p className="text-xs text-green-300">
-                        🎉 Funcionalidade desbloqueada! Disponível a partir do nível 10 ou com a conquista "XP Master".
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
+            <SettingsVisualSection 
+              settings={tempSettings}
+              settingsLocks={settingsLocks}
+              onToggle={handleToggle}
+            />
 
-            {/* Notificações Globais */}
-            <Card className="p-4 bg-card/50 border-border">
-              <div className="flex items-center gap-2 mb-4">
-                <Bell className="h-4 w-4 text-blue-400" />
-                <h3 className="font-semibold text-blue-400">Notificações Globais</h3>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
-                  <div className="flex flex-col">
-                    <Label className="text-sm">Ativar Notificações</Label>
-                    <span className="text-xs text-muted-foreground">
-                      Controla todas as notificações do sistema
-                    </span>
-                  </div>
-                </div>
-                <Switch
-                  checked={tempSettings.globalNotifications}
-                  onCheckedChange={() => handleToggle('globalNotifications')}
-                />
-              </div>
-            </Card>
+            <SettingsNotificationSection 
+              settings={tempSettings}
+              onToggle={handleToggle}
+            />
 
-            {/* Funcionalidades Gamificadas */}
-            <Card className="p-4 bg-card/50 border-border">
-              <div className="flex items-center gap-2 mb-4">
-                <Shield className="h-4 w-4 text-red-400" />
-                <h3 className="font-semibold text-red-400">Funcionalidades Gamificadas</h3>
-              </div>
-              
-              <div className="space-y-4">
-                {/* Modo Hardcore */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm">Modo Hardcore</Label>
-                        {tempSettings.hardcoreMode && (
-                          <Badge variant="destructive" className="text-xs">ATIVO</Badge>
-                        )}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {settingsLocks.hardcoreMode.isLocked 
-                          ? settingsLocks.hardcoreMode.reason
-                          : 'Penalidades severas, mas XP e moedas aumentados'
-                        }
-                      </span>
-                    </div>
-                    {settingsLocks.hardcoreMode.isLocked && (
-                      <Lock className="h-3 w-3 text-yellow-400" />
-                    )}
-                  </div>
-                  <Switch
-                    checked={tempSettings.hardcoreMode}
-                    onCheckedChange={() => handleToggle('hardcoreMode')}
-                    disabled={settingsLocks.hardcoreMode.isLocked}
-                  />
-                </div>
+            <SettingsGameSection 
+              settings={tempSettings}
+              settingsLocks={settingsLocks}
+              onToggle={handleToggle}
+            />
 
-                {/* Modo Férias */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Plane className="h-4 w-4" />
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm">Modo Férias</Label>
-                        {tempSettings.vacationMode && (
-                          <Badge variant="secondary" className="text-xs">PAUSADO</Badge>
-                        )}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        Pausa penalidades temporariamente
-                      </span>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={tempSettings.vacationMode}
-                    onCheckedChange={() => handleToggle('vacationMode')}
-                  />
-                </div>
-              </div>
-            </Card>
+            <SettingsInfoSection 
+              level={gameState.level}
+              achievements={achievements}
+            />
 
-            {/* Info sobre níveis */}
-            <Card className="p-3 bg-blue-900/20 border-blue-800">
-              <div className="text-xs text-blue-300">
-                <p className="mb-1">🔒 <strong>Nível Atual:</strong> {gameState.level}</p>
-                <p className="mb-1">🏆 <strong>Conquistas:</strong> {achievements.filter(a => a.unlocked).length}/{achievements.length}</p>
-                <p className="text-blue-400">
-                  Algumas configurações são desbloqueadas conforme você progride no jogo!
-                </p>
-              </div>
-            </Card>
-
-            {/* Botão de Ajuda */}
-            <Card className="p-4 bg-card/50 border-border">
-              <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <CircleHelp className="h-5 w-5 text-cyan-400" />
-                  <h3 className="font-semibold text-cyan-400">Precisa de Ajuda?</h3>
-                </div>
-                <p className="text-sm text-muted-foreground text-center">
-                  Tem dúvidas sobre como usar as configurações? Clique no botão abaixo para obter ajuda.
-                </p>
-                <Button 
-                  onClick={handleHelp}
-                  variant="outline"
-                  className="w-full border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10"
-                >
-                  <CircleHelp className="h-4 w-4 mr-2" />
-                  Obter Ajuda
-                </Button>
-              </div>
-            </Card>
+            <SettingsHelpSection />
           </div>
         </ScrollArea>
 
