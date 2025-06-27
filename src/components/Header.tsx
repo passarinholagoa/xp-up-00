@@ -1,214 +1,104 @@
 
 import React, { useState } from 'react';
-import { Crown, Coins, Heart, Zap, Menu, X, Settings } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Trophy, Settings, Zap, ShoppingBag } from 'lucide-react';
 import { useGame } from '@/contexts/GameContext';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { LogoutButton } from '@/components/LogoutButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const Header = () => {
-  const { gameState, createNewQuest, openProfile, openSettings, profile } = useGame();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { gameState, openAchievements, openProfile, openSettings } = useGame();
+  const { user } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const hpPercentage = (gameState.hp / gameState.maxHp) * 100;
+  const xpPercentage = gameState.maxXp > 0 ? (gameState.xp / gameState.maxXp) * 100 : 0;
 
   return (
-    <header className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <img 
-                src="/lovable-uploads/88cf0038-6fd4-4fe2-a514-2cc60714a3a2.png" 
-                alt="XPJP Logo" 
-                className="h-10 w-10 object-contain"
-              />
-            </div>
+    <Card className="mb-6 bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-500/30">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 border-2 border-primary/50">
+              <AvatarFallback className="bg-primary/20 text-primary font-bold text-lg">
+                {user?.name?.charAt(0) || '?'}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <h1 className="text-2xl font-bold text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">
-                XpUp
-              </h1>
-              <p className="text-xs text-muted-foreground">Gamifique suas tarefas</p>
+              <h2 className="text-xl font-bold text-white">{user?.name || 'Usuário'}</h2>
+              <p className="text-purple-200 text-sm">Nível {gameState.level}</p>
             </div>
           </div>
-
-          {/* Desktop Stats & Profile */}
-          <div className="hidden md:flex items-center gap-4">
-            {/* Profile Preview */}
-            <div 
-              className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all hover:bg-primary/10 ${profile.backgroundColor} ${profile.frameBorder}`}
-              onClick={openProfile}
-            >
-              <div className="w-8 h-8 rounded-full bg-quest-gradient flex items-center justify-center text-sm">
-                {profile.avatar}
-              </div>
-              <span className={`text-sm font-medium ${profile.nameColor}`}>
-                {profile.displayName}
-              </span>
-            </div>
-
-            {/* Stats */}
-            <div className="flex items-center gap-2 stat-badge bg-hp-high/20 text-hp-high">
-              <Heart className="h-4 w-4" />
-              <span className="font-mono">{gameState.hp}/{gameState.maxHp}</span>
-            </div>
-            
-            <div className="flex items-center gap-2 stat-badge bg-xp-bar/20 text-xp-glow">
-              <Zap className="h-4 w-4" />
-              <span className="font-mono">{gameState.xp.toLocaleString()} XP</span>
-            </div>
-            
-            <div className="flex items-center gap-2 stat-badge bg-quest-legendary/20 text-quest-legendary">
-              <Coins className="h-4 w-4" />
-              <span className="font-mono">{gameState.coins}</span>
-            </div>
-            
-            <div className="flex items-center gap-2 stat-badge bg-quest-primary/20 text-quest-primary">
-              <Crown className="h-4 w-4" />
-              <span className="font-mono">Nível {gameState.level}</span>
-            </div>
-          </div>
-
-          {/* Mobile & Desktop Actions */}
+          
           <div className="flex items-center gap-2">
-            {/* Mobile Menu */}
-            <div className="md:hidden">
-              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Menu className="h-4 w-4" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-80">
-                  <SheetHeader>
-                    <SheetTitle>Menu</SheetTitle>
-                  </SheetHeader>
-                  
-                  <div className="space-y-6 mt-6">
-                    {/* Mobile Profile Preview */}
-                    <div 
-                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all hover:bg-primary/10 ${profile.backgroundColor} ${profile.frameBorder}`}
-                      onClick={() => {
-                        openProfile();
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      <div className="w-10 h-10 rounded-full bg-quest-gradient flex items-center justify-center text-lg">
-                        {profile.avatar}
-                      </div>
-                      <div>
-                        <span className={`text-base font-medium ${profile.nameColor}`}>
-                          {profile.displayName}
-                        </span>
-                        <p className="text-sm text-muted-foreground">Ver Perfil</p>
-                      </div>
-                    </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={openAchievements}
+              className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10"
+            >
+              <Trophy className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={openProfile}
+              className="text-purple-300 hover:text-purple-200 hover:bg-purple-400/10"
+            >
+              <ShoppingBag className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={openSettings}
+              className="text-gray-300 hover:text-gray-200 hover:bg-gray-400/10"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            <LogoutButton />
+          </div>
+        </div>
 
-                    {/* Mobile Stats */}
-                    <div className="space-y-3">
-                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
-                        Stats
-                      </h3>
-                      
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="flex items-center gap-2 stat-badge bg-hp-high/20 text-hp-high">
-                          <Heart className="h-4 w-4" />
-                          <span className="font-mono text-sm">{gameState.hp}/{gameState.maxHp}</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 stat-badge bg-quest-primary/20 text-quest-primary">
-                          <Crown className="h-4 w-4" />
-                          <span className="font-mono text-sm">Nv {gameState.level}</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 stat-badge bg-xp-bar/20 text-xp-glow">
-                          <Zap className="h-4 w-4" />
-                          <span className="font-mono text-xs">{gameState.xp.toLocaleString()} XP</span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 stat-badge bg-quest-legendary/20 text-quest-legendary">
-                          <Coins className="h-4 w-4" />
-                          <span className="font-mono text-sm">{gameState.coins}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Mobile Actions */}
-                    <div className="space-y-3">
-                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
-                        Ações
-                      </h3>
-                      
-                      <Button 
-                        className="w-full bg-quest-gradient hover:opacity-90"
-                        onClick={() => {
-                          createNewQuest();
-                          setIsMenuOpen(false);
-                        }}
-                      >
-                        Nova Quest
-                      </Button>
-
-                      <Button 
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => {
-                          openSettings();
-                          setIsMenuOpen(false);
-                        }}
-                      >
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configurações
-                      </Button>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-red-300 font-medium">HP</span>
+              <span className="text-red-300 text-sm">{gameState.hp}/{gameState.maxHp}</span>
             </div>
+            <Progress 
+              value={hpPercentage} 
+              className="h-2 bg-red-900/30" 
+            />
+          </div>
 
-            {/* Desktop Actions */}
-            <div className="hidden md:flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={openProfile}
-              >
-                Perfil
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={openSettings}
-              >
-                <Settings className="h-4 w-4 mr-1" />
-                Config
-              </Button>
-              <Button 
-                size="sm" 
-                className="bg-quest-gradient hover:opacity-90"
-                onClick={createNewQuest}
-              >
-                Nova Quest
-              </Button>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-blue-300 font-medium flex items-center gap-1">
+                <Zap className="h-4 w-4" />
+                XP
+              </span>
+              <span className="text-blue-300 text-sm">{gameState.xp}/{gameState.maxXp}</span>
             </div>
+            <Progress 
+              value={xpPercentage} 
+              className="h-2 bg-blue-900/30" 
+            />
+          </div>
 
-            {/* Mobile Nova Quest Button (visible sempre) */}
-            <div className="md:hidden">
-              <Button 
-                size="sm" 
-                className="bg-quest-gradient hover:opacity-90"
-                onClick={createNewQuest}
-              >
-                Nova Quest
-              </Button>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-yellow-300 font-medium">Moedas</span>
+              <span className="text-yellow-300 text-sm font-bold">{gameState.coins}</span>
+            </div>
+            <div className="h-2 bg-yellow-500/20 rounded-full">
+              <div className="h-full bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full animate-pulse" style={{ width: '100%' }} />
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </CardContent>
+    </Card>
   );
 };
