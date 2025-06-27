@@ -11,6 +11,7 @@ import { SettingsVisualSection } from '@/components/settings/SettingsVisualSecti
 import { SettingsNotificationSection } from '@/components/settings/SettingsNotificationSection';
 import { SettingsGameSection } from '@/components/settings/SettingsGameSection';
 import { SettingsInfoSection } from '@/components/settings/SettingsInfoSection';
+import { SettingsPrivacySection } from '@/components/settings/SettingsPrivacySection';
 import { SettingsHelpSection } from '@/components/settings/SettingsHelpSection';
 
 interface SettingsModalProps {
@@ -73,6 +74,8 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             />
 
             <SettingsInfoSection />
+
+            <SettingsPrivacySection />
 
             <SettingsHelpSection />
           </div>
