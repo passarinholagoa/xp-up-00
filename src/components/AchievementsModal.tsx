@@ -1,11 +1,10 @@
 
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Lock, X } from 'lucide-react';
+import { Trophy, Lock } from 'lucide-react';
 import { Achievement, ACHIEVEMENT_CATEGORIES } from '@/types/achievements';
 
 interface AchievementsModalProps {
@@ -30,15 +29,10 @@ export const AchievementsModal = ({ isOpen, onClose, achievements }: Achievement
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto quest-card">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <Trophy className="h-6 w-6 text-quest-legendary" />
-              Conquistas
-            </DialogTitle>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+            <Trophy className="h-6 w-6 text-quest-legendary" />
+            Conquistas
+          </DialogTitle>
           
           <div className="flex items-center gap-4 mt-2">
             <Badge variant="secondary" className="text-sm">
