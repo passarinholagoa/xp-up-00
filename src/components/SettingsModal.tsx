@@ -72,10 +72,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
               onToggle={handleToggle}
             />
 
-            <SettingsInfoSection 
-              level={gameState.level}
-              achievements={achievements}
-            />
+            <SettingsInfoSection />
 
             <SettingsHelpSection />
           </div>
