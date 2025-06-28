@@ -1,96 +1,51 @@
 
 export interface XpUpSettings {
-  // Visual Settings
+  // Personalização Visual
   darkMode: boolean;
   animatedXpBar: boolean;
   
-  // Game Settings
+  // Notificações Globais
+  globalNotifications: boolean;
+  
+  // Funcionalidades Gamificadas
   hardcoreMode: boolean;
   vacationMode: boolean;
-  
-  // Notification Settings
-  globalNotifications: boolean;
-  levelUpNotifications: boolean;
-  taskCompletionNotifications: boolean;
-  achievementNotifications: boolean;
-  
-  // Privacy Settings
-  profileVisibility: 'public' | 'friends' | 'private';
-  showStats: boolean;
-  showAchievements: boolean;
 }
 
 export const DEFAULT_SETTINGS: XpUpSettings = {
-  // Visual Settings
-  darkMode: false,
-  animatedXpBar: true,
-  
-  // Game Settings  
-  hardcoreMode: false,
-  vacationMode: false,
-  
-  // Notification Settings
+  darkMode: true,
+  animatedXpBar: false, // Travado até nível 10
   globalNotifications: true,
-  levelUpNotifications: true,
-  taskCompletionNotifications: true,
-  achievementNotifications: true,
-  
-  // Privacy Settings
-  profileVisibility: 'public',
-  showStats: true,
-  showAchievements: true,
+  hardcoreMode: false, // Travado até nível 15
+  vacationMode: false
 };
 
-export const SETTINGS_DESCRIPTIONS = {
-  // Visual Settings
-  darkMode: {
-    title: 'Modo Escuro',
-    description: 'Ativa o tema escuro da interface'
-  },
-  animatedXpBar: {
-    title: 'Nível Animado',
-    description: 'Ativa animação colorida no número do nível do personagem'
-  },
-  
-  // Game Settings
-  hardcoreMode: {
-    title: 'Modo Hardcore',
-    description: 'Aumenta recompensas em 50% e penalidades em 50%'
-  },
-  vacationMode: {
-    title: 'Modo Férias',
-    description: 'Protege contra penalidades de hábitos negativos'
-  },
-  
-  // Notification Settings
-  globalNotifications: {
-    title: 'Notificações Globais',
-    description: 'Ativa/desativa todas as notificações do sistema'
-  },
-  levelUpNotifications: {
-    title: 'Notificações de Level Up',
-    description: 'Mostra notificação ao subir de nível'
-  },
-  taskCompletionNotifications: {
-    title: 'Notificações de Tarefas',
-    description: 'Mostra notificação ao completar tarefas'
-  },
-  achievementNotifications: {
-    title: 'Notificações de Conquistas',
-    description: 'Mostra notificação ao desbloquear conquistas'
-  },
-  
-  // Privacy Settings
-  profileVisibility: {
-    title: 'Visibilidade do Perfil',
-    description: 'Define quem pode ver seu perfil'
-  },
-  showStats: {
-    title: 'Mostrar Estatísticas',
-    description: 'Permite que outros vejam suas estatísticas'
-  },
-  showAchievements: {
-    title: 'Mostrar Conquistas',
-    description: 'Permite que outros vejam suas conquistas'
-  },
+export interface SettingsLock {
+  isLocked: boolean;
+  requiredLevel?: number;
+  requiredAchievement?: string;
+  reason: string;
+}
+
+export const getSettingsLocks = (level: number, achievements: any[]): Record<keyof XpUpSettings, SettingsLock> => {
+  const hasXpMaster = achievements.find(a => a.id === 'xp-master')?.unlocked || false;
+  const hasTransformacao = achievements.find(a => a.id === 'transformacao')?.unlocked || false;
+
+  return {
+    darkMode: { isLocked: false, reason: '' },
+    animatedXpBar: { 
+      isLocked: level < 10 && !hasXpMaster, 
+      requiredLevel: 10,
+      requiredAchievement: 'xp-master',
+      reason: 'Desbloqueie no Nível 10 ou com a conquista "XP Master"'
+    },
+    globalNotifications: { isLocked: false, reason: '' },
+    hardcoreMode: { 
+      isLocked: level < 15 && !hasTransformacao, 
+      requiredLevel: 15,
+      requiredAchievement: 'transformacao',
+      reason: 'Desbloqueie no Nível 15 ou com a conquista "Transformação"'
+    },
+    vacationMode: { isLocked: false, reason: '' }
+  };
 };
