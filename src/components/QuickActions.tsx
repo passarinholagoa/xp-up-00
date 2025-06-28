@@ -1,87 +1,18 @@
 
 import React from 'react';
-import { Plus, Zap, Trophy, ShoppingBag, Settings } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useGame } from '@/contexts/GameContext';
 
 export const QuickActions = () => {
-  const { createNewQuest, openAchievements, openProfile, openSettings, gameState } = useGame();
-
-  const actions = [
-    {
-      icon: Plus,
-      label: 'Nova Quest',
-      description: 'Criar nova tarefa',
-      variant: 'default' as const,
-      onClick: createNewQuest,
-      className: 'bg-quest-gradient hover:opacity-90'
-    },
-    {
-      icon: Trophy,
-      label: 'Conquistas',
-      description: 'Ver progresso',
-      variant: 'outline' as const,
-      onClick: openAchievements,
-      className: 'hover:bg-quest-legendary/10 hover:border-quest-legendary/50'
-    },
-    {
-      icon: ShoppingBag,
-      label: 'Loja & Perfil',
-      description: 'Personalizar perfil',
-      variant: 'outline' as const,
-      onClick: openProfile,
-      className: 'hover:bg-quest-epic/10 hover:border-quest-epic/50'
-    },
-    {
-      icon: Settings,
-      label: 'Configurações',
-      description: 'Ajustar perfil',
-      variant: 'outline' as const,
-      onClick: openSettings,
-      className: 'hover:bg-muted/50'
-    }
-  ];
+  const { openAchievements, gameState } = useGame();
 
   const xpRemaining = gameState.maxXp - gameState.xp;
   const xpPercentage = gameState.maxXp > 0 ? (gameState.xp / gameState.maxXp) * 100 : 100;
 
   return (
     <div className="space-y-6">
-      {/* Quick Actions */}
-      <Card className="quest-card">
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg flex items-center gap-2">
-            <Zap className="h-5 w-5 text-primary" />
-            Ações Rápidas
-          </h3>
-          
-          <div className="space-y-3">
-            {actions.map((action, index) => {
-              const Icon = action.icon;
-              return (
-                <Button
-                  key={index}
-                  variant={action.variant}
-                  className={`w-full justify-start h-auto p-4 text-left transition-all duration-200 ${action.className || ''}`}
-                  onClick={action.onClick}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className="h-5 w-5" />
-                    <div>
-                      <div className="font-medium">{action.label}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {action.description}
-                      </div>
-                    </div>
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
-        </div>
-      </Card>
-
       {/* Level Progress */}
       <Card className="quest-card">
         <div className="space-y-4">
