@@ -102,6 +102,54 @@ export const SettingsHelpSection = () => {
                       </AccordionContent>
                     </AccordionItem>
 
+                    <AccordionItem value="gamification">
+                      <AccordionTrigger className="text-left">
+                        🎮 Funcionalidades Gamificadas
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground space-y-3">
+                        <div>
+                          <p className="font-medium text-red-400 mb-2">🔥 Modo Hardcore:</p>
+                          <ul className="list-disc pl-4 space-y-1">
+                            <li><strong>Recompensas aumentadas:</strong> Ganhe 50% mais XP e moedas</li>
+                            <li><strong>Penalidades severas:</strong> Perde mais HP por hábitos negativos (15 ao invés de 10)</li>
+                            <li><strong>Desafio intenso:</strong> Para jogadores experientes que querem mais emoção</li>
+                            <li><strong>Desbloqueio:</strong> Disponível no nível 15 ou com a conquista "Transformação"</li>
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <p className="font-medium text-blue-400 mb-2">✈️ Modo Férias:</p>
+                          <ul className="list-disc pl-4 space-y-1">
+                            <li><strong>Proteção temporária:</strong> Pausa todas as penalidades</li>
+                            <li><strong>Sem perda de HP:</strong> Hábitos negativos não causam dano</li>
+                            <li><strong>Mantém streak:</strong> Sua sequência não é quebrada por dailies perdidas</li>
+                            <li><strong>Uso consciente:</strong> Ideal para períodos de descanso ou viagens</li>
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="font-medium text-purple-400 mb-2">📊 Sistema de Progressão:</p>
+                          <ul className="list-disc pl-4 space-y-1">
+                            <li><strong>Níveis:</strong> De 0 a 100, cada nível exige mais XP que o anterior</li>
+                            <li><strong>Pontos de Vida (HP):</strong> Representa sua motivação, perdido com hábitos ruins</li>
+                            <li><strong>Experiência (XP):</strong> Ganha completando tarefas, usado para subir de nível</li>
+                            <li><strong>Moedas:</strong> Obtidas com tarefas, usadas na loja para personalização</li>
+                            <li><strong>Streak:</strong> Dias consecutivos completando dailies</li>
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="font-medium text-yellow-400 mb-2">🏆 Sistema de Conquistas:</p>
+                          <ul className="list-disc pl-4 space-y-1">
+                            <li><strong>Marcos de progresso:</strong> Desbloqueadas ao atingir objetivos específicos</li>
+                            <li><strong>Funcionalidades extras:</strong> Algumas conquistas desbloqueiam novos recursos</li>
+                            <li><strong>Reconhecimento:</strong> Mostram seu progresso e dedicação no sistema</li>
+                            <li><strong>Variedade:</strong> Diferentes tipos: níveis, tarefas, streaks, etc.</li>
+                          </ul>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
                     <AccordionItem value="how-to-use">
                       <AccordionTrigger className="text-left">
                         🚀 Como Usar o Site
