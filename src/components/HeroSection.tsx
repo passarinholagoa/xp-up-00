@@ -51,7 +51,7 @@ export const HeroSection = () => {
             <div className="relative">
               <div className="w-64 h-64 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
                 <div className="text-center space-y-2">
-                  <div className={`text-6xl font-bold ${settings.animatedXpBar ? 'animate-pulse' : ''}`}>
+                  <div className={`text-6xl font-bold ${settings.animatedXpBar ? 'animate-[color-change_3s_ease-in-out_infinite]' : ''}`}>
                     {gameState.level}
                   </div>
                   <div className="text-xl opacity-80">Nível</div>

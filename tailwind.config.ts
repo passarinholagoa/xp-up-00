@@ -127,6 +127,26 @@ export default {
 						transform: 'scale(1)',
 						opacity: '1'
 					}
+				},
+				'color-change': {
+					'0%': {
+						color: '#FBBF24'
+					},
+					'20%': {
+						color: '#8B5CF6'
+					},
+					'40%': {
+						color: '#06B6D4'
+					},
+					'60%': {
+						color: '#10B981'
+					},
+					'80%': {
+						color: '#EF4444'
+					},
+					'100%': {
+						color: '#FBBF24'
+					}
 				}
 			},
 			animation: {
