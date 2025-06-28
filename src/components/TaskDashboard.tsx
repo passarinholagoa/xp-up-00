@@ -17,9 +17,10 @@ export const TaskDashboard = () => {
         <h2 className="text-2xl font-bold">Suas Aventuras</h2>
         <Button
           onClick={createNewQuest}
-          className="bg-quest-gradient hover:opacity-90 flex items-center gap-2"
+          size="lg"
+          className="bg-quest-gradient hover:opacity-90 flex items-center gap-3 px-6 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5" />
           Nova Quest
         </Button>
       </div>
