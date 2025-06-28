@@ -31,7 +31,7 @@ export const SettingsVisualSection = ({ settings, settingsLocks, onToggle }: Set
                 <span className="text-xs text-muted-foreground">
                   {settingsLocks.animatedXpBar.isLocked 
                     ? settingsLocks.animatedXpBar.reason
-                    : 'Adiciona efeitos visuais à barra de experiência'
+                    : 'Faz o número do nível mudar de cor continuamente'
                   }
                 </span>
               </div>
