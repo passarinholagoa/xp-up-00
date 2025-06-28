@@ -19,7 +19,7 @@ export const HeroSection = () => {
   const progressPercentage = (gameState.xp / gameState.maxXp) * 100;
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-quest-gradient p-8 text-white">
+    <section className="relative overflow-hidden rounded-2xl p-8 text-white" style={{ backgroundColor: '#211C58' }}>
       <div className="absolute inset-0 bg-black/20" />
       <div className="relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
