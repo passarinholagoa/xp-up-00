@@ -52,28 +52,31 @@ export const StatsPanel = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         const percentage = stat.max ? (stat.value / stat.max) * 100 : 100;
         const isAnimatedXpBar = stat.isXp && settings.animatedXpBar;
         
         return (
-          <Card key={index} className={`p-6 ${stat.bgColor} border ${stat.borderColor} backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
-            <div className="space-y-4">
+          <Card key={index} className={`p-3 sm:p-6 ${stat.bgColor} border ${stat.borderColor} backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
+            <div className="space-y-2 sm:space-y-4">
               <div className="flex items-center justify-between">
-                <div className={`p-3 ${stat.bgColor} rounded-xl border ${stat.borderColor}`}>
-                  <Icon className={`h-6 w-6 ${stat.color}`} />
+                <div className={`p-2 sm:p-3 ${stat.bgColor} rounded-xl border ${stat.borderColor}`}>
+                  <Icon className={`h-4 w-4 sm:h-6 sm:w-6 ${stat.color}`} />
                 </div>
-                <div className={`text-2xl font-bold ${stat.color}`}>
-                  {stat.value.toLocaleString()}{stat.max && `/${stat.max.toLocaleString()}`}
+                <div className={`text-lg sm:text-2xl font-bold ${stat.color}`}>
+                  {stat.max 
+                    ? `${stat.value.toLocaleString()}/${stat.max.toLocaleString()}`
+                    : stat.value.toLocaleString()
+                  }
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+              <div className="space-y-1 sm:space-y-2">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">{stat.label}</p>
                 {stat.max && (
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 sm:h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div 
                       className={`h-full bg-gradient-to-r ${stat.gradient} rounded-full transition-all duration-500 ease-out ${isAnimatedXpBar ? 'animate-pulse' : ''}`}
                       style={{ width: `${percentage}%` }}

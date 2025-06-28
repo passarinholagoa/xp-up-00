@@ -32,19 +32,19 @@ const Index = () => {
     <div className="min-h-screen bg-background transition-colors duration-300">
       <Header />
       
-      <main className="container mx-auto px-4 py-6 max-w-7xl">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
         {/* Hero Section */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <HeroSection />
         </div>
         
         {/* Stats Section */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <StatsPanel />
         </div>
         
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-8">
           {/* Main content area - Tasks */}
           <div className="xl:col-span-3">
             <TaskDashboard />
@@ -52,7 +52,7 @@ const Index = () => {
           
           {/* Sidebar - Quick Actions */}
           <div className="xl:col-span-1">
-            <div className="sticky top-6">
+            <div className="xl:sticky xl:top-6">
               <QuickActions />
             </div>
           </div>
