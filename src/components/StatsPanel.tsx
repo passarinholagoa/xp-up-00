@@ -13,16 +13,20 @@ export const StatsPanel = () => {
       label: 'Pontos de Vida',
       value: gameState.hp,
       max: gameState.maxHp,
-      color: 'hp-high',
-      gradient: 'hp-gradient'
+      color: 'text-red-400',
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/20',
+      gradient: 'from-red-500 to-red-600'
     },
     {
       icon: Zap,
       label: 'Experiência',
       value: gameState.xp,
       max: gameState.maxXp,
-      color: 'xp-bar',
-      gradient: 'xp-gradient',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20',
+      gradient: 'from-blue-500 to-blue-600',
       isXp: true
     },
     {
@@ -30,54 +34,50 @@ export const StatsPanel = () => {
       label: 'Moedas de Ouro',
       value: gameState.coins,
       max: null,
-      color: 'quest-legendary',
-      gradient: 'legendary-gradient'
+      color: 'text-yellow-400',
+      bgColor: 'bg-yellow-500/10',
+      borderColor: 'border-yellow-500/20',
+      gradient: 'from-yellow-500 to-yellow-600'
     },
     {
       icon: TrendingUp,
       label: 'Sequência',
       value: gameState.streak,
       max: null,
-      color: 'quest-primary',
-      gradient: 'quest-gradient'
+      color: 'text-purple-400',
+      bgColor: 'bg-purple-500/10',
+      borderColor: 'border-purple-500/20',
+      gradient: 'from-purple-500 to-purple-600'
     }
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         const percentage = stat.max ? (stat.value / stat.max) * 100 : 100;
         const isAnimatedXpBar = stat.isXp && settings.animatedXpBar;
         
         return (
-          <Card key={index} className="quest-card">
-            <div className="space-y-3">
+          <Card key={index} className={`p-6 ${stat.bgColor} border ${stat.borderColor} backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Icon className={`h-5 w-5 text-${stat.color}`} />
-                <span className={`text-lg font-bold text-${stat.color}`}>
-                  {stat.value}{stat.max && `/${stat.max}`}
-                </span>
+                <div className={`p-3 ${stat.bgColor} rounded-xl border ${stat.borderColor}`}>
+                  <Icon className={`h-6 w-6 ${stat.color}`} />
+                </div>
+                <div className={`text-2xl font-bold ${stat.color}`}>
+                  {stat.value.toLocaleString()}{stat.max && `/${stat.max.toLocaleString()}`}
+                </div>
               </div>
               
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
                 {stat.max && (
-                  <div className="progress-bar">
+                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div 
-                      className={`progress-fill bg-${stat.gradient} ${isAnimatedXpBar ? 'transition-all duration-500 ease-out' : ''}`}
+                      className={`h-full bg-gradient-to-r ${stat.gradient} rounded-full transition-all duration-500 ease-out ${isAnimatedXpBar ? 'animate-pulse' : ''}`}
                       style={{ width: `${percentage}%` }}
-                    >
-                      {isAnimatedXpBar && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
-                      )}
-                      {!isAnimatedXpBar && stat.isXp && (
-                        <div className="absolute inset-0 bg-white/20" />
-                      )}
-                      {!stat.isXp && (
-                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                      )}
-                    </div>
+                    />
                   </div>
                 )}
               </div>

@@ -32,19 +32,29 @@ const Index = () => {
     <div className="min-h-screen bg-background transition-colors duration-300">
       <Header />
       
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        <HeroSection />
+      <main className="container mx-auto px-4 py-6 max-w-7xl">
+        {/* Hero Section */}
+        <div className="mb-8">
+          <HeroSection />
+        </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main content area */}
-          <div className="lg:col-span-3 space-y-6">
-            <StatsPanel />
+        {/* Stats Section */}
+        <div className="mb-8">
+          <StatsPanel />
+        </div>
+        
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          {/* Main content area - Tasks */}
+          <div className="xl:col-span-3">
             <TaskDashboard />
           </div>
           
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <QuickActions />
+          {/* Sidebar - Quick Actions */}
+          <div className="xl:col-span-1">
+            <div className="sticky top-6">
+              <QuickActions />
+            </div>
           </div>
         </div>
       </main>
