@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ShopItem } from '@/types/profile';
 
-interface ShopItemCardProps {
+interface ShopItemCardProps extends React.ComponentPropsWithoutRef<'div'> {
   item: ShopItem;
   canBuy: boolean;
   missingRequirements: string[];
@@ -18,7 +17,8 @@ export const ShopItemCard = ({
   canBuy, 
   missingRequirements, 
   achievements, 
-  onBuyItem 
+  onBuyItem, 
+  ...rest
 }: ShopItemCardProps) => {
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
@@ -39,7 +39,7 @@ export const ShopItemCard = ({
   };
 
   return (
-    <Card className={`p-3 ${getItemCardBorder(item.rarity)} border transition-all hover:shadow-md mb-3`}>
+    <Card className={`p-3 ${getItemCardBorder(item.rarity)} border transition-all hover:shadow-md mb-3`} {...rest}>
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
