@@ -6,6 +6,8 @@ export interface XpUpSettings {
   
   // Notificações Globais
   globalNotifications: boolean;
+  dailyReminder: boolean;
+  reminderTime: string;
   
   // Funcionalidades Gamificadas
   hardcoreMode: boolean;
@@ -16,6 +18,8 @@ export const DEFAULT_SETTINGS: XpUpSettings = {
   darkMode: true,
   animatedXpBar: false, // Travado até nível 10
   globalNotifications: true,
+  dailyReminder: true,
+  reminderTime: '09:00',
   hardcoreMode: false, // Travado até nível 15
   vacationMode: false
 };
@@ -40,6 +44,8 @@ export const getSettingsLocks = (level: number, achievements: any[]): Record<key
       reason: 'Desbloqueie no Nível 10 ou com a conquista "XP Master"'
     },
     globalNotifications: { isLocked: false, reason: '' },
+    dailyReminder: { isLocked: false, reason: '' },
+    reminderTime: { isLocked: false, reason: '' },
     hardcoreMode: { 
       isLocked: level < 15 && !hasTransformacao, 
       requiredLevel: 15,

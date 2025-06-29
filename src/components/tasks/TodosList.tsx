@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Clock, Coins, Zap, AlertTriangle, Edit2, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -20,7 +19,7 @@ import {
 
 export const TodosList = () => {
   const { todos, completeTodo, deleteTodo } = useGame();
-  const [completedTodos, setCompletedTodos] = useState<number[]>([3]);
+  const [completedTodos, setCompletedTodos] = useState<string[]>([]);
   const [editingTodo, setEditingTodo] = useState<typeof todos[0] | null>(null);
 
   const getPriorityColor = (priority: string) => {
@@ -52,12 +51,12 @@ export const TodosList = () => {
     setEditingTodo(todo);
   };
 
-  const handleDelete = (todoId: number) => {
+  const handleDelete = (todoId: string) => {
     deleteTodo(todoId);
     setCompletedTodos(prev => prev.filter(id => id !== todoId));
   };
 
-  const isCompleted = (todoId: number) => completedTodos.includes(todoId);
+  const isCompleted = (todoId: string) => completedTodos.includes(todoId);
 
   return (
     <div className="space-y-4">

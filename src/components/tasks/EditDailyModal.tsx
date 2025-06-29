@@ -20,7 +20,7 @@ import { useGame } from '@/contexts/GameContext';
 
 interface EditDailyModalProps {
   daily: {
-    id: number;
+    id: string;
     title: string;
     dueTime: string;
     difficulty: 'easy' | 'medium' | 'hard';

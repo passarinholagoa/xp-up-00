@@ -37,8 +37,8 @@ export const Header = () => {
 
   // Memoização do nome do usuário para evitar recalculos
   const displayName = useMemo(() => 
-    profile.displayName || user?.name || 'Aventureiro',
-    [profile.displayName, user?.name]
+    profile.displayName || user?.email?.split('@')[0] || 'Aventureiro',
+    [profile.displayName, user?.email]
   );
 
   // Memoização das classes CSS para evitar reconstrução

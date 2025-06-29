@@ -21,7 +21,7 @@ import { useGame } from '@/contexts/GameContext';
 
 interface EditHabitModalProps {
   habit: {
-    id: number;
+    id: string;
     title: string;
     difficulty: 'easy' | 'medium' | 'hard';
     xpReward: number;

@@ -1,0 +1,48 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Segurança Completa
+
+Esta regra faz uma varredura no projeto para identificar falhas de segurança, como:
+
+✅ Chaves de API expostas  
+✅ Senhas ou tokens em código  
+✅ Arquivos sensíveis versionados (ex: `.env`, `.pem`)  
+✅ Configurações perigosas (debug ativo, CORS aberto)  
+✅ Dependências vulneráveis  
+
+## Classificação de Riscos:
+
+🔴 **Grave**  
+- Chaves ou tokens diretamente no código  
+- Senhas explícitas  
+- Arquivos privados versionados  
+
+🟠 **Médio**  
+- Informações de ambiente em arquivos públicos  
+- Debug ou logs ativos em produção  
+- Dependências desatualizadas com vulnerabilidades conhecidas  
+
+🟢 **Leve**  
+- Comentários que revelam informações internas  
+- Estruturas que indicam má configuração  
+
+## Arquivos Relevantes:  
+@*.js @*.ts @*.env @*.json @*.yml @*.yaml @*.py @*.config @package.json
+
+---
+
+**Relatório:**  
+Para cada falha encontrada, será gerado:  
+- Descrição do problema  
+- Nível de risco  
+- Sugestão de correção  
+
+*Exemplo:*  
+`src/config.ts` - 🔴 **Grave**  
+> API_KEY="123abc..." encontrada no código.  
+**Correção:** Utilizar variáveis de ambiente e garantir que arquivos sensíveis não estejam versionados.  
+
+depois de tudo gerer um arquivo chamado "seugurança" explicando como resolver os problemas.

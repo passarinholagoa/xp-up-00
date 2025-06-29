@@ -13,7 +13,7 @@ export const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isCreateAccount, setIsCreateAccount] = useState(false);
-  const { login, isLoading } = useAuth();
+  const { signIn, signUp, loading } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,22 +29,29 @@ export const LoginForm = () => {
     }
 
     if (isCreateAccount) {
-      toast({
-        title: "Funcionalidade em desenvolvimento",
-        description: "Criação de conta será implementada com Supabase",
-        className: "bg-blue-500/10 border-blue-500/50"
-      });
-      return;
-    }
-
-    const success = await login(email, password);
-    
-    if (!success) {
-      toast({
-        title: "Erro no login",
-        description: "Email ou senha incorretos",
-        variant: "destructive"
-      });
+      const { error } = await signUp(email, password);
+      if (error) {
+        toast({
+          title: "Erro ao criar conta",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Conta criada!",
+          description: "Verifique seu email para confirmar a conta",
+          className: "bg-green-500/10 border-green-500/50"
+        });
+      }
+    } else {
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast({
+          title: "Erro no login",
+          description: "Email ou senha incorretos",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -78,7 +85,7 @@ export const LoginForm = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyPress={handleKeyPress}
-                disabled={isLoading}
+                disabled={loading}
               />
             </div>
             
@@ -92,14 +99,14 @@ export const LoginForm = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  disabled={isLoading}
+                  disabled={loading}
                   className="pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  disabled={isLoading}
+                  disabled={loading}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -110,9 +117,9 @@ export const LoginForm = () => {
               <Button 
                 type="submit" 
                 className="w-full bg-primary hover:bg-primary/90"
-                disabled={isLoading}
+                disabled={loading}
               >
-                {isLoading ? 'Carregando...' : (isCreateAccount ? 'Criar Conta' : 'Entrar')}
+                {loading ? 'Carregando...' : (isCreateAccount ? 'Criar Conta' : 'Entrar')}
               </Button>
               
               <Button 
@@ -120,7 +127,7 @@ export const LoginForm = () => {
                 variant="outline" 
                 className="w-full"
                 onClick={() => setIsCreateAccount(!isCreateAccount)}
-                disabled={isLoading}
+                disabled={loading}
               >
                 {isCreateAccount ? 'Já tem conta? Entrar' : 'Criar Conta'}
               </Button>

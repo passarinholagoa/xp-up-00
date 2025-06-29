@@ -20,7 +20,7 @@ import { useGame } from '@/contexts/GameContext';
 
 interface EditTodoModalProps {
   todo: {
-    id: number;
+    id: string;
     title: string;
     dueDate: string;
     priority: 'low' | 'medium' | 'high';
