@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
 import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
 import { XpUpSettings, DEFAULT_SETTINGS } from '@/types/settings';
+import { useAuth } from './AuthContext';
+import { useSupabaseData, DatabaseGameState, DatabaseHabit, DatabaseDaily, DatabaseTodo } from '@/hooks/useSupabaseData';
 
 interface GameState {
   hp: number;
@@ -16,7 +18,7 @@ interface GameState {
 }
 
 interface Habit {
-  id: number;
+  id: string;
   title: string;
   streak: number;
   difficulty: 'easy' | 'medium' | 'hard';
@@ -26,7 +28,7 @@ interface Habit {
 }
 
 interface Daily {
-  id: number;
+  id: string;
   title: string;
   completed: boolean;
   dueTime: string;
@@ -37,7 +39,7 @@ interface Daily {
 }
 
 interface Todo {
-  id: number;
+  id: string;
   title: string;
   completed: boolean;
   dueDate: string;
@@ -56,18 +58,18 @@ interface GameContextType {
   achievements: Achievement[];
   isNewQuestModalOpen: boolean;
   isAchievementsModalOpen: boolean;
-  completeHabit: (habitId: number, isPositive: boolean) => void;
-  completeDaily: (dailyId: number) => void;
-  completeTodo: (todoId: number) => void;
+  completeHabit: (habitId: string, isPositive: boolean) => void;
+  completeDaily: (dailyId: string) => void;
+  completeTodo: (todoId: string) => void;
   addHabit: (habit: Omit<Habit, 'id'>) => void;
   addDaily: (daily: Omit<Daily, 'id'>) => void;
   addTodo: (todo: Omit<Todo, 'id'>) => void;
-  updateHabit: (id: number, habit: Partial<Habit>) => void;
-  updateDaily: (id: number, daily: Partial<Daily>) => void;
-  updateTodo: (id: number, todo: Partial<Todo>) => void;
-  deleteHabit: (id: number) => void;
-  deleteDaily: (id: number) => void;
-  deleteTodo: (id: number) => void;
+  updateHabit: (id: string, habit: Partial<Habit>) => void;
+  updateDaily: (id: string, daily: Partial<Daily>) => void;
+  updateTodo: (id: string, todo: Partial<Todo>) => void;
+  deleteHabit: (id: string) => void;
+  deleteDaily: (id: string) => void;
+  deleteTodo: (id: string) => void;
   createNewQuest: () => void;
   closeNewQuestModal: () => void;
   openShop: () => void;
@@ -85,6 +87,7 @@ interface GameContextType {
   isSettingsModalOpen: boolean;
   updateSettings: (newSettings: XpUpSettings) => void;
   closeSettings: () => void;
+  loading: boolean;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -103,24 +106,24 @@ interface GameProviderProps {
 
 // Function to calculate level from total XP (0-100 levels)
 const calculateLevel = (totalXp: number): number => {
-  if (totalXp === 0) return 0;
+  if (totalXp === 0) return 1;
   
   // Exponential growth: each level requires more XP
   // Level n requires approximately n^2 * 100 total XP
-  const level = Math.floor(Math.sqrt(totalXp / 100));
+  const level = Math.floor(Math.sqrt(totalXp / 100)) + 1;
   return Math.min(level, 100); // Cap at level 100
 };
 
 // Function to calculate XP needed for next level
 const calculateXpForNextLevel = (currentLevel: number): number => {
   if (currentLevel >= 100) return 0;
-  return (currentLevel + 1) * (currentLevel + 1) * 100;
+  return (currentLevel) * (currentLevel) * 100;
 };
 
 // Function to calculate current level XP and max XP for progress bar
 const calculateLevelProgress = (totalXp: number, currentLevel: number) => {
-  const currentLevelBaseXp = currentLevel * currentLevel * 100;
-  const nextLevelBaseXp = calculateXpForNextLevel(currentLevel);
+  const currentLevelBaseXp = (currentLevel - 1) * (currentLevel - 1) * 100;
+  const nextLevelBaseXp = currentLevel * currentLevel * 100;
   
   return {
     currentLevelXp: totalXp - currentLevelBaseXp,
@@ -128,55 +131,83 @@ const calculateLevelProgress = (totalXp: number, currentLevel: number) => {
   };
 };
 
+const convertDatabaseToLocal = {
+  gameState: (data: DatabaseGameState): GameState => {
+    const level = calculateLevel(data.total_xp);
+    const { currentLevelXp, maxLevelXp } = calculateLevelProgress(data.total_xp, level);
+    
+    return {
+      hp: data.hp,
+      maxHp: data.max_hp,
+      xp: currentLevelXp,
+      totalXp: data.total_xp,
+      maxXp: maxLevelXp,
+      coins: data.coins,
+      level: level,
+      streak: data.streak
+    };
+  },
+  
+  habit: (data: DatabaseHabit): Habit => ({
+    id: data.id,
+    title: data.title,
+    streak: data.streak,
+    difficulty: data.difficulty,
+    xpReward: data.xp_reward,
+    coinReward: data.coin_reward,
+    isPositive: data.is_positive
+  }),
+  
+  daily: (data: DatabaseDaily): Daily => ({
+    id: data.id,
+    title: data.title,
+    completed: data.completed,
+    dueTime: data.due_time,
+    difficulty: data.difficulty,
+    xpReward: data.xp_reward,
+    coinReward: data.coin_reward,
+    streak: data.streak
+  }),
+  
+  todo: (data: DatabaseTodo): Todo => ({
+    id: data.id,
+    title: data.title,
+    completed: data.completed,
+    dueDate: data.due_date,
+    priority: data.priority,
+    difficulty: data.difficulty,
+    xpReward: data.xp_reward,
+    coinReward: data.coin_reward,
+    isOverdue: data.is_overdue
+  })
+};
+
 export const GameProvider = ({ children }: GameProviderProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const supabaseData = useSupabaseData(user);
+  
+  const [loading, setLoading] = useState(true);
   const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [settings, setSettings] = useState<XpUpSettings>(DEFAULT_SETTINGS);
-  
-  const initialTotalXp = 14400;
-  const initialLevel = calculateLevel(initialTotalXp);
-  const { currentLevelXp, maxLevelXp } = calculateLevelProgress(initialTotalXp, initialLevel);
   
   const [gameState, setGameState] = useState<GameState>({
-    hp: 85,
+    hp: 100,
     maxHp: 100,
-    xp: currentLevelXp,
-    totalXp: initialTotalXp,
-    maxXp: maxLevelXp,
-    coins: 342,
-    level: initialLevel,
-    streak: 7
+    xp: 0,
+    totalXp: 0,
+    maxXp: 100,
+    coins: 0,
+    level: 1,
+    streak: 0
   });
-
-  // Initialize achievements with some unlocked based on current state
-  const [achievements, setAchievements] = useState<Achievement[]>(() => {
-    return ACHIEVEMENTS.map(achievement => {
-      // Auto-unlock some achievements based on current game state
-      if (achievement.id === 'nivel-5' && initialLevel >= 5) {
-        return { ...achievement, unlocked: true, unlockedAt: new Date() };
-      }
-      if (achievement.id === 'nivel-10' && initialLevel >= 10) {
-        return { ...achievement, unlocked: true, unlockedAt: new Date() };
-      }
-      if (achievement.id === 'xp-master' && initialTotalXp >= 1000) {
-        return { ...achievement, unlocked: true, unlockedAt: new Date() };
-      }
-      if (achievement.id === 'primeira-missao') {
-        return { ...achievement, unlocked: true, unlockedAt: new Date() };
-      }
-      if (achievement.id === 'o-despertar') {
-        return { ...achievement, unlocked: true, unlockedAt: new Date() };
-      }
-      if (achievement.id === 'foco-total') {
-        return { ...achievement, unlocked: true, unlockedAt: new Date() };
-      }
-      return achievement;
-    });
-  });
-
+  
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [dailies, setDailies] = useState<Daily[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS);
   const [profile, setProfile] = useState<ProfileCustomization>({
     displayName: 'Aventureiro',
     avatar: '👤',
@@ -184,121 +215,104 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     nameColor: 'text-foreground',
     backgroundColor: 'bg-card'
   });
+  const [shopItems, setShopItems] = useState<ShopItem[]>(SHOP_ITEMS);
+  const [settings, setSettings] = useState<XpUpSettings>(DEFAULT_SETTINGS);
 
-  const [shopItems, setShopItems] = useState<ShopItem[]>(() => {
-    // Initialize some items as owned for demonstration
-    return SHOP_ITEMS.map(item => {
-      // Give basic items for free and some based on achievements
-      if (item.price <= 50) return { ...item, owned: true };
-      if (item.id === 'bg-praia-brasileira') return { ...item, owned: true };
-      if (item.id === 'color-verde-amarelo') return { ...item, owned: true };
-      if (item.id === 'frame-sertao') return { ...item, owned: true };
-      if (item.id === 'avatar-praiano') return { ...item, owned: true };
-      if (item.id === 'bg-floresta-amazonica' && initialLevel >= 5) return { ...item, owned: true };
-      if (item.id === 'frame-amazonia' && initialLevel >= 5) return { ...item, owned: true };
-      if (item.id === 'color-praiano' && initialLevel >= 5) return { ...item, owned: true };
-      return item;
-    });
-  });
+  // Load all data when user is available
+  useEffect(() => {
+    const loadAllData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-  const [habits, setHabits] = useState<Habit[]>([
-    {
-      id: 1,
-      title: 'Exercitar-se por 30 minutos',
-      streak: 12,
-      difficulty: 'medium',
-      xpReward: 15,
-      coinReward: 3,
-      isPositive: true
-    },
-    {
-      id: 2,
-      title: 'Ler por 20 minutos',
-      streak: 7,
-      difficulty: 'easy',
-      xpReward: 10,
-      coinReward: 2,
-      isPositive: true
-    },
-    {
-      id: 3,
-      title: 'Fumar',
-      streak: 0,
-      difficulty: 'hard',
-      xpReward: 0,
-      coinReward: 0,
-      isPositive: false
-    }
-  ]);
+      setLoading(true);
+      
+      try {
+        // Load game state
+        const gameStateData = await supabaseData.loadGameState();
+        if (gameStateData) {
+          setGameState(convertDatabaseToLocal.gameState(gameStateData));
+        } else {
+          // Create initial game state
+          const initialState = {
+            hp: 100,
+            max_hp: 100,
+            xp: 0,
+            total_xp: 0,
+            max_xp: 100,
+            coins: 0,
+            level: 1,
+            streak: 0
+          };
+          await supabaseData.saveGameState(initialState);
+        }
 
-  const [dailies, setDailies] = useState<Daily[]>([
-    {
-      id: 1,
-      title: 'Tomar 8 copos de água',
-      completed: false,
-      dueTime: '22:00',
-      difficulty: 'easy',
-      xpReward: 12,
-      coinReward: 2,
-      streak: 5
-    },
-    {
-      id: 2,
-      title: 'Meditar por 10 minutos',
-      completed: false,
-      dueTime: '07:00',
-      difficulty: 'medium',
-      xpReward: 18,
-      coinReward: 3,
-      streak: 3
-    },
-    {
-      id: 3,
-      title: 'Revisar metas do dia',
-      completed: false,
-      dueTime: '20:00',
-      difficulty: 'easy',
-      xpReward: 10,
-      coinReward: 2,
-      streak: 8
-    }
-  ]);
+        // Load profile
+        const profileData = await supabaseData.loadProfile();
+        if (profileData) {
+          setProfile({
+            displayName: profileData.display_name,
+            avatar: profileData.avatar,
+            frameBorder: profileData.frame_border,
+            nameColor: profileData.name_color,
+            backgroundColor: profileData.background_color
+          });
+        } else {
+          // Create initial profile
+          await supabaseData.saveProfile({
+            display_name: 'Aventureiro',
+            avatar: '👤',
+            frame_border: 'border-2 border-primary/50',
+            name_color: 'text-foreground',
+            background_color: 'bg-card'
+          });
+        }
 
-  const [todos, setTodos] = useState<Todo[]>([
-    {
-      id: 1,
-      title: 'Finalizar relatório do projeto',
-      completed: false,
-      dueDate: '2024-06-22',
-      priority: 'high',
-      difficulty: 'hard',
-      xpReward: 25,
-      coinReward: 5,
-      isOverdue: false
-    },
-    {
-      id: 2,
-      title: 'Comprar presentes de aniversário',
-      completed: false,
-      dueDate: '2024-06-21',
-      priority: 'medium',
-      difficulty: 'easy',
-      xpReward: 8,
-      coinReward: 2,
-      isOverdue: true
-    },
-    {
-      id: 3,
-      title: 'Agendar consulta médica',
-      completed: false,
-      dueDate: '2024-06-20',
-      priority: 'high',
-      difficulty: 'easy',
-      xpReward: 15,
-      coinReward: 3,
-      isOverdue: false
-    }
-  ]);
+        // Load settings
+        const settingsData = await supabaseData.loadSettings();
+        if (settingsData) {
+          setSettings({
+            globalNotifications: settingsData.global_notifications,
+            dailyReminder: settingsData.daily_reminder,
+            reminderTime: settingsData.reminder_time,
+            hardcoreMode: settingsData.hardcore_mode,
+            vacationMode: settingsData.vacation_mode,
+            animatedXpBar: settingsData.animated_xp_bar
+          });
+        } else {
+          // Create initial settings
+          await supabaseData.saveSettings({
+            global_notifications: true,
+            daily_reminder: true,
+            reminder_time: '09:00',
+            hardcore_mode: false,
+            vacation_mode: false,
+            animated_xp_bar: true
+          });
+        }
+
+        // Load habits
+        const habitsData = await supabaseData.loadHabits();
+        setHabits(habitsData.map(convertDatabaseToLocal.habit));
+
+        // Load dailies
+        const dailiesData = await supabaseData.loadDailies();
+        setDailies(dailiesData.map(convertDatabaseToLocal.daily));
+
+        // Load todos
+        const todosData = await supabaseData.loadTodos();
+        setTodos(todosData.map(convertDatabaseToLocal.todo));
+
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAllData();
+  }, [user]);
 
   const checkAchievements = (context: string, data?: any) => {
     setAchievements(prev => {
@@ -377,57 +391,83 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     });
   };
 
-  const updateGameStateXp = (xpGain: number) => {
-    setGameState(prev => {
-      const newTotalXp = prev.totalXp + xpGain;
-      const newLevel = calculateLevel(newTotalXp);
-      const { currentLevelXp, maxLevelXp } = calculateLevelProgress(newTotalXp, newLevel);
-      
-      // Apply hardcore mode multiplier if enabled
-      const finalXpGain = settings.hardcoreMode ? Math.floor(xpGain * 1.5) : xpGain;
-      const adjustedTotalXp = settings.hardcoreMode ? prev.totalXp + finalXpGain : newTotalXp;
-      const adjustedLevel = calculateLevel(adjustedTotalXp);
-      
-      // Check for level up and show notification only if global notifications are enabled
-      if (adjustedLevel > prev.level) {
-        checkAchievements('level-up', { newLevel: adjustedLevel });
-        if (settings.globalNotifications) {
-          toast({
-            title: `🎉 LEVEL UP! 🎉`,
-            description: `Parabéns! Você alcançou o nível ${adjustedLevel}!`,
-            className: "bg-quest-legendary/20 border-quest-legendary"
-          });
-        }
-      }
-      
-      return {
-        ...prev,
-        xp: currentLevelXp,
-        totalXp: adjustedTotalXp,
-        maxXp: maxLevelXp,
-        level: adjustedLevel
-      };
+  const updateGameStateXp = async (xpGain: number) => {
+    const newTotalXp = gameState.totalXp + xpGain;
+    const newLevel = calculateLevel(newTotalXp);
+    const { currentLevelXp, maxLevelXp } = calculateLevelProgress(newTotalXp, newLevel);
+    
+    const finalXpGain = settings.hardcoreMode ? Math.floor(xpGain * 1.5) : xpGain;
+    const adjustedTotalXp = settings.hardcoreMode ? gameState.totalXp + finalXpGain : newTotalXp;
+    const adjustedLevel = calculateLevel(adjustedTotalXp);
+    
+    const newGameState = {
+      ...gameState,
+      xp: currentLevelXp,
+      totalXp: adjustedTotalXp,
+      maxXp: maxLevelXp,
+      level: adjustedLevel
+    };
+    
+    setGameState(newGameState);
+    
+    // Save to database
+    await supabaseData.saveGameState({
+      hp: newGameState.hp,
+      max_hp: newGameState.maxHp,
+      xp: currentLevelXp,
+      total_xp: adjustedTotalXp,
+      max_xp: maxLevelXp,
+      coins: newGameState.coins,
+      level: adjustedLevel,
+      streak: newGameState.streak
     });
+    
+    if (adjustedLevel > gameState.level && settings.globalNotifications) {
+      toast({
+        title: `🎉 LEVEL UP! 🎉`,
+        description: `Parabéns! Você alcançou o nível ${adjustedLevel}!`,
+        className: "bg-quest-legendary/20 border-quest-legendary"
+      });
+    }
   };
 
-  const completeHabit = (habitId: number, isPositive: boolean) => {
+  const completeHabit = async (habitId: string, isPositive: boolean) => {
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit) return;
+
     if (isPositive) {
-      const habit = habits.find(h => h.id === habitId);
-      const baseXpGain = habit?.xpReward || 15;
-      const baseCoinGain = habit?.coinReward || 3;
+      const baseXpGain = habit.xpReward;
+      const baseCoinGain = habit.coinReward;
       
-      // Apply hardcore mode multipliers
       const xpGain = settings.hardcoreMode ? Math.floor(baseXpGain * 1.5) : baseXpGain;
       const coinGain = settings.hardcoreMode ? Math.floor(baseCoinGain * 1.5) : baseCoinGain;
       
-      updateGameStateXp(xpGain);
-      setGameState(prev => ({
-        ...prev,
-        coins: prev.coins + coinGain,
-        hp: Math.min(prev.hp + 2, prev.maxHp)
-      }));
+      await updateGameStateXp(xpGain);
+      
+      const newGameState = {
+        ...gameState,
+        coins: gameState.coins + coinGain,
+        hp: Math.min(gameState.hp + 2, gameState.maxHp)
+      };
+      
+      setGameState(newGameState);
+      
+      // Update habit streak
+      const updatedHabit = { ...habit, streak: habit.streak + 1 };
+      setHabits(prev => prev.map(h => h.id === habitId ? updatedHabit : h));
+      
+      // Save to database
+      await supabaseData.saveGameState({
+        hp: newGameState.hp,
+        max_hp: newGameState.maxHp,
+        coins: newGameState.coins
+      });
+      
+      await supabaseData.saveHabit({
+        id: habitId,
+        streak: updatedHabit.streak
+      });
 
-      // Only show notification if global notifications are enabled
       if (settings.globalNotifications) {
         toast({
           title: "Hábito Completado! 🎉",
@@ -436,7 +476,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         });
       }
     } else {
-      // Apply vacation mode protection
       if (settings.vacationMode) {
         if (settings.globalNotifications) {
           toast({
@@ -448,15 +487,19 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         return;
       }
 
-      // Apply hardcore mode penalty multiplier
       const hpLoss = settings.hardcoreMode ? 15 : 10;
       
-      setGameState(prev => ({
-        ...prev,
-        hp: Math.max(prev.hp - hpLoss, 0)
-      }));
+      const newGameState = {
+        ...gameState,
+        hp: Math.max(gameState.hp - hpLoss, 0)
+      };
+      
+      setGameState(newGameState);
+      
+      await supabaseData.saveGameState({
+        hp: newGameState.hp
+      });
 
-      // Only show notification if global notifications are enabled
       if (settings.globalNotifications) {
         toast({
           title: "Hábito Negativo Registrado 😞",
@@ -467,22 +510,41 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const completeDaily = (dailyId: number) => {
+  const completeDaily = async (dailyId: string) => {
     const daily = dailies.find(d => d.id === dailyId);
-    const baseXpGain = daily?.xpReward || 18;
-    const baseCoinGain = daily?.coinReward || 3;
+    if (!daily) return;
+
+    const baseXpGain = daily.xpReward;
+    const baseCoinGain = daily.coinReward;
     
-    // Apply hardcore mode multipliers
     const xpGain = settings.hardcoreMode ? Math.floor(baseXpGain * 1.5) : baseXpGain;
     const coinGain = settings.hardcoreMode ? Math.floor(baseCoinGain * 1.5) : baseCoinGain;
     
-    updateGameStateXp(xpGain);
-    setGameState(prev => ({
-      ...prev,
-      coins: prev.coins + coinGain
-    }));
+    await updateGameStateXp(xpGain);
+    
+    const newGameState = {
+      ...gameState,
+      coins: gameState.coins + coinGain
+    };
+    
+    setGameState(newGameState);
+    
+    // Update daily
+    const updatedDaily = { ...daily, completed: true, streak: daily.streak + 1 };
+    setDailies(prev => prev.map(d => d.id === dailyId ? updatedDaily : d));
+    
+    // Save to database
+    await supabaseData.saveGameState({
+      coins: newGameState.coins
+    });
+    
+    await supabaseData.saveDaily({
+      id: dailyId,
+      completed: true,
+      streak: updatedDaily.streak,
+      completed_at: new Date().toISOString().split('T')[0]
+    });
 
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Daily Completada! ✨",
@@ -492,22 +554,40 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const completeTodo = (todoId: number) => {
+  const completeTodo = async (todoId: string) => {
     const todo = todos.find(t => t.id === todoId);
-    const baseXpGain = todo?.xpReward || 25;
-    const baseCoinGain = todo?.coinReward || 5;
+    if (!todo) return;
+
+    const baseXpGain = todo.xpReward;
+    const baseCoinGain = todo.coinReward;
     
-    // Apply hardcore mode multipliers
     const xpGain = settings.hardcoreMode ? Math.floor(baseXpGain * 1.5) : baseXpGain;
     const coinGain = settings.hardcoreMode ? Math.floor(baseCoinGain * 1.5) : baseCoinGain;
     
-    updateGameStateXp(xpGain);
-    setGameState(prev => ({
-      ...prev,
-      coins: prev.coins + coinGain
-    }));
+    await updateGameStateXp(xpGain);
+    
+    const newGameState = {
+      ...gameState,
+      coins: gameState.coins + coinGain
+    };
+    
+    setGameState(newGameState);
+    
+    // Update todo
+    const updatedTodo = { ...todo, completed: true };
+    setTodos(prev => prev.map(t => t.id === todoId ? updatedTodo : t));
+    
+    // Save to database
+    await supabaseData.saveGameState({
+      coins: newGameState.coins
+    });
+    
+    await supabaseData.saveTodo({
+      id: todoId,
+      completed: true,
+      completed_at: new Date().toISOString()
+    });
 
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Quest Completada! 🏆",
@@ -517,59 +597,93 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const addHabit = (habit: Omit<Habit, 'id'>) => {
-    const newId = Math.max(...habits.map(h => h.id), 0) + 1;
-    setHabits(prev => [...prev, { ...habit, id: newId }]);
+  const addHabit = async (habit: Omit<Habit, 'id'>) => {
+    const newHabit = await supabaseData.saveHabit({
+      title: habit.title,
+      streak: habit.streak,
+      difficulty: habit.difficulty,
+      xp_reward: habit.xpReward,
+      coin_reward: habit.coinReward,
+      is_positive: habit.isPositive
+    });
     
-    // Check for first habit achievement
-    if (habits.length === 0) {
-      checkAchievements('first-habit-created');
-    }
-    
-    // Only show notification if global notifications are enabled
-    if (settings.globalNotifications) {
-      toast({
-        title: "Novo Hábito Criado! 🎯",
-        description: `"${habit.title}" foi adicionado à sua lista`,
-        className: "bg-green-500/10 border-green-500/50"
-      });
-    }
-  };
-
-  const addDaily = (daily: Omit<Daily, 'id'>) => {
-    const newId = Math.max(...dailies.map(d => d.id), 0) + 1;
-    setDailies(prev => [...prev, { ...daily, id: newId }]);
-    
-    // Only show notification if global notifications are enabled
-    if (settings.globalNotifications) {
-      toast({
-        title: "Nova Daily Criada! ⚡",
-        description: `"${daily.title}" foi adicionada à sua lista`,
-        className: "bg-blue-500/10 border-blue-500/50"
-      });
+    if (newHabit) {
+      setHabits(prev => [...prev, convertDatabaseToLocal.habit(newHabit)]);
+      
+      if (settings.globalNotifications) {
+        toast({
+          title: "Novo Hábito Criado! 🎯",
+          description: `"${habit.title}" foi adicionado à sua lista`,
+          className: "bg-green-500/10 border-green-500/50"
+        });
+      }
     }
   };
 
-  const addTodo = (todo: Omit<Todo, 'id'>) => {
-    const newId = Math.max(...todos.map(t => t.id), 0) + 1;
-    setTodos(prev => [...prev, { ...todo, id: newId }]);
+  const addDaily = async (daily: Omit<Daily, 'id'>) => {
+    const newDaily = await supabaseData.saveDaily({
+      title: daily.title,
+      completed: daily.completed,
+      due_time: daily.dueTime,
+      difficulty: daily.difficulty,
+      xp_reward: daily.xpReward,
+      coin_reward: daily.coinReward,
+      streak: daily.streak
+    });
     
-    // Only show notification if global notifications are enabled
-    if (settings.globalNotifications) {
-      toast({
-        title: "Nova Quest Criada! 🎮",
-        description: `"${todo.title}" foi adicionada à sua lista`,
-        className: "bg-purple-500/10 border-purple-500/50"
-      });
+    if (newDaily) {
+      setDailies(prev => [...prev, convertDatabaseToLocal.daily(newDaily)]);
+      
+      if (settings.globalNotifications) {
+        toast({
+          title: "Nova Daily Criada! ⚡",
+          description: `"${daily.title}" foi adicionada à sua lista`,
+          className: "bg-blue-500/10 border-blue-500/50"
+        });
+      }
     }
   };
 
-  const updateHabit = (id: number, updatedHabit: Partial<Habit>) => {
+  const addTodo = async (todo: Omit<Todo, 'id'>) => {
+    const newTodo = await supabaseData.saveTodo({
+      title: todo.title,
+      completed: todo.completed,
+      due_date: todo.dueDate,
+      priority: todo.priority,
+      difficulty: todo.difficulty,
+      xp_reward: todo.xpReward,
+      coin_reward: todo.coinReward,
+      is_overdue: todo.isOverdue
+    });
+    
+    if (newTodo) {
+      setTodos(prev => [...prev, convertDatabaseToLocal.todo(newTodo)]);
+      
+      if (settings.globalNotifications) {
+        toast({
+          title: "Nova Quest Criada! 🎮",
+          description: `"${todo.title}" foi adicionada à sua lista`,
+          className: "bg-purple-500/10 border-purple-500/50"
+        });
+      }
+    }
+  };
+
+  const updateHabit = async (id: string, updatedHabit: Partial<Habit>) => {
+    await supabaseData.saveHabit({
+      id,
+      title: updatedHabit.title,
+      streak: updatedHabit.streak,
+      difficulty: updatedHabit.difficulty,
+      xp_reward: updatedHabit.xpReward,
+      coin_reward: updatedHabit.coinReward,
+      is_positive: updatedHabit.isPositive
+    });
+    
     setHabits(prev => prev.map(habit => 
       habit.id === id ? { ...habit, ...updatedHabit } : habit
     ));
     
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Hábito Atualizado! ✏️",
@@ -579,12 +693,22 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const updateDaily = (id: number, updatedDaily: Partial<Daily>) => {
+  const updateDaily = async (id: string, updatedDaily: Partial<Daily>) => {
+    await supabaseData.saveDaily({
+      id,
+      title: updatedDaily.title,
+      completed: updatedDaily.completed,
+      due_time: updatedDaily.dueTime,
+      difficulty: updatedDaily.difficulty,
+      xp_reward: updatedDaily.xpReward,
+      coin_reward: updatedDaily.coinReward,
+      streak: updatedDaily.streak
+    });
+    
     setDailies(prev => prev.map(daily => 
       daily.id === id ? { ...daily, ...updatedDaily } : daily
     ));
     
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Daily Atualizada! ✏️",
@@ -594,12 +718,23 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const updateTodo = (id: number, updatedTodo: Partial<Todo>) => {
+  const updateTodo = async (id: string, updatedTodo: Partial<Todo>) => {
+    await supabaseData.saveTodo({
+      id,
+      title: updatedTodo.title,
+      completed: updatedTodo.completed,
+      due_date: updatedTodo.dueDate,
+      priority: updatedTodo.priority,
+      difficulty: updatedTodo.difficulty,
+      xp_reward: updatedTodo.xpReward,
+      coin_reward: updatedTodo.coinReward,
+      is_overdue: updatedTodo.isOverdue
+    });
+    
     setTodos(prev => prev.map(todo => 
       todo.id === id ? { ...todo, ...updatedTodo } : todo
     ));
     
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Quest Atualizada! ✏️",
@@ -609,11 +744,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const deleteHabit = (id: number) => {
+  const deleteHabit = async (id: string) => {
     const habit = habits.find(h => h.id === id);
+    await supabaseData.deleteHabit(id);
     setHabits(prev => prev.filter(h => h.id !== id));
     
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Hábito Removido! 🗑️",
@@ -623,11 +758,11 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const deleteDaily = (id: number) => {
+  const deleteDaily = async (id: string) => {
     const daily = dailies.find(d => d.id === id);
+    await supabaseData.deleteDaily(id);
     setDailies(prev => prev.filter(d => d.id !== id));
     
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Daily Removida! 🗑️",
@@ -637,16 +772,57 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     }
   };
 
-  const deleteTodo = (id: number) => {
+  const deleteTodo = async (id: string) => {
     const todo = todos.find(t => t.id === id);
+    await supabaseData.deleteTodo(id);
     setTodos(prev => prev.filter(t => t.id !== id));
     
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: "Quest Removida! 🗑️",
         description: `"${todo?.title}" foi removida`,
         className: "bg-red-500/10 border-red-500/50"
+      });
+    }
+  };
+
+  const updateProfile = async (newProfile: ProfileCustomization) => {
+    setProfile(newProfile);
+    
+    await supabaseData.saveProfile({
+      display_name: newProfile.displayName,
+      avatar: newProfile.avatar,
+      frame_border: newProfile.frameBorder,
+      name_color: newProfile.nameColor,
+      background_color: newProfile.backgroundColor
+    });
+    
+    if (settings.globalNotifications) {
+      toast({
+        title: "Perfil Atualizado! ✨",
+        description: "Suas personalizações foram salvas",
+        className: "bg-quest-primary/10 border-quest-primary/50"
+      });
+    }
+  };
+
+  const updateSettings = async (newSettings: XpUpSettings) => {
+    setSettings(newSettings);
+    
+    await supabaseData.saveSettings({
+      global_notifications: newSettings.globalNotifications,
+      daily_reminder: newSettings.dailyReminder,
+      reminder_time: newSettings.reminderTime,
+      hardcore_mode: newSettings.hardcoreMode,
+      vacation_mode: newSettings.vacationMode,
+      animated_xp_bar: newSettings.animatedXpBar
+    });
+    
+    if (newSettings.globalNotifications) {
+      toast({
+        title: "Configurações Atualizadas! ⚙️",
+        description: "Suas preferências foram salvas com sucesso",
+        className: "bg-cyan-500/10 border-cyan-500/50"
       });
     }
   };
@@ -659,17 +835,32 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     setIsNewQuestModalOpen(false);
   };
 
-  const updateProfile = (newProfile: ProfileCustomization) => {
-    setProfile(newProfile);
-    
-    // Only show notification if global notifications are enabled
-    if (settings.globalNotifications) {
-      toast({
-        title: "Perfil Atualizado! ✨",
-        description: "Suas personalizações foram salvas",
-        className: "bg-quest-primary/10 border-quest-primary/50"
-      });
-    }
+  const openProfile = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const closeProfile = () => {
+    setIsProfileModalOpen(false);
+  };
+
+  const openShop = () => {
+    openProfile();
+  };
+
+  const openAchievements = () => {
+    setIsAchievementsModalOpen(true);
+  };
+
+  const closeAchievements = () => {
+    setIsAchievementsModalOpen(false);
+  };
+
+  const openSettings = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  const closeSettings = () => {
+    setIsSettingsModalOpen(false);
   };
 
   const buyShopItem = (itemId: string) => {
@@ -691,7 +882,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         missingRequirements.push(`conquista "${achievement?.title}"`);
       }
 
-      // Only show notification if global notifications are enabled
       if (settings.globalNotifications) {
         toast({
           title: "Requisitos não atendidos 🚫",
@@ -711,7 +901,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       i.id === itemId ? { ...i, owned: true } : i
     ));
 
-    // Only show notification if global notifications are enabled
     if (settings.globalNotifications) {
       toast({
         title: `${item.icon} Item Comprado!`,
@@ -719,47 +908,6 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         className: `bg-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/10 border-${item.rarity === 'legendary' ? 'quest-legendary' : 'quest-epic'}/50`
       });
     }
-  };
-
-  const openProfile = () => {
-    setIsProfileModalOpen(true);
-  };
-
-  const closeProfile = () => {
-    setIsProfileModalOpen(false);
-  };
-
-  const openShop = () => {
-    openProfile(); // Redirect to profile modal which now has the shop
-  };
-
-  const openAchievements = () => {
-    setIsAchievementsModalOpen(true);
-  };
-
-  const closeAchievements = () => {
-    setIsAchievementsModalOpen(false);
-  };
-
-  const updateSettings = (newSettings: XpUpSettings) => {
-    setSettings(newSettings);
-    
-    // Only show notification if global notifications are enabled (use the NEW settings)
-    if (newSettings.globalNotifications) {
-      toast({
-        title: "Configurações Atualizadas! ⚙️",
-        description: "Suas preferências foram salvas com sucesso",
-        className: "bg-cyan-500/10 border-cyan-500/50"
-      });
-    }
-  };
-
-  const openSettings = () => {
-    setIsSettingsModalOpen(true);
-  };
-
-  const closeSettings = () => {
-    setIsSettingsModalOpen(false);
   };
 
   return (
@@ -800,6 +948,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       isSettingsModalOpen,
       updateSettings,
       closeSettings,
+      loading,
     }}>
       {children}
     </GameContext.Provider>

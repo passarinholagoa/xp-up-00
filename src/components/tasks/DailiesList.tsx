@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calendar, Coins, Zap, Clock, Edit2, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -21,7 +20,7 @@ import {
 
 export const DailiesList = () => {
   const { dailies, completeDaily, deleteDaily } = useGame();
-  const [completedDailies, setCompletedDailies] = useState<number[]>([1]);
+  const [completedDailies, setCompletedDailies] = useState<string[]>([]);
   const [editingDaily, setEditingDaily] = useState<typeof dailies[0] | null>(null);
 
   const getDifficultyColor = (difficulty: string) => {
@@ -44,12 +43,12 @@ export const DailiesList = () => {
     setEditingDaily(daily);
   };
 
-  const handleDelete = (dailyId: number) => {
+  const handleDelete = (dailyId: string) => {
     deleteDaily(dailyId);
     setCompletedDailies(prev => prev.filter(id => id !== dailyId));
   };
 
-  const isCompleted = (dailyId: number) => completedDailies.includes(dailyId);
+  const isCompleted = (dailyId: string) => completedDailies.includes(dailyId);
 
   return (
     <div className="space-y-4">
