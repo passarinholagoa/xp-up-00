@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { GameProvider } from "./contexts/GameContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ResetPassword from './pages/ResetPassword';
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -46,6 +46,10 @@ const AppRoutes = () => {
       <Route 
         path="/auth" 
         element={user ? <Navigate to="/" replace /> : <Auth />} 
+      />
+      <Route
+        path="/auth/reset-password"
+        element={<ResetPassword />}
       />
       <Route 
         path="/" 
