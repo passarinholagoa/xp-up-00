@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -117,34 +116,37 @@
       -webkit-touch-callout: none;
       -webkit-user-select: none;
     }
+  }
 
-    /* Container principal mais compacto */
-    .container {
-      @apply px-2;
-    }
+  /* Container principal mais compacto */
+  .container {
+    @apply px-4; /* valor padrão */
+    @apply max-[390px]:px-2;
+  }
 
-    /* Textos menores em mobile pequeno */
-    h1 { @apply text-xl; }
-    h2 { @apply text-lg; }
-    h3 { @apply text-base; }
-    
-    /* Botões mais compactos */
-    .mobile-button {
-      @apply px-3 py-2 text-sm;
-    }
+  /* Textos menores em mobile pequeno */
+  h1 { @apply text-2xl max-[390px]:text-xl; }
+  h2 { @apply text-xl max-[390px]:text-lg; }
+  h3 { @apply text-lg max-[390px]:text-base; }
+  
+  /* Botões mais compactos */
+  .mobile-button {
+    @apply px-4 py-3 text-base; /* padrão */
+    @apply max-[390px]:px-3 max-[390px]:py-2 max-[390px]:text-sm;
+  }
 
-    /* Cards mais compactos */
-    .quest-card {
-      @apply p-3;
-    }
+  /* Cards mais compactos */
+  .quest-card {
+    @apply p-4; /* padrão */
+    @apply max-[390px]:p-3;
+  }
 
-    /* Reduz animações em dispositivos móveis menos potentes */
-    @media (prefers-reduced-motion: no-preference) {
-      .mobile-optimized {
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        perspective: 1000px;
-      }
+  /* Reduz animações em dispositivos móveis menos potentes */
+  @media (max-width: 390px) and (prefers-reduced-motion: no-preference) {
+    .mobile-optimized {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      perspective: 1000px;
     }
   }
 
@@ -169,29 +171,18 @@
 @layer components {
   .quest-card {
     @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20;
-    
-    /* Mobile específico */
-    @media (max-width: 390px) {
-      @apply p-3 rounded-lg;
-    }
+    @apply p-4 rounded-xl; /* padrão */
+    @apply max-[390px]:p-3 max-[390px]:rounded-lg;
   }
   
   .stat-badge {
     @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
-    
-    /* Mobile específico */
-    @media (max-width: 390px) {
-      @apply px-2 py-1 text-xs gap-1;
-    }
+    @apply max-[390px]:px-2 max-[390px]:py-1 max-[390px]:text-xs max-[390px]:gap-1;
   }
   
   .progress-bar {
     @apply w-full h-3 bg-secondary rounded-full overflow-hidden relative;
-    
-    /* Mobile específico */
-    @media (max-width: 390px) {
-      @apply h-2;
-    }
+    @apply max-[390px]:h-2;
   }
   
   .progress-fill {
@@ -219,33 +210,23 @@
 
   /* Layout mobile específico */
   .mobile-grid {
-    @media (max-width: 390px) {
-      @apply grid-cols-1 gap-2;
-    }
+    @apply max-[390px]:grid-cols-1 max-[390px]:gap-2;
   }
 
   .mobile-flex {
-    @media (max-width: 390px) {
-      @apply flex-col gap-2;
-    }
+    @apply max-[390px]:flex-col max-[390px]:gap-2;
   }
 
   .mobile-text {
-    @media (max-width: 390px) {
-      @apply text-sm;
-    }
+    @apply max-[390px]:text-sm;
   }
 
   .mobile-padding {
-    @media (max-width: 390px) {
-      @apply p-3;
-    }
+    @apply max-[390px]:p-3;
   }
 
   .mobile-margin {
-    @media (max-width: 390px) {
-      @apply m-2;
-    }
+    @apply max-[390px]:m-2;
   }
 }
 
