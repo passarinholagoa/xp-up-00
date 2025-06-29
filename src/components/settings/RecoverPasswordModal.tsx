@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Mail, Send } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RecoverPasswordModalProps {
   isOpen: boolean;
@@ -44,17 +44,32 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
     }
 
     setIsLoading(true);
-    
-    // Simular envio de email
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setEmailSent(true);
-    toast({
-      title: "Email enviado",
-      description: "Verifique sua caixa de entrada para recuperar sua senha",
-      className: "bg-green-500/10 border-green-500/50"
-    });
-    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/auth/reset-password',
+      });
+      if (error) {
+        toast({
+          title: "Erro ao enviar email",
+          description: error.message,
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+      setEmailSent(true);
+      toast({
+        title: "Email enviado",
+        description: "Verifique sua caixa de entrada para recuperar sua senha",
+        className: "bg-green-500/10 border-green-500/50"
+      });
+    } catch (err) {
+      toast({
+        title: "Erro inesperado",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive"
+      });
+    }
     setIsLoading(false);
   };
 

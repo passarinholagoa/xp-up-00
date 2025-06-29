@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,10 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Sword, Shield, Star } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import LoginForm from '@/components/LoginForm';
+import SignUpForm from '@/components/SignUpForm';
+import { RecoverPasswordModal } from '@/components/settings/RecoverPasswordModal';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +18,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
+  const [recoverModalOpen, setRecoverModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +51,12 @@ const Auth = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleToggleMode = () => {
+    setIsLogin((prev) => !prev);
+    setEmail('');
+    setPassword('');
   };
 
   return (
@@ -87,41 +97,51 @@ const Auth = () => {
             </p>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                placeholder="seu@email.com"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                placeholder="••••••••"
-              />
-            </div>
-            
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-quest-gradient hover:opacity-90 text-white font-semibold py-3 glow-effect"
-            >
-              {loading ? 'Carregando...' : (isLogin ? 'Entrar' : 'Criar Conta')}
-            </Button>
-          </form>
+          {/* Animação de transição entre formulários com Framer Motion */}
+          <div className="relative min-h-[220px]">
+            <AnimatePresence mode="wait" initial={false}>
+              {isLogin ? (
+                <motion.div
+                  key="login"
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.35, ease: 'easeInOut' }}
+                  className="absolute w-full"
+                  style={{ zIndex: 2 }}
+                >
+                  <LoginForm
+                    email={email}
+                    password={password}
+                    loading={loading}
+                    onEmailChange={e => setEmail(e.target.value)}
+                    onPasswordChange={e => setPassword(e.target.value)}
+                    onSubmit={handleSubmit}
+                    onForgotPassword={() => setRecoverModalOpen(true)}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="signup"
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 40 }}
+                  transition={{ duration: 0.35, ease: 'easeInOut' }}
+                  className="absolute w-full"
+                  style={{ zIndex: 2 }}
+                >
+                  <SignUpForm
+                    email={email}
+                    password={password}
+                    loading={loading}
+                    onEmailChange={e => setEmail(e.target.value)}
+                    onPasswordChange={e => setPassword(e.target.value)}
+                    onSubmit={handleSubmit}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           
           <div className="mt-6 pt-6 border-t border-white/20 text-center">
             <p className="text-white/70 mb-4">
@@ -130,7 +150,7 @@ const Auth = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={handleToggleMode}
               className="border-white/20 text-white hover:bg-white/10"
             >
               {isLogin ? 'Criar Conta' : 'Fazer Login'}
@@ -138,6 +158,7 @@ const Auth = () => {
           </div>
         </Card>
       </div>
+      <RecoverPasswordModal isOpen={recoverModalOpen} onClose={() => setRecoverModalOpen(false)} />
     </div>
   );
 };

@@ -1,23 +1,18 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
-import { Eye, EyeOff, Zap } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
-interface LoginFormProps {
+interface SignUpFormProps {
   email: string;
   password: string;
   loading: boolean;
   onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
-  onForgotPassword?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ email, password, loading, onEmailChange, onPasswordChange, onSubmit, onForgotPassword }) => (
+const SignUpForm: React.FC<SignUpFormProps> = ({ email, password, loading, onEmailChange, onPasswordChange, onSubmit }) => (
   <form onSubmit={onSubmit} className="space-y-6">
     <div className="space-y-2">
       <Label htmlFor="email" className="text-white">Email</Label>
@@ -42,24 +37,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ email, password, loading, onEmail
         className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
         placeholder="••••••••"
       />
-      {onForgotPassword && (
-        <button
-          type="button"
-          onClick={onForgotPassword}
-          className="mt-2 text-xs text-blue-300 hover:underline focus:outline-none"
-        >
-          Esqueci minha senha?
-        </button>
-      )}
     </div>
     <Button
       type="submit"
       disabled={loading}
       className="w-full bg-quest-gradient hover:opacity-90 text-white font-semibold py-3 glow-effect"
     >
-      {loading ? 'Carregando...' : 'Entrar'}
+      {loading ? 'Carregando...' : 'Criar Conta'}
     </Button>
   </form>
 );
 
-export default LoginForm;
+export default SignUpForm; 
