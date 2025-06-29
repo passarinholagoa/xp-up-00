@@ -272,23 +272,24 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         // Load settings
         const settingsData = await supabaseData.loadSettings();
         if (settingsData) {
-          setSettings({
+          setSettings(prev => ({
+            ...prev,
             globalNotifications: settingsData.global_notifications,
             dailyReminder: settingsData.daily_reminder,
             reminderTime: settingsData.reminder_time,
             hardcoreMode: settingsData.hardcore_mode,
             vacationMode: settingsData.vacation_mode,
             animatedXpBar: settingsData.animated_xp_bar
-          });
+          }));
         } else {
           // Create initial settings
           await supabaseData.saveSettings({
-            global_notifications: true,
-            daily_reminder: true,
-            reminder_time: '09:00',
-            hardcore_mode: false,
-            vacation_mode: false,
-            animated_xp_bar: true
+            global_notifications: DEFAULT_SETTINGS.globalNotifications,
+            daily_reminder: DEFAULT_SETTINGS.dailyReminder,
+            reminder_time: DEFAULT_SETTINGS.reminderTime,
+            hardcore_mode: DEFAULT_SETTINGS.hardcoreMode,
+            vacation_mode: DEFAULT_SETTINGS.vacationMode,
+            animated_xp_bar: DEFAULT_SETTINGS.animatedXpBar
           });
         }
 
@@ -807,7 +808,10 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const updateSettings = async (newSettings: XpUpSettings) => {
-    setSettings(newSettings);
+    setSettings(prev => ({
+      ...prev,
+      ...newSettings
+    }));
     
     await supabaseData.saveSettings({
       global_notifications: newSettings.globalNotifications,
