@@ -43,7 +43,7 @@ export const HabitsList = () => {
     setEditingHabit(habit);
   };
 
-  const handleDelete = (habitId: number) => {
+  const handleDelete = (habitId: string) => {
     deleteHabit(habitId);
   };
 
