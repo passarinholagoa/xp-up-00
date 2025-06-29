@@ -180,7 +180,7 @@ export const useSupabaseData = (user: User | null) => {
       return [];
     }
     
-    return data || [];
+    return (data || []) as DatabaseHabit[];
   };
 
   const saveHabit = async (habit: Partial<DatabaseHabit> & { id?: string }) => {
@@ -189,7 +189,14 @@ export const useSupabaseData = (user: User | null) => {
     if (habit.id) {
       const { data, error } = await supabase
         .from('habits')
-        .update(habit)
+        .update({
+          title: habit.title,
+          streak: habit.streak,
+          difficulty: habit.difficulty,
+          xp_reward: habit.xp_reward,
+          coin_reward: habit.coin_reward,
+          is_positive: habit.is_positive
+        })
         .eq('id', habit.id)
         .select()
         .single();
@@ -199,11 +206,19 @@ export const useSupabaseData = (user: User | null) => {
         return null;
       }
       
-      return data;
+      return data as DatabaseHabit;
     } else {
       const { data, error } = await supabase
         .from('habits')
-        .insert({ user_id: user.id, ...habit })
+        .insert({ 
+          user_id: user.id, 
+          title: habit.title!,
+          streak: habit.streak || 0,
+          difficulty: habit.difficulty!,
+          xp_reward: habit.xp_reward || 10,
+          coin_reward: habit.coin_reward || 2,
+          is_positive: habit.is_positive ?? true
+        })
         .select()
         .single();
       
@@ -212,7 +227,7 @@ export const useSupabaseData = (user: User | null) => {
         return null;
       }
       
-      return data;
+      return data as DatabaseHabit;
     }
   };
 
@@ -244,7 +259,7 @@ export const useSupabaseData = (user: User | null) => {
       return [];
     }
     
-    return data || [];
+    return (data || []) as DatabaseDaily[];
   };
 
   const saveDaily = async (daily: Partial<DatabaseDaily> & { id?: string }) => {
@@ -253,7 +268,16 @@ export const useSupabaseData = (user: User | null) => {
     if (daily.id) {
       const { data, error } = await supabase
         .from('dailies')
-        .update(daily)
+        .update({
+          title: daily.title,
+          completed: daily.completed,
+          due_time: daily.due_time,
+          difficulty: daily.difficulty,
+          xp_reward: daily.xp_reward,
+          coin_reward: daily.coin_reward,
+          streak: daily.streak,
+          completed_at: daily.completed_at
+        })
         .eq('id', daily.id)
         .select()
         .single();
@@ -263,11 +287,20 @@ export const useSupabaseData = (user: User | null) => {
         return null;
       }
       
-      return data;
+      return data as DatabaseDaily;
     } else {
       const { data, error } = await supabase
         .from('dailies')
-        .insert({ user_id: user.id, ...daily })
+        .insert({ 
+          user_id: user.id, 
+          title: daily.title!,
+          completed: daily.completed || false,
+          due_time: daily.due_time!,
+          difficulty: daily.difficulty!,
+          xp_reward: daily.xp_reward || 15,
+          coin_reward: daily.coin_reward || 3,
+          streak: daily.streak || 0
+        })
         .select()
         .single();
       
@@ -276,7 +309,7 @@ export const useSupabaseData = (user: User | null) => {
         return null;
       }
       
-      return data;
+      return data as DatabaseDaily;
     }
   };
 
@@ -308,7 +341,7 @@ export const useSupabaseData = (user: User | null) => {
       return [];
     }
     
-    return data || [];
+    return (data || []) as DatabaseTodo[];
   };
 
   const saveTodo = async (todo: Partial<DatabaseTodo> & { id?: string }) => {
@@ -317,7 +350,17 @@ export const useSupabaseData = (user: User | null) => {
     if (todo.id) {
       const { data, error } = await supabase
         .from('todos')
-        .update(todo)
+        .update({
+          title: todo.title,
+          completed: todo.completed,
+          due_date: todo.due_date,
+          priority: todo.priority,
+          difficulty: todo.difficulty,
+          xp_reward: todo.xp_reward,
+          coin_reward: todo.coin_reward,
+          is_overdue: todo.is_overdue,
+          completed_at: todo.completed_at
+        })
         .eq('id', todo.id)
         .select()
         .single();
@@ -327,11 +370,21 @@ export const useSupabaseData = (user: User | null) => {
         return null;
       }
       
-      return data;
+      return data as DatabaseTodo;
     } else {
       const { data, error } = await supabase
         .from('todos')
-        .insert({ user_id: user.id, ...todo })
+        .insert({ 
+          user_id: user.id, 
+          title: todo.title!,
+          completed: todo.completed || false,
+          due_date: todo.due_date!,
+          priority: todo.priority!,
+          difficulty: todo.difficulty!,
+          xp_reward: todo.xp_reward || 20,
+          coin_reward: todo.coin_reward || 4,
+          is_overdue: todo.is_overdue || false
+        })
         .select()
         .single();
       
@@ -340,7 +393,7 @@ export const useSupabaseData = (user: User | null) => {
         return null;
       }
       
-      return data;
+      return data as DatabaseTodo;
     }
   };
 

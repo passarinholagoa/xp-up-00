@@ -7,15 +7,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export const LogoutButton = () => {
-  const { logout, user } = useAuth();
+  const { signOut, user } = useAuth();
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
   const handleLogout = () => {
-    logout();
+    signOut();
     toast({
       title: "Logout realizado",
-      description: `Até logo, ${user?.name}!`,
+      description: `Até logo!`,
       className: "bg-blue-500/10 border-blue-500/50"
     });
   };
