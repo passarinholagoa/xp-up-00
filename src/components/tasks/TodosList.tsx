@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, Clock, Coins, Zap, AlertTriangle, Edit2, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useGame } from '@/contexts/GameContext';
 import { EditTodoModal } from './EditTodoModal';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +23,7 @@ export const TodosList = () => {
   const { todos, completeTodo, deleteTodo } = useGame();
   const [completedTodos, setCompletedTodos] = useState<string[]>([]);
   const [editingTodo, setEditingTodo] = useState<typeof todos[0] | null>(null);
+  const isMobile = useIsMobile();
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -59,45 +62,45 @@ export const TodosList = () => {
   const isCompleted = (todoId: string) => completedTodos.includes(todoId);
 
   return (
-    <div className="space-y-4">
+    <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
       {todos.map((todo) => {
         const completed = isCompleted(todo.id);
         
         return (
           <Card key={todo.id} className={`quest-card ${completed ? 'opacity-75' : ''} ${todo.isOverdue ? 'border-red-500/50' : ''}`}>
-            <div className="space-y-4">
+            <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
               {/* Header com título e indicador de atraso */}
-              <div className="flex items-start gap-3">
+              <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'}`}>
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className={`font-semibold text-base ${completed ? 'line-through text-muted-foreground' : ''}`}>
+                    <h3 className={`font-semibold ${isMobile ? 'text-sm' : 'text-base'} ${completed ? 'line-through text-muted-foreground' : ''}`}>
                       {todo.title}
                     </h3>
                     {todo.isOverdue && !completed && (
-                      <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0" />
+                      <AlertTriangle className={`flex-shrink-0 text-red-400 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
                     )}
                   </div>
                   
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge className={getPriorityColor(todo.priority)}>
+                    <Badge className={`${getPriorityColor(todo.priority)} ${isMobile ? 'text-xs px-2 py-0.5' : ''}`}>
                       {todo.priority}
                     </Badge>
-                    <Badge className={getDifficultyColor(todo.difficulty)}>
+                    <Badge className={`${getDifficultyColor(todo.difficulty)} ${isMobile ? 'text-xs px-2 py-0.5' : ''}`}>
                       {todo.difficulty}
                     </Badge>
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      <span className="text-xs">{todo.dueDate}</span>
+                    <div className={`flex items-center gap-1 text-muted-foreground ${isMobile ? 'text-xs' : ''}`}>
+                      <Clock className={isMobile ? 'h-3 w-3' : 'h-3 w-3'} />
+                      <span className={isMobile ? 'text-xs' : 'text-xs'}>{todo.dueDate}</span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                  <div className={`flex items-center gap-4 text-muted-foreground flex-wrap ${isMobile ? 'text-xs' : 'text-sm'}`}>
                     <div className="flex items-center gap-1">
-                      <Zap className="h-3 w-3 text-xp-bar" />
+                      <Zap className={`text-xp-bar ${isMobile ? 'h-3 w-3' : 'h-3 w-3'}`} />
                       <span>+{todo.xpReward} XP</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Coins className="h-3 w-3 text-quest-legendary" />
+                      <Coins className={`text-quest-legendary ${isMobile ? 'h-3 w-3' : 'h-3 w-3'}`} />
                       <span>+{todo.coinReward}</span>
                     </div>
                   </div>
@@ -105,34 +108,38 @@ export const TodosList = () => {
               </div>
 
               {/* Botões de ação */}
-              <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-border/50">
+              <div className={`flex pt-2 border-t border-border/50 ${isMobile ? 'flex-col gap-2' : 'flex-col sm:flex-row gap-2'}`}>
                 {!completed && (
                   <Button 
-                    size="sm" 
-                    className="bg-quest-gradient hover:opacity-90 glow-effect flex-1 sm:flex-initial"
+                    size={isMobile ? "sm" : "sm"}
+                    className={`bg-quest-gradient hover:opacity-90 glow-effect ${isMobile ? 'w-full text-sm' : 'flex-1 sm:flex-initial'}`}
                     onClick={() => handleCompleteTodo(todo)}
                   >
-                    <CheckCircle className="h-4 w-4 mr-2" />
+                    <CheckCircle className={`mr-2 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
                     Completar
                   </Button>
                 )}
                 
-                <div className="flex gap-2 sm:ml-auto">
+                <div className={`flex gap-2 ${isMobile ? '' : 'sm:ml-auto'}`}>
                   <Button
-                    size="sm"
+                    size={isMobile ? "sm" : "sm"}
                     variant="outline"
-                    className="flex-1 sm:flex-initial"
+                    className={isMobile ? 'flex-1 text-sm' : 'flex-1 sm:flex-initial'}
                     onClick={() => handleEdit(todo)}
                   >
-                    <Edit2 className="h-4 w-4 sm:mr-0 mr-2" />
-                    <span className="sm:hidden">Editar</span>
+                    <Edit2 className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 sm:mr-0 mr-2'}`} />
+                    {isMobile ? 'Editar' : <><span className="sm:hidden">Editar</span></>}
                   </Button>
                   
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button size="sm" variant="outline" className="flex-1 sm:flex-initial">
-                        <Trash2 className="h-4 w-4 sm:mr-0 mr-2" />
-                        <span className="sm:hidden">Remover</span>
+                      <Button 
+                        size={isMobile ? "sm" : "sm"} 
+                        variant="outline" 
+                        className={isMobile ? 'flex-1 text-sm' : 'flex-1 sm:flex-initial'}
+                      >
+                        <Trash2 className={`${isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4 sm:mr-0 mr-2'}`} />
+                        {isMobile ? 'Remover' : <><span className="sm:hidden">Remover</span></>}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>

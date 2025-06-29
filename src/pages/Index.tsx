@@ -11,6 +11,7 @@ import { useGame } from '../contexts/GameContext';
 import { ProfileModal } from '../components/ProfileModal';
 import { SettingsModal } from '../components/SettingsModal';
 import { useTheme } from '../hooks/useTheme';
+import { useIsMobile } from '../hooks/use-mobile';
 
 const Index = () => {
   const { 
@@ -25,6 +26,8 @@ const Index = () => {
     achievements
   } = useGame();
 
+  const isMobile = useIsMobile();
+  
   // Aplicar o tema
   useTheme();
 
@@ -32,19 +35,19 @@ const Index = () => {
     <div className="min-h-screen bg-background transition-colors duration-300">
       <Header />
       
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-7xl">
+      <main className={`container mx-auto py-4 max-w-7xl ${isMobile ? 'px-2' : 'px-3 sm:px-4'}`}>
         {/* Hero Section */}
-        <div className="mb-6 sm:mb-8">
+        <div className={isMobile ? 'mb-4' : 'mb-6 sm:mb-8'}>
           <HeroSection />
         </div>
         
         {/* Stats Section */}
-        <div className="mb-6 sm:mb-8">
+        <div className={isMobile ? 'mb-4' : 'mb-6 sm:mb-8'}>
           <StatsPanel />
         </div>
         
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-8">
+        <div className={`grid grid-cols-1 xl:grid-cols-4 ${isMobile ? 'gap-3' : 'gap-4 sm:gap-8'}`}>
           {/* Main content area - Tasks */}
           <div className="xl:col-span-3">
             <TaskDashboard />

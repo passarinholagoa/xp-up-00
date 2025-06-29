@@ -110,12 +110,32 @@
       radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
   }
 
-  /* Otimizações para performance mobile */
-  @media (max-width: 768px) {
+  /* Otimizações específicas para mobile 375x667 */
+  @media (max-width: 390px) {
     * {
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
+    }
+
+    /* Container principal mais compacto */
+    .container {
+      @apply px-2;
+    }
+
+    /* Textos menores em mobile pequeno */
+    h1 { @apply text-xl; }
+    h2 { @apply text-lg; }
+    h3 { @apply text-base; }
+    
+    /* Botões mais compactos */
+    .mobile-button {
+      @apply px-3 py-2 text-sm;
+    }
+
+    /* Cards mais compactos */
+    .quest-card {
+      @apply p-3;
     }
 
     /* Reduz animações em dispositivos móveis menos potentes */
@@ -130,7 +150,7 @@
 
   /* Scrollbar styling */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   
   ::-webkit-scrollbar-track {
@@ -148,15 +168,30 @@
 
 @layer components {
   .quest-card {
-    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-6 transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20;
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20;
+    
+    /* Mobile específico */
+    @media (max-width: 390px) {
+      @apply p-3 rounded-lg;
+    }
   }
   
   .stat-badge {
     @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
+    
+    /* Mobile específico */
+    @media (max-width: 390px) {
+      @apply px-2 py-1 text-xs gap-1;
+    }
   }
   
   .progress-bar {
     @apply w-full h-3 bg-secondary rounded-full overflow-hidden relative;
+    
+    /* Mobile específico */
+    @media (max-width: 390px) {
+      @apply h-2;
+    }
   }
   
   .progress-fill {
@@ -167,7 +202,7 @@
     @apply shadow-lg transition-shadow duration-300 hover:shadow-xl;
   }
 
-  /* Novas classes para otimização mobile */
+  /* Classes para otimização mobile */
   .mobile-menu-transition {
     @apply transition-all duration-200 ease-out will-change-transform;
   }
@@ -180,6 +215,37 @@
   .mobile-dropdown {
     @apply transform origin-top-right mobile-menu-transition;
     contain: layout style paint;
+  }
+
+  /* Layout mobile específico */
+  .mobile-grid {
+    @media (max-width: 390px) {
+      @apply grid-cols-1 gap-2;
+    }
+  }
+
+  .mobile-flex {
+    @media (max-width: 390px) {
+      @apply flex-col gap-2;
+    }
+  }
+
+  .mobile-text {
+    @media (max-width: 390px) {
+      @apply text-sm;
+    }
+  }
+
+  .mobile-padding {
+    @media (max-width: 390px) {
+      @apply p-3;
+    }
+  }
+
+  .mobile-margin {
+    @media (max-width: 390px) {
+      @apply m-2;
+    }
   }
 }
 
