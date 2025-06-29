@@ -98,12 +98,34 @@
       radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
     background-attachment: fixed;
+    /* Otimizações para mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   .light body {
     background-image: 
       radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
       radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+  }
+
+  /* Otimizações para performance mobile */
+  @media (max-width: 768px) {
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+    }
+
+    /* Reduz animações em dispositivos móveis menos potentes */
+    @media (prefers-reduced-motion: no-preference) {
+      .mobile-optimized {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+      }
+    }
   }
 
   /* Scrollbar styling */
@@ -143,6 +165,21 @@
   
   .glow-effect {
     @apply shadow-lg transition-shadow duration-300 hover:shadow-xl;
+  }
+
+  /* Novas classes para otimização mobile */
+  .mobile-menu-transition {
+    @apply transition-all duration-200 ease-out will-change-transform;
+  }
+
+  .mobile-button-hover {
+    @apply transition-colors duration-150 active:scale-95;
+  }
+
+  /* Otimização para dropdowns mobile */
+  .mobile-dropdown {
+    @apply transform origin-top-right mobile-menu-transition;
+    contain: layout style paint;
   }
 }
 
