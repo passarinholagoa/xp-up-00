@@ -68,27 +68,27 @@ export const HeroSection = () => {
             </div>
           </div>
           
-          {/* Level Circle */}
+          {/* Level Card - New Style */}
           <div className="flex justify-center lg:justify-end mt-4 lg:mt-0">
             <div className="relative">
-              <div className="w-32 h-32 sm:w-48 sm:h-48 lg:w-56 lg:h-56 rounded-full bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm border-2 border-white/20 flex items-center justify-center shadow-2xl">
-                <div className="text-center space-y-1 sm:space-y-2">
-                  <div className={`text-3xl sm:text-5xl lg:text-6xl font-bold ${settings.animatedXpBar ? 'animate-[color-change_3s_ease-in-out_infinite]' : 'text-white'}`}>
+              <div className="bg-white/15 backdrop-blur-sm rounded-2xl sm:rounded-3xl px-6 sm:px-8 py-6 sm:py-8 border border-white/20 shadow-2xl">
+                <div className="text-center space-y-3 sm:space-y-4">
+                  <div className={`text-4xl sm:text-6xl lg:text-7xl font-bold ${settings.animatedXpBar ? 'animate-[color-change_3s_ease-in-out_infinite]' : 'text-white'}`}>
                     {gameState.level}
                   </div>
-                  <div className="text-sm sm:text-lg opacity-80">Nível</div>
-                  <div className="w-16 sm:w-24 h-1.5 sm:h-2 bg-white/20 rounded-full mx-auto overflow-hidden">
+                  <div className="text-base sm:text-xl opacity-90 font-medium">Nível</div>
+                  <div className="w-20 sm:w-32 h-2 sm:h-3 bg-white/20 rounded-full mx-auto overflow-hidden">
                     <div 
                       className="h-full bg-gradient-to-r from-quest-legendary to-yellow-300 rounded-full transition-all duration-700 ease-out" 
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>
-                  <div className="text-xs opacity-70">
+                  <div className="text-sm sm:text-base opacity-80">
                     {gameState.xp}/{gameState.maxXp} XP
                   </div>
                 </div>
               </div>
-              <div className="absolute -inset-2 sm:-inset-4 rounded-full border-2 border-quest-legendary/50 animate-pulse-glow" />
+              <div className="absolute -inset-2 sm:-inset-4 rounded-2xl sm:rounded-3xl border-2 border-quest-legendary/50 animate-pulse-glow" />
             </div>
           </div>
         </div>
