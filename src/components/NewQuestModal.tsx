@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useGame } from '@/contexts/GameContext';
 
 interface NewQuestModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ type QuestType = 'habit' | 'daily' | 'todo';
 type Difficulty = 'easy' | 'medium' | 'hard';
 
 export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
+  const { addHabit, addDaily, addTodo } = useGame();
   const { toast } = useToast();
   const [questType, setQuestType] = useState<QuestType>('habit');
   const [title, setTitle] = useState('');
@@ -36,7 +38,22 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
     { value: 'hard' as Difficulty, label: 'Difícil', color: 'bg-quest-epic/20 text-quest-epic' }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const getRewards = (diff: Difficulty) => {
+    const baseRewards = {
+      easy: { xp: 10, coins: 2 },
+      medium: { xp: 15, coins: 3 },
+      hard: { xp: 20, coins: 4 }
+    };
+    
+    // Adjust rewards based on quest type
+    const multiplier = questType === 'habit' ? 1 : questType === 'daily' ? 1.5 : 2;
+    return {
+      xp: Math.floor(baseRewards[diff].xp * multiplier),
+      coins: Math.floor(baseRewards[diff].coins * multiplier)
+    };
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!title.trim()) {
@@ -48,21 +65,65 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
       return;
     }
 
-    // Simulate adding the quest
+    const rewards = getRewards(difficulty);
     const questTypeLabel = questTypes.find(q => q.type === questType)?.label;
-    
-    toast({
-      title: `${questTypeLabel} Criado! ✨`,
-      description: `"${title}" foi adicionado às suas aventuras.`,
-      className: "bg-green-500/10 border-green-500/50"
-    });
 
-    // Reset form
-    setTitle('');
-    setDescription('');
-    setDifficulty('easy');
-    setDueTime('');
-    onClose();
+    try {
+      if (questType === 'habit') {
+        await addHabit({
+          title: title.trim(),
+          streak: 0,
+          difficulty,
+          xpReward: rewards.xp,
+          coinReward: rewards.coins,
+          isPositive: true
+        });
+      } else if (questType === 'daily') {
+        await addDaily({
+          title: title.trim(),
+          completed: false,
+          dueTime: dueTime || '09:00',
+          difficulty,
+          xpReward: rewards.xp,
+          coinReward: rewards.coins,
+          streak: 0
+        });
+      } else if (questType === 'todo') {
+        const today = new Date();
+        const dueDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+        
+        await addTodo({
+          title: title.trim(),
+          completed: false,
+          dueDate: dueDate.toISOString().split('T')[0],
+          priority: difficulty === 'easy' ? 'low' : difficulty === 'medium' ? 'medium' : 'high',
+          difficulty,
+          xpReward: rewards.xp,
+          coinReward: rewards.coins,
+          isOverdue: false
+        });
+      }
+
+      toast({
+        title: `${questTypeLabel} Criada! ✨`,
+        description: `"${title}" foi adicionada às suas aventuras.`,
+        className: "bg-green-500/10 border-green-500/50"
+      });
+
+      // Reset form
+      setTitle('');
+      setDescription('');
+      setDifficulty('easy');
+      setDueTime('');
+      onClose();
+    } catch (error) {
+      console.error('Erro ao criar quest:', error);
+      toast({
+        title: "Erro ao criar quest",
+        description: "Ocorreu um erro ao salvar sua quest. Tente novamente.",
+        className: "bg-red-500/10 border-red-500/50"
+      });
+    }
   };
 
   const getDifficultyColor = (diff: Difficulty) => {
@@ -165,8 +226,8 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
           <div className="p-3 rounded-lg bg-muted/20 space-y-2">
             <div className="text-sm font-medium">Recompensas Estimadas:</div>
             <div className="flex gap-4 text-xs text-muted-foreground">
-              <span>+{difficulty === 'easy' ? '10-15' : difficulty === 'medium' ? '15-25' : '25-35'} XP</span>
-              <span>+{difficulty === 'easy' ? '2-3' : difficulty === 'medium' ? '3-5' : '5-8'} Moedas</span>
+              <span>+{getRewards(difficulty).xp} XP</span>
+              <span>+{getRewards(difficulty).coins} Moedas</span>
             </div>
           </div>
 
