@@ -32,6 +32,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
+  const location = window.location.pathname;
   
   if (loading) {
     return (
@@ -45,7 +46,7 @@ const AppRoutes = () => {
     <Routes>
       <Route 
         path="/auth" 
-        element={user ? <Navigate to="/" replace /> : <Auth />} 
+        element={user && location !== "/auth/reset-password" ? <Navigate to="/" replace /> : <Auth />} 
       />
       <Route
         path="/auth/reset-password"
