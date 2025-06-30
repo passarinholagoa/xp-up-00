@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoginForm } from '@/components/LoginForm';
+import LoginForm from '@/components/LoginForm';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
