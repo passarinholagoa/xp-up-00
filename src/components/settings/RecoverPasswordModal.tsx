@@ -46,9 +46,13 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
 
     setIsLoading(true);
     try {
+      // Configurar a URL de redirecionamento para a página específica de redefinir senha
+      const redirectUrl = `${window.location.origin}/reset-password`;
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/reset-password',
+        redirectTo: redirectUrl,
       });
+      
       if (error) {
         toast({
           title: "Erro ao enviar email",
@@ -58,6 +62,7 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
         setIsLoading(false);
         return;
       }
+      
       setEmailSent(true);
       toast({
         title: "Email enviado",
@@ -145,7 +150,10 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
                 Enviamos um link para <strong>{email}</strong>
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Clique no link do email para ser redirecionado para a página de redefinição de senha
+                Clique no link do email para acessar a página de redefinição de senha
+              </p>
+              <p className="text-xs text-muted-foreground mt-2 text-orange-600">
+                ⚠️ O link expira em 1 hora por segurança
               </p>
             </div>
             
