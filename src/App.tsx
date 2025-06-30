@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { GameProvider } from "./contexts/GameContext";
 import Index from "./pages/Index";
@@ -32,7 +32,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
-  const location = window.location.pathname;
+  const location = useLocation();
   
   if (loading) {
     return (
@@ -42,14 +42,21 @@ const AppRoutes = () => {
     );
   }
   
+  // Nunca redirecionar para a home se estiver em /auth/reset-password ou /reset-password
+  const isResetPassword = location.pathname === "/auth/reset-password" || location.pathname === "/reset-password";
+
   return (
     <Routes>
       <Route 
         path="/auth" 
-        element={user && location !== "/auth/reset-password" ? <Navigate to="/" replace /> : <Auth />} 
+        element={user && !isResetPassword ? <Navigate to="/" replace /> : <Auth />} 
       />
       <Route
         path="/auth/reset-password"
+        element={<ResetPassword />}
+      />
+      <Route
+        path="/reset-password"
         element={<ResetPassword />}
       />
       <Route 
