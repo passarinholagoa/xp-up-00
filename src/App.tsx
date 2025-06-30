@@ -47,17 +47,26 @@ const AppRoutes = () => {
     );
   }
   
-  // Verificar se está em uma página de redefinição de senha
-  const isResetPassword = location.pathname === "/auth/reset-password" || location.pathname === "/reset-password";
-  
   // Verificar se tem parâmetros de redefinição de senha na URL
   const hasResetParams = location.hash.includes('access_token') && location.hash.includes('type=recovery');
+  
+  console.log('Current location:', location.pathname);
+  console.log('Has reset params:', hasResetParams);
+  console.log('Hash:', location.hash);
 
   return (
     <Routes>
       <Route 
         path="/auth" 
-        element={user && !isResetPassword && !hasResetParams ? <Navigate to="/" replace /> : <Auth />} 
+        element={
+          // Se tem parâmetros de reset, redireciona para reset-password
+          hasResetParams ? (
+            <Navigate to="/reset-password" replace />
+          ) : (
+            // Se está logado e não tem parâmetros de reset, vai para home
+            user ? <Navigate to="/" replace /> : <Auth />
+          )
+        } 
       />
       <Route
         path="/auth/reset-password"
@@ -70,6 +79,7 @@ const AppRoutes = () => {
       <Route 
         path="/" 
         element={
+          // PRIORIDADE: se tem parâmetros de reset, sempre vai para reset-password
           hasResetParams ? (
             <Navigate to="/reset-password" replace />
           ) : (
