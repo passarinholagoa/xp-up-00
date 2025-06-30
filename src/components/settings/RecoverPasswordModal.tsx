@@ -47,7 +47,7 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/auth/reset-password',
+        redirectTo: window.location.origin + '/reset-password',
       });
       if (error) {
         toast({
@@ -145,7 +145,7 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
                 Enviamos um link para <strong>{email}</strong>
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Verifique sua caixa de entrada e spam
+                Clique no link do email para ser redirecionado para a página de redefinição de senha
               </p>
             </div>
             

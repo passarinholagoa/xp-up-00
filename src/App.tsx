@@ -15,6 +15,7 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
   
   if (loading) {
     return (
@@ -24,7 +25,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  if (!user) {
+  // Se estiver na página de redefinir senha, não redirecionar
+  const isResetPasswordPage = location.pathname === "/reset-password" || location.pathname === "/auth/reset-password";
+  
+  if (!user && !isResetPasswordPage) {
     return <Navigate to="/auth" replace />;
   }
   
@@ -43,14 +47,17 @@ const AppRoutes = () => {
     );
   }
   
-  // Nunca redirecionar para a home se estiver em /auth/reset-password ou /reset-password
+  // Verificar se está em uma página de redefinição de senha
   const isResetPassword = location.pathname === "/auth/reset-password" || location.pathname === "/reset-password";
+  
+  // Verificar se tem parâmetros de redefinição de senha na URL
+  const hasResetParams = location.hash.includes('access_token') && location.hash.includes('type=recovery');
 
   return (
     <Routes>
       <Route 
         path="/auth" 
-        element={user && !isResetPassword ? <Navigate to="/" replace /> : <Auth />} 
+        element={user && !isResetPassword && !hasResetParams ? <Navigate to="/" replace /> : <Auth />} 
       />
       <Route
         path="/auth/reset-password"
@@ -63,11 +70,15 @@ const AppRoutes = () => {
       <Route 
         path="/" 
         element={
-          <ProtectedRoute>
-            <GameProvider>
-              <Index />
-            </GameProvider>
-          </ProtectedRoute>
+          hasResetParams ? (
+            <Navigate to="/reset-password" replace />
+          ) : (
+            <ProtectedRoute>
+              <GameProvider>
+                <Index />
+              </GameProvider>
+            </ProtectedRoute>
+          )
         } 
       />
     </Routes>
