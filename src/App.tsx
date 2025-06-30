@@ -15,7 +15,6 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  const location = useLocation();
   
   if (loading) {
     return (
@@ -25,10 +24,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  // Se estiver na página de redefinir senha, não redirecionar
-  const isResetPasswordPage = location.pathname === "/reset-password" || location.pathname === "/auth/reset-password";
-  
-  if (!user && !isResetPasswordPage) {
+  if (!user) {
     return <Navigate to="/auth" replace />;
   }
   
@@ -54,23 +50,16 @@ const AppRoutes = () => {
   console.log('Has reset params:', hasResetParams);
   console.log('Hash:', location.hash);
 
+  // Se há parâmetros de reset, SEMPRE redirecionar para reset-password
+  if (hasResetParams && location.pathname !== '/reset-password') {
+    return <Navigate to="/reset-password" replace />;
+  }
+
   return (
     <Routes>
       <Route 
         path="/auth" 
-        element={
-          // Se tem parâmetros de reset, redireciona para reset-password
-          hasResetParams ? (
-            <Navigate to="/reset-password" replace />
-          ) : (
-            // Se está logado e não tem parâmetros de reset, vai para home
-            user ? <Navigate to="/" replace /> : <Auth />
-          )
-        } 
-      />
-      <Route
-        path="/auth/reset-password"
-        element={<ResetPassword />}
+        element={user ? <Navigate to="/" replace /> : <Auth />} 
       />
       <Route
         path="/reset-password"
@@ -79,16 +68,11 @@ const AppRoutes = () => {
       <Route 
         path="/" 
         element={
-          // PRIORIDADE: se tem parâmetros de reset, sempre vai para reset-password
-          hasResetParams ? (
-            <Navigate to="/reset-password" replace />
-          ) : (
-            <ProtectedRoute>
-              <GameProvider>
-                <Index />
-              </GameProvider>
-            </ProtectedRoute>
-          )
+          <ProtectedRoute>
+            <GameProvider>
+              <Index />
+            </GameProvider>
+          </ProtectedRoute>
         } 
       />
     </Routes>
