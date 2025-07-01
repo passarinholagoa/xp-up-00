@@ -165,9 +165,6 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
               <p className="text-sm text-muted-foreground mt-2">
                 Clique no link do email para redefinir sua senha
               </p>
-              <p className="text-xs text-muted-foreground mt-2 text-orange-600">
-                ⚠️ O link expira em 1 hora por segurança
-              </p>
             </div>
             
             <Button 
