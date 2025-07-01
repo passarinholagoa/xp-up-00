@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -42,18 +43,23 @@ const AppRoutes = () => {
     );
   }
   
-  // Nunca redirecionar para a home se estiver em /auth/reset-password ou /reset-password
-  const isResetPassword = location.pathname === "/auth/reset-password" || location.pathname === "/reset-password";
+  // Verificar se tem parâmetros de redefinição de senha na URL
+  const hasResetParams = location.hash.includes('access_token') && location.hash.includes('type=recovery');
+  
+  console.log('Current location:', location.pathname);
+  console.log('Has reset params:', hasResetParams);
+  console.log('Hash:', location.hash);
+
+  // Se há parâmetros de reset, SEMPRE redirecionar para reset-password
+  if (hasResetParams && location.pathname !== '/reset-password') {
+    return <Navigate to="/reset-password" replace />;
+  }
 
   return (
     <Routes>
       <Route 
         path="/auth" 
-        element={user && !isResetPassword ? <Navigate to="/" replace /> : <Auth />} 
-      />
-      <Route
-        path="/auth/reset-password"
-        element={<ResetPassword />}
+        element={user ? <Navigate to="/" replace /> : <Auth />} 
       />
       <Route
         path="/reset-password"
