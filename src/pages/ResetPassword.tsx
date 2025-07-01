@@ -26,16 +26,16 @@ const ResetPassword: React.FC = () => {
   useEffect(() => {
     const hash = location.hash;
     const search = location.search;
-    console.log('URL hash:', hash);
-    console.log('URL search:', search);
+    console.log('ResetPassword - URL hash:', hash);
+    console.log('ResetPassword - URL search:', search);
     
-    // Verificar se há erro nos parâmetros
+    // Verificar se há erro nos parâmetros primeiro
     if (search.includes('error=access_denied') || search.includes('error_code=otp_expired_error')) {
       console.log('Link expirado ou inválido detectado nos parâmetros');
       setIsValidToken(false);
       toast({
-        title: 'Link expirado',
-        description: 'O link de redefinição expirou. Solicite um novo link.',
+        title: 'Link expirado ou inválido',
+        description: 'O link de redefinição expirou ou é inválido. Solicite um novo link.',
         variant: 'destructive',
       });
       setTimeout(() => navigate('/auth'), 3000);
@@ -44,15 +44,29 @@ const ResetPassword: React.FC = () => {
     }
     
     // Verificar se há token de acesso válido no hash
-    if (hash.includes('access_token') && hash.includes('type=recovery')) {
-      console.log('Token válido encontrado');
-      setIsValidToken(true);
+    if (hash.includes('access_token=') && hash.includes('type=recovery')) {
+      console.log('Token válido encontrado no hash');
+      // Extrair e verificar se o token não está vazio
+      const tokenMatch = hash.match(/access_token=([^&]+)/);
+      if (tokenMatch && tokenMatch[1] && tokenMatch[1].length > 10) {
+        console.log('Token válido com comprimento adequado');
+        setIsValidToken(true);
+      } else {
+        console.log('Token inválido ou muito curto');
+        setIsValidToken(false);
+        toast({
+          title: 'Token inválido',
+          description: 'O token de redefinição é inválido. Solicite um novo link.',
+          variant: 'destructive',
+        });
+        setTimeout(() => navigate('/auth'), 3000);
+      }
     } else {
-      console.log('Token inválido ou ausente');
+      console.log('Token não encontrado ou tipo incorreto');
       setIsValidToken(false);
       toast({
         title: 'Link inválido',
-        description: 'O link de redefinição está incorreto. Solicite um novo link.',
+        description: 'O link de redefinição está incorreto ou expirou. Solicite um novo link.',
         variant: 'destructive',
       });
       setTimeout(() => navigate('/auth'), 3000);
@@ -97,13 +111,14 @@ const ResetPassword: React.FC = () => {
     setLoading(true);
     
     try {
+      console.log('Tentando atualizar senha...');
       const { error } = await supabase.auth.updateUser({ password });
       
       if (error) {
         console.error('Erro ao atualizar senha:', error);
         
         // Verificar se o erro é de token expirado
-        if (error.message.includes('expired') || error.message.includes('invalid')) {
+        if (error.message.includes('expired') || error.message.includes('invalid') || error.message.includes('JWT')) {
           toast({ 
             title: 'Link expirado', 
             description: 'O link de redefinição expirou. Solicite um novo link.', 
@@ -121,6 +136,7 @@ const ResetPassword: React.FC = () => {
         return;
       }
       
+      console.log('Senha atualizada com sucesso');
       toast({ 
         title: 'Senha redefinida com sucesso!', 
         description: 'Você será redirecionado para fazer login com sua nova senha.', 
@@ -184,7 +200,7 @@ const ResetPassword: React.FC = () => {
             <Lock className="h-16 w-16 text-green-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Redefinir Senha</h2>
             <p className="text-white/80 text-sm">
-              Digite sua nova senha abaixo. Sua conta será protegida imediatamente após a alteração.
+              Digite sua nova senha abaixo. Certifique-se de que ambas as senhas sejam idênticas.
             </p>
           </div>
 

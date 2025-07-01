@@ -45,21 +45,25 @@ const AppRoutes = () => {
   
   // Verificar se tem parâmetros de redefinição de senha na URL
   const hasResetParams = location.hash.includes('access_token') && location.hash.includes('type=recovery');
+  const hasErrorParams = location.search.includes('error=access_denied') || location.search.includes('error_code=otp_expired_error');
   
   console.log('Current location:', location.pathname);
   console.log('Has reset params:', hasResetParams);
+  console.log('Has error params:', hasErrorParams);
   console.log('Hash:', location.hash);
+  console.log('Search:', location.search);
 
-  // Se há parâmetros de reset, SEMPRE redirecionar para reset-password
-  if (hasResetParams && location.pathname !== '/reset-password') {
-    return <Navigate to="/reset-password" replace />;
+  // Se há parâmetros de reset ou erro, SEMPRE redirecionar para reset-password
+  if ((hasResetParams || hasErrorParams) && location.pathname !== '/reset-password') {
+    console.log('Redirecting to reset-password due to parameters');
+    return <Navigate to={`/reset-password${location.search}${location.hash}`} replace />;
   }
 
   return (
     <Routes>
       <Route 
         path="/auth" 
-        element={user ? <Navigate to="/" replace /> : <Auth />} 
+        element={user && !hasResetParams && !hasErrorParams ? <Navigate to="/" replace /> : <Auth />} 
       />
       <Route
         path="/reset-password"
