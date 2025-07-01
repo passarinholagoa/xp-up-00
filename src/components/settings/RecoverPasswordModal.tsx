@@ -22,6 +22,13 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
   const { toast } = useToast();
   const { user } = useAuth();
 
+  // Pré-preencher com o email do usuário logado
+  React.useEffect(() => {
+    if (user?.email && isOpen) {
+      setEmail(user.email);
+    }
+  }, [user?.email, isOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -110,7 +117,7 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={user?.email || "Digite seu email"}
+                placeholder="Digite seu email"
                 className="w-full"
               />
               <p className="text-sm text-muted-foreground">
