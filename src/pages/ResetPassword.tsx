@@ -25,20 +25,37 @@ const ResetPassword: React.FC = () => {
   // Verificar se o token está presente na URL
   useEffect(() => {
     const hash = location.hash;
+    const search = location.search;
     console.log('URL hash:', hash);
+    console.log('URL search:', search);
     
-    if (!hash.includes('access_token') || !hash.includes('type=recovery')) {
-      console.log('Token inválido ou ausente');
+    // Verificar se há erro nos parâmetros
+    if (search.includes('error=access_denied') || search.includes('error_code=otp_expired_error')) {
+      console.log('Link expirado ou inválido detectado nos parâmetros');
       setIsValidToken(false);
       toast({
-        title: 'Link inválido ou expirado',
-        description: 'O link de redefinição está incorreto ou expirou. Solicite um novo link.',
+        title: 'Link expirado',
+        description: 'O link de redefinição expirou. Solicite um novo link.',
         variant: 'destructive',
       });
       setTimeout(() => navigate('/auth'), 3000);
-    } else {
+      setTokenChecked(true);
+      return;
+    }
+    
+    // Verificar se há token de acesso válido no hash
+    if (hash.includes('access_token') && hash.includes('type=recovery')) {
       console.log('Token válido encontrado');
       setIsValidToken(true);
+    } else {
+      console.log('Token inválido ou ausente');
+      setIsValidToken(false);
+      toast({
+        title: 'Link inválido',
+        description: 'O link de redefinição está incorreto. Solicite um novo link.',
+        variant: 'destructive',
+      });
+      setTimeout(() => navigate('/auth'), 3000);
     }
     setTokenChecked(true);
   }, [location, navigate, toast]);
@@ -84,6 +101,18 @@ const ResetPassword: React.FC = () => {
       
       if (error) {
         console.error('Erro ao atualizar senha:', error);
+        
+        // Verificar se o erro é de token expirado
+        if (error.message.includes('expired') || error.message.includes('invalid')) {
+          toast({ 
+            title: 'Link expirado', 
+            description: 'O link de redefinição expirou. Solicite um novo link.', 
+            variant: 'destructive' 
+          });
+          setTimeout(() => navigate('/auth'), 2000);
+          return;
+        }
+        
         toast({ 
           title: 'Erro ao redefinir senha', 
           description: error.message, 
@@ -129,10 +158,10 @@ const ResetPassword: React.FC = () => {
         <div className="relative z-10 w-full max-w-md">
           <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8 text-center">
             <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-4">Link Inválido</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Link Inválido ou Expirado</h2>
             <p className="text-white/80 mb-6">
-              O link de redefinição de senha está incorreto ou expirou. 
-              Você será redirecionado para solicitar um novo link.
+              O link de redefinição de senha expirou ou está incorreto. 
+              Por favor, solicite um novo link de redefinição.
             </p>
             <Button
               onClick={() => navigate('/auth')}

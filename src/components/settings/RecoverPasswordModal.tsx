@@ -46,14 +46,19 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
 
     setIsLoading(true);
     try {
-      // Configurar URL de redirecionamento específica para redefinir senha
-      const redirectUrl = `${window.location.origin}/reset-password`;
+      // Usar a URL atual do aplicativo para garantir que funcione em qualquer ambiente
+      const currentUrl = window.location.origin;
+      const redirectUrl = `${currentUrl}/reset-password`;
+      
+      console.log('Enviando email de recuperação para:', email);
+      console.log('URL de redirecionamento:', redirectUrl);
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
       
       if (error) {
+        console.error('Erro ao enviar email:', error);
         toast({
           title: "Erro ao enviar email",
           description: error.message,
@@ -65,11 +70,12 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
       
       setEmailSent(true);
       toast({
-        title: "Email enviado",
-        description: "Verifique sua caixa de entrada para recuperar sua senha",
+        title: "Email enviado com sucesso!",
+        description: "Verifique sua caixa de entrada e clique no link para redefinir sua senha",
         className: "bg-green-500/10 border-green-500/50"
       });
     } catch (err) {
+      console.error('Erro inesperado:', err);
       toast({
         title: "Erro inesperado",
         description: "Tente novamente mais tarde.",
@@ -108,7 +114,7 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
                 className="w-full"
               />
               <p className="text-sm text-muted-foreground">
-                Enviaremos um link direto para a página de redefinição de senha
+                Enviaremos um link de redefinição de senha para este email
               </p>
             </div>
 
@@ -150,7 +156,7 @@ export const RecoverPasswordModal = ({ isOpen, onClose }: RecoverPasswordModalPr
                 Enviamos um link para <strong>{email}</strong>
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                O link levará você diretamente para a página de redefinição de senha
+                Clique no link do email para redefinir sua senha
               </p>
               <p className="text-xs text-muted-foreground mt-2 text-orange-600">
                 ⚠️ O link expira em 1 hora por segurança
