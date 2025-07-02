@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,33 +15,9 @@ const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [tokenChecked, setTokenChecked] = useState(false);
-  const [isValidToken, setIsValidToken] = useState(false);
   
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Verificar se o token está presente na URL
-  useEffect(() => {
-    const hash = location.hash;
-    console.log('URL hash:', hash);
-    
-    if (!hash.includes('access_token') || !hash.includes('type=recovery')) {
-      console.log('Token inválido ou ausente');
-      setIsValidToken(false);
-      toast({
-        title: 'Link inválido ou expirado',
-        description: 'O link de redefinição está incorreto ou expirou. Solicite um novo link.',
-        variant: 'destructive',
-      });
-      setTimeout(() => navigate('/auth'), 3000);
-    } else {
-      console.log('Token válido encontrado');
-      setIsValidToken(true);
-    }
-    setTokenChecked(true);
-  }, [location, navigate, toast]);
 
   const validatePassword = (pass: string) => {
     return pass.length >= 6;
@@ -80,6 +56,7 @@ const ResetPassword: React.FC = () => {
     setLoading(true);
     
     try {
+      console.log('Tentando atualizar senha...');
       const { error } = await supabase.auth.updateUser({ password });
       
       if (error) {
@@ -92,6 +69,7 @@ const ResetPassword: React.FC = () => {
         return;
       }
       
+      console.log('Senha atualizada com sucesso');
       toast({ 
         title: 'Senha redefinida com sucesso!', 
         description: 'Você será redirecionado para fazer login com sua nova senha.', 
@@ -114,38 +92,6 @@ const ResetPassword: React.FC = () => {
     }
   };
 
-  if (!tokenChecked) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
-        <div className="text-white text-xl">Verificando link de redefinição...</div>
-      </div>
-    );
-  }
-
-  if (!isValidToken) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 w-full max-w-md">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 p-8 text-center">
-            <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-4">Link Inválido</h2>
-            <p className="text-white/80 mb-6">
-              O link de redefinição de senha está incorreto ou expirou. 
-              Você será redirecionado para solicitar um novo link.
-            </p>
-            <Button
-              onClick={() => navigate('/auth')}
-              className="w-full bg-red-500 hover:bg-red-600 text-white"
-            >
-              Voltar ao Login
-            </Button>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/20" />
@@ -155,7 +101,7 @@ const ResetPassword: React.FC = () => {
             <Lock className="h-16 w-16 text-green-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Redefinir Senha</h2>
             <p className="text-white/80 text-sm">
-              Digite sua nova senha abaixo. Sua conta será protegida imediatamente após a alteração.
+              Digite sua nova senha abaixo. Certifique-se de que ambas as senhas sejam idênticas.
             </p>
           </div>
 
