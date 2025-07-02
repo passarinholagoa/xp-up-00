@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Trophy, Star, ShoppingBag, Coins } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -16,7 +15,7 @@ export const QuickActions = () => {
     .slice(0, 6);
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className={isMobile ? 'space-y-1.5 w-full' : 'space-y-4 sm:space-y-6'}>
       {/* Achievements Preview */}
       <Card className="p-4 sm:p-6 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20 backdrop-blur-sm">
         <div className="space-y-3 sm:space-y-4">

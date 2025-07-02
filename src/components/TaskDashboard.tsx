@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,9 +14,9 @@ export const TaskDashboard = () => {
   const isMobile = useIsMobile();
 
   return (
-    <Card className={`bg-card/50 backdrop-blur-sm border-border ${isMobile ? 'p-3' : 'p-4 sm:p-6'}`}>
-      <div className={isMobile ? 'space-y-3' : 'space-y-4 sm:space-y-6'}>
-        <div className={`flex items-start justify-between ${isMobile ? 'flex-col gap-3' : 'flex-col sm:flex-row gap-4'}`}>
+    <Card className={`bg-card/50 backdrop-blur-sm border-border w-full ${isMobile ? 'p-1.5' : 'p-4 sm:p-6'}`}>
+      <div className={isMobile ? 'space-y-2' : 'space-y-4 sm:space-y-6'}>
+        <div className={`flex items-start justify-between ${isMobile ? 'flex-col gap-2' : 'flex-col sm:flex-row gap-4'}`}>
           <div>
             <h2 className={`font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}>
               Suas Aventuras
@@ -28,7 +27,7 @@ export const TaskDashboard = () => {
           </div>
           <Button
             onClick={createNewQuest}
-            size={isMobile ? "default" : "lg"}
+            size={isMobile ? 'default' : 'lg'}
             className={`bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 flex items-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto ${
               isMobile 
                 ? 'gap-2 px-4 py-2 text-sm font-semibold' 
@@ -39,7 +38,6 @@ export const TaskDashboard = () => {
             Nova Quest
           </Button>
         </div>
-        
         <Tabs defaultValue="habits" className="w-full">
           <TabsList className={`grid w-full grid-cols-3 bg-secondary/30 ${isMobile ? 'h-9' : 'h-10 sm:h-12'}`}>
             <TabsTrigger 
@@ -61,17 +59,14 @@ export const TaskDashboard = () => {
               To-Dos
             </TabsTrigger>
           </TabsList>
-          
-          <div className={isMobile ? 'mt-3' : 'mt-4 sm:mt-6'}>
-            <TabsContent value="habits" className="space-y-4 mt-0">
+          <div className={isMobile ? 'mt-2' : 'mt-4 sm:mt-6'}>
+            <TabsContent value="habits" className="space-y-3 mt-0">
               <HabitsList />
             </TabsContent>
-            
-            <TabsContent value="dailies" className="space-y-4 mt-0">
+            <TabsContent value="dailies" className="space-y-3 mt-0">
               <DailiesList />
             </TabsContent>
-            
-            <TabsContent value="todos" className="space-y-4 mt-0">
+            <TabsContent value="todos" className="space-y-3 mt-0">
               <TodosList />
             </TabsContent>
           </div>

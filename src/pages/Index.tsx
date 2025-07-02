@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Header } from '../components/Header';
 import { HeroSection } from '../components/HeroSection';
@@ -32,22 +31,22 @@ const Index = () => {
   useTheme();
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className="min-h-screen bg-background w-full transition-colors duration-300">
       <Header />
       
-      <main className={`container mx-auto py-4 max-w-7xl ${isMobile ? 'px-2' : 'px-3 sm:px-4'}`}>
+      <main className={`w-full px-1.5 sm:px-4 py-3 sm:py-4 ${isMobile ? '' : 'container mx-auto max-w-7xl'}`}>
         {/* Hero Section */}
-        <div className={isMobile ? 'mb-4' : 'mb-6 sm:mb-8'}>
+        <div className={isMobile ? 'mb-2' : 'mb-6 sm:mb-8'}>
           <HeroSection />
         </div>
         
         {/* Stats Section */}
-        <div className={isMobile ? 'mb-4' : 'mb-6 sm:mb-8'}>
+        <div className={isMobile ? 'mb-2' : 'mb-6 sm:mb-8'}>
           <StatsPanel />
         </div>
         
         {/* Main Content Grid */}
-        <div className={`grid grid-cols-1 xl:grid-cols-4 ${isMobile ? 'gap-3' : 'gap-4 sm:gap-8'}`}>
+        <div className={`grid grid-cols-1 xl:grid-cols-4 w-full ${isMobile ? 'gap-1.5' : 'gap-4 sm:gap-8'}`}>
           {/* Main content area - Tasks */}
           <div className="xl:col-span-3">
             <TaskDashboard />

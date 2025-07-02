@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Sword, Target, Trophy } from 'lucide-react';
 import { useGame } from '@/contexts/GameContext';
@@ -19,10 +18,10 @@ export const HeroSection = () => {
   const progressPercentage = (gameState.xp / gameState.maxXp) * 100;
 
   return (
-    <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-8 text-white shadow-2xl" style={{ backgroundColor: '#211C58' }}>
+    <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-1.5 sm:p-8 text-white shadow-2xl w-full" style={{ backgroundColor: '#211C58' }}>
       <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/30" />
       <div className="relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-8 items-center">
           {/* Welcome Content */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <div className="space-y-2 sm:space-y-3">

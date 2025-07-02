@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Heart, Zap, Coins, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -52,14 +51,14 @@ export const StatsPanel = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-6 w-full">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         const percentage = stat.max ? (stat.value / stat.max) * 100 : 100;
         const isAnimatedXpBar = stat.isXp && settings.animatedXpBar;
         
         return (
-          <Card key={index} className={`p-3 sm:p-6 ${stat.bgColor} border ${stat.borderColor} backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
+          <Card key={index} className={`w-full p-1.5 sm:p-6 ${stat.bgColor} border ${stat.borderColor} backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
             <div className="space-y-2 sm:space-y-4">
               <div className="flex items-center justify-between">
                 <div className={`p-2 sm:p-3 ${stat.bgColor} rounded-xl border ${stat.borderColor}`}>
