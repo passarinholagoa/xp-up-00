@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
@@ -665,6 +666,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       const newGameState = {
         ...gameState,
         coins: gameState.coins + coinGain,
+        hp: Math.min(gameState.hp + 2, gameState.maxHp),
         streak: gameState.streak + 1
       };
       
@@ -676,6 +678,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       
       // Save to database
       await supabaseData.saveGameState({
+        hp: newGameState.hp,
+        max_hp: newGameState.maxHp,
         coins: newGameState.coins,
         streak: newGameState.streak
       });
@@ -693,7 +697,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       if (settings.globalNotifications) {
         toast({
           title: "Hábito Completado! 🎉",
-          description: `+${xpGain} XP, +${coinGain} moedas${settings.hardcoreMode ? ' (Modo Hardcore)' : ''}`,
+          description: `+${xpGain} XP, +${coinGain} moedas, +2 HP${settings.hardcoreMode ? ' (Modo Hardcore)' : ''}`,
           className: "bg-green-500/10 border-green-500/50"
         });
       }
