@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
@@ -305,6 +306,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
         const todosData = await supabaseData.loadTodos();
         setTodos(todosData.map(convertDatabaseToLocal.todo));
 
+        // Initialize achievements with current progress
+        await initializeAchievements(gameStateData, habitsData, dailiesData, todosData);
+
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -315,7 +319,138 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     loadAllData();
   }, [user]);
 
-  const checkAchievements = (context: string, data?: any) => {
+  const initializeAchievements = async (gameStateData: any, habitsData: any[], dailiesData: any[], todosData: any[]) => {
+    let updatedAchievements = [...ACHIEVEMENTS];
+    
+    if (gameStateData) {
+      const currentLevel = calculateLevel(gameStateData.total_xp);
+      const totalXp = gameStateData.total_xp;
+      const coins = gameStateData.coins;
+      const streak = gameStateData.streak;
+
+      // Check level achievements
+      const levelAchievements = [
+        { id: 'nivel-5', level: 5 },
+        { id: 'nivel-10', level: 10 },
+        { id: 'nivel-15', level: 15 },
+        { id: 'nivel-20', level: 20 },
+        { id: 'lenda-viva', level: 50 }
+      ];
+
+      levelAchievements.forEach(({ id, level }) => {
+        const achievement = updatedAchievements.find(a => a.id === id);
+        if (achievement && currentLevel >= level && !achievement.unlocked) {
+          achievement.unlocked = true;
+          achievement.unlockedAt = new Date();
+        }
+      });
+
+      // Check XP achievements
+      if (totalXp >= 1000) {
+        const xpAchievement = updatedAchievements.find(a => a.id === 'xp-master');
+        if (xpAchievement && !xpAchievement.unlocked) {
+          xpAchievement.unlocked = true;
+          xpAchievement.unlockedAt = new Date();
+        }
+      }
+
+      if (totalXp >= 10000) {
+        const xpAchievement = updatedAchievements.find(a => a.id === 'milionario-xp');
+        if (xpAchievement && !xpAchievement.unlocked) {
+          xpAchievement.unlocked = true;
+          xpAchievement.unlockedAt = new Date();
+        }
+      }
+
+      // Check coins achievement
+      if (coins >= 1000) {
+        const coinAchievement = updatedAchievements.find(a => a.id === 'colecionador-moedas');
+        if (coinAchievement && !coinAchievement.unlocked) {
+          coinAchievement.unlocked = true;
+          coinAchievement.unlockedAt = new Date();
+        }
+      }
+
+      // Check streak achievements
+      const streakAchievements = [
+        { id: 'foco-total', streak: 7 },
+        { id: 'primeira-semana', streak: 7 },
+        { id: 'maratonista', streak: 30 },
+        { id: 'primeiro-mes', streak: 30 },
+        { id: 'mestre-da-disciplina', streak: 100 }
+      ];
+
+      streakAchievements.forEach(({ id, streak: requiredStreak }) => {
+        const achievement = updatedAchievements.find(a => a.id === id);
+        if (achievement && streak >= requiredStreak && !achievement.unlocked) {
+          achievement.unlocked = true;
+          achievement.unlockedAt = new Date();
+        }
+      });
+    }
+
+    // Check creation achievements
+    const habitCount = habitsData.length;
+    const dailyCount = dailiesData.length;
+    const todoCount = todosData.length;
+    const completedTodos = todosData.filter(t => t.completed).length;
+    const completedDailies = dailiesData.filter(d => d.completed).length;
+
+    // First creations
+    if (habitCount > 0) {
+      const achievement = updatedAchievements.find(a => a.id === 'primeiro-habito');
+      if (achievement && !achievement.unlocked) {
+        achievement.unlocked = true;
+        achievement.unlockedAt = new Date();
+      }
+    }
+
+    if (completedTodos > 0) {
+      const achievement = updatedAchievements.find(a => a.id === 'primeira-missao');
+      if (achievement && !achievement.unlocked) {
+        achievement.unlocked = true;
+        achievement.unlockedAt = new Date();
+      }
+    }
+
+    if (completedDailies > 0) {
+      const achievement = updatedAchievements.find(a => a.id === 'o-despertar');
+      if (achievement && !achievement.unlocked) {
+        achievement.unlocked = true;
+        achievement.unlockedAt = new Date();
+      }
+    }
+
+    // Count achievements
+    const countAchievements = [
+      { id: 'mestre-da-organizacao', count: todoCount, required: 15 },
+      { id: 'organizador-supremo', count: todoCount, required: 50 },
+      { id: 'rotina-perfeita', count: dailyCount, required: 10 },
+      { id: 'mente-saudavel', count: habitCount, required: 10 }
+    ];
+
+    countAchievements.forEach(({ id, count, required }) => {
+      const achievement = updatedAchievements.find(a => a.id === id);
+      if (achievement && count >= required && !achievement.unlocked) {
+        achievement.unlocked = true;
+        achievement.unlockedAt = new Date();
+      }
+    });
+
+    // Check for active habits achievement
+    const activeHabits = habitsData.filter(h => h.is_positive && h.streak > 0).length;
+    if (activeHabits >= 5) {
+      const achievement = updatedAchievements.find(a => a.id === 'guru-dos-habitos');
+      if (achievement && !achievement.unlocked) {
+        achievement.unlocked = true;
+        achievement.unlockedAt = new Date();
+      }
+    }
+
+    setAchievements(updatedAchievements);
+  };
+
+  const checkAchievements = async (context: string, data?: any) => {
     setAchievements(prev => {
       let updated = [...prev];
       let newUnlocks = [];
@@ -352,7 +487,10 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       if (context === 'level-up' && data?.newLevel) {
         const levelAchievements = [
           { id: 'nivel-5', level: 5 },
-          { id: 'nivel-10', level: 10 }
+          { id: 'nivel-10', level: 10 },
+          { id: 'nivel-15', level: 15 },
+          { id: 'nivel-20', level: 20 },
+          { id: 'lenda-viva', level: 50 }
         ];
 
         levelAchievements.forEach(({ id, level }) => {
@@ -375,6 +513,80 @@ export const GameProvider = ({ children }: GameProviderProps) => {
           achievement.unlockedAt = new Date();
           newUnlocks.push(achievement);
         }
+      }
+
+      // Check XP achievements
+      if (context === 'xp-gained' && data?.totalXp) {
+        if (data.totalXp >= 1000 && !updated.find(a => a.id === 'xp-master')?.unlocked) {
+          const achievement = updated.find(a => a.id === 'xp-master');
+          if (achievement) {
+            achievement.unlocked = true;
+            achievement.unlockedAt = new Date();
+            newUnlocks.push(achievement);
+          }
+        }
+
+        if (data.totalXp >= 10000 && !updated.find(a => a.id === 'milionario-xp')?.unlocked) {
+          const achievement = updated.find(a => a.id === 'milionario-xp');
+          if (achievement) {
+            achievement.unlocked = true;
+            achievement.unlockedAt = new Date();
+            newUnlocks.push(achievement);
+          }
+        }
+      }
+
+      // Check coins achievement
+      if (context === 'coins-gained' && data?.totalCoins >= 1000) {
+        const achievement = updated.find(a => a.id === 'colecionador-moedas');
+        if (achievement && !achievement.unlocked) {
+          achievement.unlocked = true;
+          achievement.unlockedAt = new Date();
+          newUnlocks.push(achievement);
+        }
+      }
+
+      // Check streak achievements
+      if (context === 'streak-updated' && data?.streak) {
+        const streakAchievements = [
+          { id: 'foco-total', streak: 7 },
+          { id: 'primeira-semana', streak: 7 },
+          { id: 'maratonista', streak: 30 },
+          { id: 'primeiro-mes', streak: 30 },
+          { id: 'mestre-da-disciplina', streak: 100 }
+        ];
+
+        streakAchievements.forEach(({ id, streak: requiredStreak }) => {
+          if (data.streak >= requiredStreak && !updated.find(a => a.id === id)?.unlocked) {
+            const achievement = updated.find(a => a.id === id);
+            if (achievement) {
+              achievement.unlocked = true;
+              achievement.unlockedAt = new Date();
+              newUnlocks.push(achievement);
+            }
+          }
+        });
+      }
+
+      // Check count achievements
+      if (context === 'count-updated') {
+        const countAchievements = [
+          { id: 'mestre-da-organizacao', count: data?.todoCount || 0, required: 15 },
+          { id: 'organizador-supremo', count: data?.todoCount || 0, required: 50 },
+          { id: 'rotina-perfeita', count: data?.dailyCount || 0, required: 10 },
+          { id: 'mente-saudavel', count: data?.habitCount || 0, required: 10 }
+        ];
+
+        countAchievements.forEach(({ id, count, required }) => {
+          if (count >= required && !updated.find(a => a.id === id)?.unlocked) {
+            const achievement = updated.find(a => a.id === id);
+            if (achievement) {
+              achievement.unlocked = true;
+              achievement.unlockedAt = new Date();
+              newUnlocks.push(achievement);
+            }
+          }
+        });
       }
 
       // Show toast for new achievements only if global notifications are enabled
@@ -423,12 +635,18 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       streak: newGameState.streak
     });
     
-    if (adjustedLevel > gameState.level && settings.globalNotifications) {
-      toast({
-        title: `🎉 LEVEL UP! 🎉`,
-        description: `Parabéns! Você alcançou o nível ${adjustedLevel}!`,
-        className: "bg-quest-legendary/20 border-quest-legendary"
-      });
+    // Check XP achievement
+    checkAchievements('xp-gained', { totalXp: adjustedTotalXp });
+    
+    if (adjustedLevel > gameState.level) {
+      checkAchievements('level-up', { newLevel: adjustedLevel });
+      if (settings.globalNotifications) {
+        toast({
+          title: `🎉 LEVEL UP! 🎉`,
+          description: `Parabéns! Você alcançou o nível ${adjustedLevel}!`,
+          className: "bg-quest-legendary/20 border-quest-legendary"
+        });
+      }
     }
   };
 
@@ -448,7 +666,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       const newGameState = {
         ...gameState,
         coins: gameState.coins + coinGain,
-        hp: Math.min(gameState.hp + 2, gameState.maxHp)
+        hp: Math.min(gameState.hp + 2, gameState.maxHp),
+        streak: gameState.streak + 1
       };
       
       setGameState(newGameState);
@@ -461,13 +680,19 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       await supabaseData.saveGameState({
         hp: newGameState.hp,
         max_hp: newGameState.maxHp,
-        coins: newGameState.coins
+        coins: newGameState.coins,
+        streak: newGameState.streak
       });
       
       await supabaseData.saveHabit({
         id: habitId,
         streak: updatedHabit.streak
       });
+
+      // Check achievements
+      checkAchievements('coins-gained', { totalCoins: newGameState.coins });
+      checkAchievements('streak-updated', { streak: newGameState.streak });
+      checkAchievements('task-completed', { difficulty: habit.difficulty });
 
       if (settings.globalNotifications) {
         toast({
@@ -525,7 +750,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     
     const newGameState = {
       ...gameState,
-      coins: gameState.coins + coinGain
+      coins: gameState.coins + coinGain,
+      streak: gameState.streak + 1
     };
     
     setGameState(newGameState);
@@ -536,7 +762,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     
     // Save to database
     await supabaseData.saveGameState({
-      coins: newGameState.coins
+      coins: newGameState.coins,
+      streak: newGameState.streak
     });
     
     await supabaseData.saveDaily({
@@ -545,6 +772,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       streak: updatedDaily.streak,
       completed_at: new Date().toISOString().split('T')[0]
     });
+
+    // Check achievements
+    checkAchievements('first-daily-completed');
+    checkAchievements('coins-gained', { totalCoins: newGameState.coins });
+    checkAchievements('streak-updated', { streak: newGameState.streak });
+    checkAchievements('task-completed', { difficulty: daily.difficulty });
 
     if (settings.globalNotifications) {
       toast({
@@ -569,7 +802,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     
     const newGameState = {
       ...gameState,
-      coins: gameState.coins + coinGain
+      coins: gameState.coins + coinGain,
+      streak: gameState.streak + 1
     };
     
     setGameState(newGameState);
@@ -580,7 +814,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     
     // Save to database
     await supabaseData.saveGameState({
-      coins: newGameState.coins
+      coins: newGameState.coins,
+      streak: newGameState.streak
     });
     
     await supabaseData.saveTodo({
@@ -588,6 +823,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       completed: true,
       completed_at: new Date().toISOString()
     });
+
+    // Check achievements
+    checkAchievements('first-todo-completed');
+    checkAchievements('coins-gained', { totalCoins: newGameState.coins });
+    checkAchievements('streak-updated', { streak: newGameState.streak });
+    checkAchievements('task-completed', { difficulty: todo.difficulty });
 
     if (settings.globalNotifications) {
       toast({
@@ -609,7 +850,13 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     });
     
     if (newHabit) {
-      setHabits(prev => [...prev, convertDatabaseToLocal.habit(newHabit)]);
+      setHabits(prev => {
+        const updated = [...prev, convertDatabaseToLocal.habit(newHabit)];
+        // Check achievements based on new count
+        checkAchievements('first-habit-created');
+        checkAchievements('count-updated', { habitCount: updated.length });
+        return updated;
+      });
       
       if (settings.globalNotifications) {
         toast({
@@ -633,7 +880,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     });
     
     if (newDaily) {
-      setDailies(prev => [...prev, convertDatabaseToLocal.daily(newDaily)]);
+      setDailies(prev => {
+        const updated = [...prev, convertDatabaseToLocal.daily(newDaily)];
+        // Check achievements based on new count
+        checkAchievements('count-updated', { dailyCount: updated.length });
+        return updated;
+      });
       
       if (settings.globalNotifications) {
         toast({
@@ -658,7 +910,12 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     });
     
     if (newTodo) {
-      setTodos(prev => [...prev, convertDatabaseToLocal.todo(newTodo)]);
+      setTodos(prev => {
+        const updated = [...prev, convertDatabaseToLocal.todo(newTodo)];
+        // Check achievements based on new count
+        checkAchievements('count-updated', { todoCount: updated.length });
+        return updated;
+      });
       
       if (settings.globalNotifications) {
         toast({
