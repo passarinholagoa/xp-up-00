@@ -311,6 +311,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_habit_rewards: {
+        Args: { difficulty_level: string }
+        Returns: {
+          xp_reward: number
+          coin_reward: number
+        }[]
+      }
       reset_dailies: {
         Args: Record<PropertyKey, never>
         Returns: undefined
