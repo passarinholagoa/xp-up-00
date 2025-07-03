@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,7 +52,7 @@ export const Header = () => {
   );
 
   return (
-    <div className="container mx-auto px-4">
+    <div className={isMobile ? 'px-4' : 'container mx-auto px-4'}>
       <Card className="mb-6 bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-500/30">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">

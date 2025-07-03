@@ -34,7 +34,7 @@ const Index = () => {
     <div className="min-h-screen bg-background w-full transition-colors duration-300">
       <Header />
       
-      <main className={`w-full px-1.5 sm:px-4 py-3 sm:py-4 ${isMobile ? '' : 'container mx-auto max-w-7xl'}`}>
+      <main className={`w-full px-4 sm:px-4 py-3 sm:py-4 ${isMobile ? '' : 'container mx-auto max-w-7xl'}`}>
         {/* Hero Section */}
         <div className={isMobile ? 'mb-2' : 'mb-6 sm:mb-8'}>
           <HeroSection />

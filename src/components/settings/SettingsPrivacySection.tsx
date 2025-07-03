@@ -1,14 +1,15 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, Key, Mail } from 'lucide-react';
+import { Shield, Key, Mail, Trash } from 'lucide-react';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { RecoverPasswordModal } from './RecoverPasswordModal';
+import DeleteAccountModal from './DeleteAccountModal';
 
 export const SettingsPrivacySection = () => {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isRecoverPasswordOpen, setIsRecoverPasswordOpen] = useState(false);
+  const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
 
   const handleChangePassword = () => {
     setIsChangePasswordOpen(true);
@@ -16,6 +17,10 @@ export const SettingsPrivacySection = () => {
 
   const handleRecoverPassword = () => {
     setIsRecoverPasswordOpen(true);
+  };
+
+  const handleDeleteAccount = () => {
+    setIsDeleteAccountOpen(true);
   };
 
   return (
@@ -44,6 +49,15 @@ export const SettingsPrivacySection = () => {
             <Mail className="h-4 w-4 mr-3" />
             Recuperar Senha
           </Button>
+          
+          <Button
+            onClick={handleDeleteAccount}
+            variant="outline"
+            className="w-full justify-start border-red-600/30 hover:bg-red-900/30 text-red-300"
+          >
+            <Trash className="h-4 w-4 mr-3" />
+            Deletar Conta
+          </Button>
         </div>
       </Card>
 
@@ -55,6 +69,11 @@ export const SettingsPrivacySection = () => {
       <RecoverPasswordModal 
         isOpen={isRecoverPasswordOpen}
         onClose={() => setIsRecoverPasswordOpen(false)}
+      />
+
+      <DeleteAccountModal
+        isOpen={isDeleteAccountOpen}
+        onClose={() => setIsDeleteAccountOpen(false)}
       />
     </>
   );
