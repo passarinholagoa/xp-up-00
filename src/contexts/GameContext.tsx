@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
@@ -612,12 +611,13 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     const finalXpGain = settings.hardcoreMode ? Math.floor(xpGain * 1.5) : xpGain;
     const adjustedTotalXp = settings.hardcoreMode ? gameState.totalXp + finalXpGain : newTotalXp;
     const adjustedLevel = calculateLevel(adjustedTotalXp);
+    const { currentLevelXp: adjustedCurrentLevelXp, maxLevelXp: adjustedMaxLevelXp } = calculateLevelProgress(adjustedTotalXp, adjustedLevel);
     
     const newGameState = {
       ...gameState,
-      xp: currentLevelXp,
+      xp: adjustedCurrentLevelXp,
       totalXp: adjustedTotalXp,
-      maxXp: maxLevelXp,
+      maxXp: adjustedMaxLevelXp,
       level: adjustedLevel
     };
     
@@ -627,9 +627,9 @@ export const GameProvider = ({ children }: GameProviderProps) => {
     await supabaseData.saveGameState({
       hp: newGameState.hp,
       max_hp: newGameState.maxHp,
-      xp: currentLevelXp,
+      xp: adjustedCurrentLevelXp,
       total_xp: adjustedTotalXp,
-      max_xp: maxLevelXp,
+      max_xp: adjustedMaxLevelXp,
       coins: newGameState.coins,
       level: adjustedLevel,
       streak: newGameState.streak
