@@ -51,13 +51,13 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
     setLoading(true);
 
     try {
-      // 1. Validar senha tentando fazer login
-      const { error: loginError } = await supabase.auth.signInWithPassword({
+      // 1. Re-autenticar o usuário para validar a senha
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
         email: user.email,
         password,
       });
 
-      if (loginError) {
+      if (reauthError) {
         setLoading(false);
         toast({ 
           title: 'Senha incorreta', 
@@ -70,31 +70,90 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
       // 2. Deletar dados do usuário das tabelas personalizadas
       const userId = user.id;
       
-      // Deletar em ordem devido às dependências
-      await supabase.from('achievements').delete().eq('user_id', userId);
-      await supabase.from('shop_items').delete().eq('user_id', userId);
-      await supabase.from('habits').delete().eq('user_id', userId);
-      await supabase.from('dailies').delete().eq('user_id', userId);
-      await supabase.from('todos').delete().eq('user_id', userId);
-      await supabase.from('game_states').delete().eq('id', userId);
-      await supabase.from('profiles').delete().eq('id', userId);
-      await supabase.from('settings').delete().eq('id', userId);
+      console.log('Iniciando exclusão dos dados do usuário:', userId);
 
-      // 3. Deletar a conta do usuário (Auth)
-      const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
+      // Deletar em ordem devido às dependências
+      const { error: achievementsError } = await supabase
+        .from('achievements')
+        .delete()
+        .eq('user_id', userId);
       
-      if (deleteError) {
-        console.error('Erro ao deletar usuário:', deleteError);
-        // Mesmo com erro, vamos fazer logout
+      if (achievementsError) {
+        console.error('Erro ao deletar achievements:', achievementsError);
       }
 
-      // 4. Fazer logout
+      const { error: shopItemsError } = await supabase
+        .from('shop_items')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (shopItemsError) {
+        console.error('Erro ao deletar shop_items:', shopItemsError);
+      }
+
+      const { error: habitsError } = await supabase
+        .from('habits')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (habitsError) {
+        console.error('Erro ao deletar habits:', habitsError);
+      }
+
+      const { error: dailiesError } = await supabase
+        .from('dailies')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (dailiesError) {
+        console.error('Erro ao deletar dailies:', dailiesError);
+      }
+
+      const { error: todosError } = await supabase
+        .from('todos')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (todosError) {
+        console.error('Erro ao deletar todos:', todosError);
+      }
+
+      const { error: gameStatesError } = await supabase
+        .from('game_states')
+        .delete()
+        .eq('id', userId);
+      
+      if (gameStatesError) {
+        console.error('Erro ao deletar game_states:', gameStatesError);
+      }
+
+      const { error: profilesError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+      
+      if (profilesError) {
+        console.error('Erro ao deletar profiles:', profilesError);
+      }
+
+      const { error: settingsError } = await supabase
+        .from('settings')
+        .delete()
+        .eq('id', userId);
+      
+      if (settingsError) {
+        console.error('Erro ao deletar settings:', settingsError);
+      }
+
+      console.log('Dados do usuário deletados com sucesso');
+
+      // 3. Fazer signOut para limpar a sessão
       await signOut();
       
       setLoading(false);
       toast({ 
         title: 'Conta deletada', 
-        description: 'Sua conta foi excluída permanentemente.' 
+        description: 'Todos os seus dados foram excluídos. Você será redirecionado para a página de login.' 
       });
       
       onClose();
@@ -128,7 +187,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
         <div className="space-y-3">
           <p className="text-sm text-red-300 font-semibold">
             Esta ação é <span className="underline">permanente</span> e <span className="underline">irreversível</span>.<br />
-            Todos os seus dados serão apagados!
+            Todos os seus dados serão apagados, mas a conta de email permanecerá no sistema por questões de segurança.
           </p>
           <Input
             type="password"
