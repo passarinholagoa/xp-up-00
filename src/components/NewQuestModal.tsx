@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Plus, Calendar, Target, CheckSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -25,6 +24,9 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
   const [description, setDescription] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [dueTime, setDueTime] = useState('');
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
+  const [dueDate, setDueDate] = useState('');
+  const [dueTimeTodo, setDueTimeTodo] = useState('');
 
   const questTypes = [
     { type: 'habit' as QuestType, label: 'Hábito', icon: Target, description: 'Atividade recorrente' },
@@ -52,6 +54,23 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
       coins: Math.floor(baseRewards[diff].coins * multiplier)
     };
   };
+
+  // Função para agendar notificação local
+  function scheduleTodoNotification(title: string, dueDateTime: string) {
+    if (!('Notification' in window)) return;
+    if (Notification.permission !== 'granted') return;
+    const dueDate = new Date(dueDateTime);
+    const notifyTime = new Date(dueDate.getTime() - 10 * 60 * 1000); // 10 minutos antes
+    const now = new Date();
+    const msUntilNotify = notifyTime.getTime() - now.getTime();
+    if (msUntilNotify > 0) {
+      setTimeout(() => {
+        new Notification('Lembrete de Quest', {
+          body: `Sua To-Do "${title}" vence em 10 minutos!`,
+        });
+      }, msUntilNotify);
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,20 +107,62 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
           coinReward: rewards.coins,
           streak: 0
         });
+        // Notificação local 10 minutos antes para Daily
+        if (dueTime) {
+          const today = new Date();
+          const dueDateTime = `${today.toISOString().split('T')[0]}T${dueTime}`;
+          if (Notification && dueTime) {
+            if (Notification.permission === 'granted') {
+              scheduleTodoNotification(title.trim(), dueDateTime);
+            } else if (Notification.permission !== 'denied') {
+              Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                  scheduleTodoNotification(title.trim(), dueDateTime);
+                } else {
+                  toast({
+                    title: 'Notificação não ativada',
+                    description: 'Ative as notificações do navegador para receber lembretes de tarefas.',
+                    className: 'bg-yellow-500/10 border-yellow-500/50'
+                  });
+                }
+              });
+            }
+          }
+        }
       } else if (questType === 'todo') {
-        const today = new Date();
-        const dueDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
-        
+        // Combina data e hora, se ambos preenchidos
+        let dueDateTime = dueDate;
+        if (dueDate && dueTimeTodo) {
+          dueDateTime = `${dueDate}T${dueTimeTodo}`;
+        }
         await addTodo({
           title: title.trim(),
           completed: false,
-          dueDate: dueDate.toISOString().split('T')[0],
-          priority: difficulty === 'easy' ? 'low' : difficulty === 'medium' ? 'medium' : 'high',
+          dueDate: dueDateTime || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          priority,
           difficulty,
           xpReward: rewards.xp,
           coinReward: rewards.coins,
           isOverdue: false
         });
+        // Notificação local 10 minutos antes
+        if (dueDateTime && Notification) {
+          if (Notification.permission === 'granted') {
+            scheduleTodoNotification(title.trim(), dueDateTime);
+          } else if (Notification.permission !== 'denied') {
+            Notification.requestPermission().then(permission => {
+              if (permission === 'granted') {
+                scheduleTodoNotification(title.trim(), dueDateTime);
+              } else {
+                toast({
+                  title: 'Notificação não ativada',
+                  description: 'Ative as notificações do navegador para receber lembretes de tarefas.',
+                  className: 'bg-yellow-500/10 border-yellow-500/50'
+                });
+              }
+            });
+          }
+        }
       }
 
       toast({
@@ -115,6 +176,9 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
       setDescription('');
       setDifficulty('easy');
       setDueTime('');
+      setDueDate('');
+      setDueTimeTodo('');
+      setPriority('low');
       onClose();
     } catch (error) {
       console.error('Erro ao criar quest:', error);
@@ -177,17 +241,6 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
             />
           </div>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Descrição (Opcional)</label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Adicione detalhes sobre sua quest..."
-              className="w-full min-h-[60px] resize-none"
-            />
-          </div>
-
           {/* Difficulty */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Dificuldade</label>
@@ -219,6 +272,42 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
                 onChange={(e) => setDueTime(e.target.value)}
                 className="w-full"
               />
+            </div>
+          )}
+
+          {/* Prioridade e Data de Vencimento para To-Do */}
+          {questType === 'todo' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Prioridade</label>
+                <select
+                  className="w-full rounded-md border px-3 py-2 bg-background text-foreground"
+                  value={priority}
+                  onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+                >
+                  <option value="low">Baixa</option>
+                  <option value="medium">Média</option>
+                  <option value="high">Alta</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Data de Vencimento</label>
+                <Input
+                  type="date"
+                  value={dueDate}
+                  onChange={e => setDueDate(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Hora</label>
+                <Input
+                  type="time"
+                  value={dueTimeTodo}
+                  onChange={e => setDueTimeTodo(e.target.value)}
+                  className="w-24"
+                />
+              </div>
             </div>
           )}
 

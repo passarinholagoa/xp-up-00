@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -111,29 +110,6 @@ export const EditTodoModal = ({ todo, isOpen, onClose }: EditTodoModalProps) => 
                   <SelectItem value="hard">Difícil</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="xpReward">XP</Label>
-              <Input
-                id="xpReward"
-                type="number"
-                min="0"
-                value={formData.xpReward}
-                onChange={(e) => setFormData(prev => ({ ...prev, xpReward: parseInt(e.target.value) || 0 }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="coinReward">Moedas</Label>
-              <Input
-                id="coinReward"
-                type="number"
-                min="0"
-                value={formData.coinReward}
-                onChange={(e) => setFormData(prev => ({ ...prev, coinReward: parseInt(e.target.value) || 0 }))}
-              />
             </div>
           </div>
 
