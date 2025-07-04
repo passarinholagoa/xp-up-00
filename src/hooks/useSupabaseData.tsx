@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -187,14 +186,13 @@ export const useSupabaseData = (user: User | null) => {
     if (!user) return null;
     
     if (habit.id) {
+      // For updates, don't send xp_reward and coin_reward as they'll be calculated by the trigger
       const { data, error } = await supabase
         .from('habits')
         .update({
           title: habit.title,
           streak: habit.streak,
           difficulty: habit.difficulty,
-          xp_reward: habit.xp_reward,
-          coin_reward: habit.coin_reward,
           is_positive: habit.is_positive
         })
         .eq('id', habit.id)
@@ -208,6 +206,7 @@ export const useSupabaseData = (user: User | null) => {
       
       return data as DatabaseHabit;
     } else {
+      // For inserts, don't send xp_reward and coin_reward as they'll be calculated by the trigger
       const { data, error } = await supabase
         .from('habits')
         .insert({ 
@@ -215,8 +214,6 @@ export const useSupabaseData = (user: User | null) => {
           title: habit.title!,
           streak: habit.streak || 0,
           difficulty: habit.difficulty!,
-          xp_reward: habit.xp_reward || 10,
-          coin_reward: habit.coin_reward || 2,
           is_positive: habit.is_positive ?? true
         })
         .select()

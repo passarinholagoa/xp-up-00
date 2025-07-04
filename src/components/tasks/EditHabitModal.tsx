@@ -38,16 +38,31 @@ export const EditHabitModal = ({ habit, isOpen, onClose }: EditHabitModalProps) 
   const [formData, setFormData] = useState({
     title: habit.title,
     difficulty: habit.difficulty,
-    xpReward: habit.xpReward,
-    coinReward: habit.coinReward,
     isPositive: habit.isPositive,
   });
 
+  const getRewards = (difficulty: 'easy' | 'medium' | 'hard') => {
+    const baseRewards = {
+      easy: { xp: 10, coins: 2 },
+      medium: { xp: 15, coins: 3 },
+      hard: { xp: 20, coins: 4 }
+    };
+    return baseRewards[difficulty];
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateHabit(habit.id, formData);
+    const rewards = getRewards(formData.difficulty);
+    
+    updateHabit(habit.id, {
+      ...formData,
+      xpReward: rewards.xp,
+      coinReward: rewards.coins,
+    });
     onClose();
   };
+
+  const currentRewards = getRewards(formData.difficulty);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -83,26 +98,12 @@ export const EditHabitModal = ({ habit, isOpen, onClose }: EditHabitModalProps) 
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="xpReward">XP</Label>
-              <Input
-                id="xpReward"
-                type="number"
-                min="0"
-                value={formData.xpReward}
-                onChange={(e) => setFormData(prev => ({ ...prev, xpReward: parseInt(e.target.value) || 0 }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="coinReward">Moedas</Label>
-              <Input
-                id="coinReward"
-                type="number"
-                min="0"
-                value={formData.coinReward}
-                onChange={(e) => setFormData(prev => ({ ...prev, coinReward: parseInt(e.target.value) || 0 }))}
-              />
+          {/* Preview das recompensas baseadas na dificuldade */}
+          <div className="p-3 rounded-lg bg-muted/20 space-y-2">
+            <div className="text-sm font-medium">Recompensas:</div>
+            <div className="flex gap-4 text-xs text-muted-foreground">
+              <span>+{currentRewards.xp} XP</span>
+              <span>+{currentRewards.coins} Moedas</span>
             </div>
           </div>
 
