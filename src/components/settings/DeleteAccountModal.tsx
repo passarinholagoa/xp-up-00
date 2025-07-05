@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -146,15 +145,15 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
             disabled={loading}
           />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={loading}>
+        <DialogFooter className="gap-2">
+          <Button variant="outline" size="default" onClick={handleClose} disabled={loading}>
             Cancelar
           </Button>
           <Button
             variant="destructive"
+            size="default"
             onClick={handleDelete}
             disabled={loading || !password || confirmation !== 'DELETAR'}
-            className="ml-2"
           >
             {loading ? 'Deletando...' : 'Deletar Conta'}
           </Button>

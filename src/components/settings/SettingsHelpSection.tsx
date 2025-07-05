@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,12 +47,12 @@ export const SettingsHelpSection = () => {
                         🔄 Hábitos (Habits)
                       </AccordionTrigger>
                       <AccordionContent className="text-sm text-muted-foreground space-y-2">
-                        <p>São ações que você pode repetir ao longo do dia, podendo ser:</p>
+                        <p>São ações que você pode repetir ao longo da quest, podendo ser:</p>
                         <ul className="list-disc pl-4 space-y-1">
                           <li><strong>Positivas:</strong> que te recompensam (Ex: beber água, praticar gratidão)</li>
                           <li><strong>Negativas:</strong> que geram penalidades (Ex: procrastinar, dormir tarde)</li>
                         </ul>
-                        <p>Você pode registrar essas ações várias vezes por dia, e o sistema acompanha seu progresso ou falhas.</p>
+                        <p>Você pode registrar essas ações várias vezes por quest, e o sistema acompanha seu progresso ou falhas.</p>
                       </AccordionContent>
                     </AccordionItem>
 
@@ -64,17 +63,17 @@ export const SettingsHelpSection = () => {
                       <AccordionContent className="text-sm text-muted-foreground space-y-2">
                         <p>Atividades recorrentes que precisam ser feitas em uma frequência específica:</p>
                         <ul className="list-disc pl-4 space-y-1">
-                          <li>Todos os dias</li>
-                          <li>Somente em dias da semana definidos</li>
+                          <li>Todas as quests</li>
+                          <li>Somente em quests da semana definidas</li>
                           <li>Ou em ciclos semanais</li>
                         </ul>
-                        <p>Se não forem concluídas no dia ou ciclo correto, você perde pontos de vida ou streak.</p>
+                        <p>Se não forem concluídas na quest ou ciclo correto, você perde pontos de vida ou streak.</p>
                         <div className="mt-2">
                           <p className="font-medium">Exemplos:</p>
                           <ul className="list-disc pl-4 space-y-1">
                             <li>📚 Estudar inglês toda segunda</li>
                             <li>🏋️ Ir à academia 3x por semana</li>
-                            <li>🧘 Meditar diariamente</li>
+                            <li>🧘 Meditar em toda quest</li>
                           </ul>
                         </div>
                       </AccordionContent>
@@ -134,7 +133,7 @@ export const SettingsHelpSection = () => {
                             <li><strong>Pontos de Vida (HP):</strong> Representa sua motivação, perdido com hábitos ruins</li>
                             <li><strong>Experiência (XP):</strong> Ganha completando tarefas, usado para subir de nível</li>
                             <li><strong>Moedas:</strong> Obtidas com tarefas, usadas na loja para personalização</li>
-                            <li><strong>Streak:</strong> Dias consecutivos completando dailies</li>
+                            <li><strong>Streak:</strong> Quests consecutivas completando dailies</li>
                           </ul>
                         </div>
 
@@ -168,7 +167,7 @@ export const SettingsHelpSection = () => {
                         <div>
                           <p className="font-medium text-cyan-400 mb-2">Dicas Importantes:</p>
                           <ul className="list-disc pl-4 space-y-1">
-                            <li>Complete dailies todos os dias para manter sua streak</li>
+                            <li>Complete dailies todas as quests para manter sua streak</li>
                             <li>Use hábitos positivos para ganhar XP extra</li>
                             <li>Evite hábitos negativos para não perder pontos</li>
                             <li>Conquiste achievements para desbloquear novos recursos</li>

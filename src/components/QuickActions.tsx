@@ -33,7 +33,7 @@ export const QuickActions = () => {
               </div>
               <div className="flex-1">
                 <div className="text-sm font-semibold text-yellow-400">Streak Master</div>
-                <div className="text-xs text-muted-foreground">{gameState.streak} dias consecutivos</div>
+                <div className="text-xs text-muted-foreground">{gameState.streak} quest consecutivas</div>
               </div>
             </div>
             

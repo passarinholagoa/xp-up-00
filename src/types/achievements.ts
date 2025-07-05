@@ -1,4 +1,3 @@
-
 import { LucideIcon } from "lucide-react";
 
 export interface Achievement {
@@ -61,7 +60,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'foco-total',
     title: 'Foco Total',
-    description: 'Mantenha uma streak de 7 dias',
+    description: 'Mantenha uma streak de 7 quests',
     icon: '🎯',
     rarity: 'uncommon',
     unlocked: false,
@@ -162,7 +161,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'primeira-semana',
     title: 'Primeira Semana',
-    description: 'Complete 7 dias consecutivos de atividades',
+    description: 'Complete 7 quests consecutivas de atividades',
     icon: '📆',
     rarity: 'uncommon',
     unlocked: false,
@@ -171,7 +170,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'primeiro-mes',
     title: 'Primeiro Mês',
-    description: 'Complete 30 dias de jornada',
+    description: 'Complete 30 quests de jornada',
     icon: '🗓️',
     rarity: 'rare',
     unlocked: false,
@@ -200,7 +199,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'maratonista',
     title: 'Maratonista',
-    description: 'Mantenha uma streak de 30 dias',
+    description: 'Mantenha uma streak de 30 quests',
     icon: '🏃‍♂️',
     rarity: 'rare',
     unlocked: false,
@@ -256,7 +255,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'mestre-da-disciplina',
     title: 'Mestre da Disciplina',
-    description: 'Mantenha uma streak de 100 dias',
+    description: 'Mantenha uma streak de 100 quests',
     icon: '🏆',
     rarity: 'legendary',
     unlocked: false,
