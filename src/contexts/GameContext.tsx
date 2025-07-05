@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
@@ -605,22 +604,20 @@ export const GameProvider = ({ children }: GameProviderProps) => {
   };
 
   const updateGameStateXp = async (xpGain: number) => {
-    const newTotalXp = gameState.totalXp + xpGain;
+    const finalXpGain = settings.hardcoreMode ? Math.floor(xpGain * 1.5) : xpGain;
+    const newTotalXp = gameState.totalXp + finalXpGain;
     const newLevel = calculateLevel(newTotalXp);
     const { currentLevelXp, maxLevelXp } = calculateLevelProgress(newTotalXp, newLevel);
-    
-    const finalXpGain = settings.hardcoreMode ? Math.floor(xpGain * 1.5) : xpGain;
-    const adjustedTotalXp = settings.hardcoreMode ? gameState.totalXp + finalXpGain : newTotalXp;
-    const adjustedLevel = calculateLevel(adjustedTotalXp);
     
     const newGameState = {
       ...gameState,
       xp: currentLevelXp,
-      totalXp: adjustedTotalXp,
+      totalXp: newTotalXp,
       maxXp: maxLevelXp,
-      level: adjustedLevel
+      level: newLevel
     };
     
+    // Update local state immediately
     setGameState(newGameState);
     
     // Save to database
@@ -628,22 +625,22 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       hp: newGameState.hp,
       max_hp: newGameState.maxHp,
       xp: currentLevelXp,
-      total_xp: adjustedTotalXp,
+      total_xp: newTotalXp,
       max_xp: maxLevelXp,
       coins: newGameState.coins,
-      level: adjustedLevel,
+      level: newLevel,
       streak: newGameState.streak
     });
     
     // Check XP achievement
-    checkAchievements('xp-gained', { totalXp: adjustedTotalXp });
+    checkAchievements('xp-gained', { totalXp: newTotalXp });
     
-    if (adjustedLevel > gameState.level) {
-      checkAchievements('level-up', { newLevel: adjustedLevel });
+    if (newLevel > gameState.level) {
+      checkAchievements('level-up', { newLevel });
       if (settings.globalNotifications) {
         toast({
           title: `🎉 LEVEL UP! 🎉`,
-          description: `Parabéns! Você alcançou o nível ${adjustedLevel}!`,
+          description: `Parabéns! Você alcançou o nível ${newLevel}!`,
           className: "bg-quest-legendary/20 border-quest-legendary"
         });
       }
@@ -661,27 +658,33 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       const xpGain = settings.hardcoreMode ? Math.floor(baseXpGain * 1.5) : baseXpGain;
       const coinGain = settings.hardcoreMode ? Math.floor(baseCoinGain * 1.5) : baseCoinGain;
       
+      // Update XP first
       await updateGameStateXp(xpGain);
       
-      const newGameState = {
+      // Then update other stats
+      const updatedGameState = {
         ...gameState,
         coins: gameState.coins + coinGain,
         hp: Math.min(gameState.hp + 2, gameState.maxHp),
         streak: gameState.streak + 1
       };
       
-      setGameState(newGameState);
+      setGameState(prev => ({
+        ...prev,
+        coins: prev.coins + coinGain,
+        hp: Math.min(prev.hp + 2, prev.maxHp),
+        streak: prev.streak + 1
+      }));
       
       // Update habit streak
       const updatedHabit = { ...habit, streak: habit.streak + 1 };
       setHabits(prev => prev.map(h => h.id === habitId ? updatedHabit : h));
       
-      // Save to database
+      // Save additional changes to database
       await supabaseData.saveGameState({
-        hp: newGameState.hp,
-        max_hp: newGameState.maxHp,
-        coins: newGameState.coins,
-        streak: newGameState.streak
+        hp: updatedGameState.hp,
+        coins: updatedGameState.coins,
+        streak: updatedGameState.streak
       });
       
       await supabaseData.saveHabit({
@@ -690,8 +693,8 @@ export const GameProvider = ({ children }: GameProviderProps) => {
       });
 
       // Check achievements
-      checkAchievements('coins-gained', { totalCoins: newGameState.coins });
-      checkAchievements('streak-updated', { streak: newGameState.streak });
+      checkAchievements('coins-gained', { totalCoins: updatedGameState.coins });
+      checkAchievements('streak-updated', { streak: updatedGameState.streak });
       checkAchievements('task-completed', { difficulty: habit.difficulty });
 
       if (settings.globalNotifications) {

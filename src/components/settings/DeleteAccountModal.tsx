@@ -50,13 +50,13 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
     setLoading(true);
 
     try {
-      // 1. Validar senha tentando fazer login
-      const { error: loginError } = await supabase.auth.signInWithPassword({
+      // 1. Re-autenticar o usuário para validar a senha
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
         email: user.email,
         password,
       });
 
-      if (loginError) {
+      if (reauthError) {
         setLoading(false);
         toast({ 
           title: 'Senha incorreta', 
@@ -66,34 +66,46 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
         return;
       }
 
-      // 2. Deletar dados do usuário das tabelas personalizadas
-      const userId = user.id;
+      // 2. Chamar a Edge Function para deletar completamente a conta
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Deletar em ordem devido às dependências
-      await supabase.from('achievements').delete().eq('user_id', userId);
-      await supabase.from('shop_items').delete().eq('user_id', userId);
-      await supabase.from('habits').delete().eq('user_id', userId);
-      await supabase.from('dailies').delete().eq('user_id', userId);
-      await supabase.from('todos').delete().eq('user_id', userId);
-      await supabase.from('game_states').delete().eq('id', userId);
-      await supabase.from('profiles').delete().eq('id', userId);
-      await supabase.from('settings').delete().eq('id', userId);
-
-      // 3. Deletar a conta do usuário (Auth)
-      const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
-      
-      if (deleteError) {
-        console.error('Erro ao deletar usuário:', deleteError);
-        // Mesmo com erro, vamos fazer logout
+      if (!session?.access_token) {
+        setLoading(false);
+        toast({ 
+          title: 'Erro de autenticação', 
+          description: 'Não foi possível obter o token de acesso.', 
+          variant: 'destructive' 
+        });
+        return;
       }
 
-      // 4. Fazer logout
+      const response = await fetch('https://fhzsjpqbmfeafvysojvz.supabase.co/functions/v1/delete-user', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Erro da Edge Function:', errorData);
+        setLoading(false);
+        toast({ 
+          title: 'Erro ao deletar conta', 
+          description: 'Não foi possível deletar a conta. Tente novamente.', 
+          variant: 'destructive' 
+        });
+        return;
+      }
+
+      // 3. Fazer signOut local
       await signOut();
       
       setLoading(false);
       toast({ 
         title: 'Conta deletada', 
-        description: 'Sua conta foi excluída permanentemente.' 
+        description: 'Sua conta e todos os dados foram excluídos permanentemente.' 
       });
       
       onClose();
@@ -127,7 +139,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
         <div className="space-y-3">
           <p className="text-sm text-red-300 font-semibold">
             Esta ação é <span className="underline">permanente</span> e <span className="underline">irreversível</span>.<br />
-            Todos os seus dados serão apagados!
+            Sua conta e todos os dados associados serão apagados completamente!
           </p>
           <Input
             type="password"
