@@ -80,7 +80,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ isOpen, 
         return;
       }
 
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/delete-user`, {
+      const response = await fetch('https://fhzsjpqbmfeafvysojvz.supabase.co/functions/v1/delete-user', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
