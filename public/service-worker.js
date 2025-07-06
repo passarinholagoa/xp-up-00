@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'taskquest-v1';
+const CACHE_NAME = 'xpup-v1';
 
 // Basic service worker for PWA
 self.addEventListener('install', event => {

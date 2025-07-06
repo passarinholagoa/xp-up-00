@@ -1,7 +1,7 @@
 
 {
-  "name": "TaskQuest - Gamifique Suas Tarefas",
-  "short_name": "TaskQuest",
+  "name": "XpUp - Gamifique Suas Tarefas",
+  "short_name": "XpUp",
   "description": "Transforme suas tarefas em uma aventura épica. Ganhe XP, suba de nível e conquiste seus objetivos!",
   "start_url": "/",
   "display": "standalone",

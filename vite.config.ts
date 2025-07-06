@@ -19,8 +19,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: 'TaskQuest - Gamifique Suas Tarefas',
-        short_name: 'TaskQuest',
+        name: 'XpUp - Gamifique Suas Tarefas',
+        short_name: 'XpUp',
         description: 'Transforme suas tarefas em uma aventura épica. Ganhe XP, suba de nível e conquiste seus objetivos!',
         theme_color: '#8b5cf6',
         background_color: '#1a1625',
