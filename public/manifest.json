@@ -1,0 +1,61 @@
+
+{
+  "name": "TaskQuest - Gamifique Suas Tarefas",
+  "short_name": "TaskQuest",
+  "description": "Transforme suas tarefas em uma aventura épica. Ganhe XP, suba de nível e conquiste seus objetivos!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1625",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait",
+  "categories": ["productivity", "games"],
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/lovable-uploads/34f4a30e-da5f-4346-872f-4110961c128c.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/34f4a30e-da5f-4346-872f-4110961c128c.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/lovable-uploads/88cf0038-6fd4-4fe2-a514-2cc60714a3a2.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nova Quest",
+      "short_name": "Quest",
+      "description": "Criar uma nova quest",
+      "url": "/?action=new-quest",
+      "icons": [
+        {
+          "src": "/lovable-uploads/34f4a30e-da5f-4346-872f-4110961c128c.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Conquistas",
+      "short_name": "Conquistas",
+      "description": "Ver suas conquistas",
+      "url": "/?action=achievements",
+      "icons": [
+        {
+          "src": "/lovable-uploads/34f4a30e-da5f-4346-872f-4110961c128c.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
