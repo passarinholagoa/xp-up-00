@@ -4,7 +4,14 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-createRoot(document.getElementById("root")!).render(
+console.log('Starting application...');
+
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+createRoot(rootElement).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
@@ -27,7 +34,6 @@ if ('serviceWorker' in navigator) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               console.log('📱 Nova versão disponível! Recarregue a página para atualizar.');
-              // Aqui você pode mostrar uma notificação para o usuário
             }
           });
         }
@@ -39,9 +45,6 @@ if ('serviceWorker' in navigator) {
         console.log('📱 PWA pode ser instalado');
         e.preventDefault();
         deferredPrompt = e;
-        
-        // Você pode mostrar um botão customizado para instalar
-        // showInstallButton();
       });
 
       // PWA Install Success
@@ -55,13 +58,6 @@ if ('serviceWorker' in navigator) {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
           console.log('🔔 Permissão de notificação concedida');
-          
-          // Opcional: Inscrever para push notifications
-          // const subscription = await registration.pushManager.subscribe({
-          //   userVisibleOnly: true,
-          //   applicationServerKey: 'YOUR_VAPID_PUBLIC_KEY'
-          // });
-          // console.log('Push Subscription:', JSON.stringify(subscription));
         } else {
           console.log('❌ Permissão de notificação negada');
         }

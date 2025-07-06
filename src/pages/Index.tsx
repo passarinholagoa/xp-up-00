@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Header } from '../components/Header';
 import { HeroSection } from '../components/HeroSection';
@@ -13,6 +14,8 @@ import { useTheme } from '../hooks/useTheme';
 import { useIsMobile } from '../hooks/use-mobile';
 
 const Index = () => {
+  console.log('Index page rendering...');
+  
   const { 
     isNewQuestModalOpen, 
     closeNewQuestModal,
