@@ -316,8 +316,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_daily_rewards: {
+        Args: { difficulty_level: string }
+        Returns: {
+          xp_reward: number
+          coin_reward: number
+        }[]
+      }
       calculate_habit_rewards: {
         Args: { difficulty_level: string }
+        Returns: {
+          xp_reward: number
+          coin_reward: number
+        }[]
+      }
+      calculate_todo_rewards: {
+        Args: { difficulty_level: string; priority_level: string }
         Returns: {
           xp_reward: number
           coin_reward: number

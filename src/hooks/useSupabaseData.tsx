@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -186,7 +187,7 @@ export const useSupabaseData = (user: User | null) => {
     if (!user) return null;
     
     if (habit.id) {
-      // For updates, don't send xp_reward and coin_reward as they'll be calculated by the trigger
+      // Para updates, apenas enviamos os campos necessários - as recompensas são calculadas pelo trigger
       const { data, error } = await supabase
         .from('habits')
         .update({
@@ -206,7 +207,7 @@ export const useSupabaseData = (user: User | null) => {
       
       return data as DatabaseHabit;
     } else {
-      // For inserts, don't send xp_reward and coin_reward as they'll be calculated by the trigger
+      // Para inserts, apenas enviamos campos obrigatórios - as recompensas são calculadas pelo trigger
       const { data, error } = await supabase
         .from('habits')
         .insert({ 
@@ -263,6 +264,7 @@ export const useSupabaseData = (user: User | null) => {
     if (!user) return null;
     
     if (daily.id) {
+      // Para updates, as recompensas são calculadas automaticamente pelo trigger
       const { data, error } = await supabase
         .from('dailies')
         .update({
@@ -270,8 +272,6 @@ export const useSupabaseData = (user: User | null) => {
           completed: daily.completed,
           due_time: daily.due_time,
           difficulty: daily.difficulty,
-          xp_reward: daily.xp_reward,
-          coin_reward: daily.coin_reward,
           streak: daily.streak,
           completed_at: daily.completed_at
         })
@@ -286,6 +286,7 @@ export const useSupabaseData = (user: User | null) => {
       
       return data as DatabaseDaily;
     } else {
+      // Para inserts, as recompensas são calculadas automaticamente pelo trigger
       const { data, error } = await supabase
         .from('dailies')
         .insert({ 
@@ -294,8 +295,6 @@ export const useSupabaseData = (user: User | null) => {
           completed: daily.completed || false,
           due_time: daily.due_time!,
           difficulty: daily.difficulty!,
-          xp_reward: daily.xp_reward || 15,
-          coin_reward: daily.coin_reward || 3,
           streak: daily.streak || 0
         })
         .select()
@@ -345,6 +344,7 @@ export const useSupabaseData = (user: User | null) => {
     if (!user) return null;
     
     if (todo.id) {
+      // Para updates, as recompensas são calculadas automaticamente pelo trigger
       const { data, error } = await supabase
         .from('todos')
         .update({
@@ -353,8 +353,6 @@ export const useSupabaseData = (user: User | null) => {
           due_date: todo.due_date,
           priority: todo.priority,
           difficulty: todo.difficulty,
-          xp_reward: todo.xp_reward,
-          coin_reward: todo.coin_reward,
           is_overdue: todo.is_overdue,
           completed_at: todo.completed_at
         })
@@ -369,6 +367,7 @@ export const useSupabaseData = (user: User | null) => {
       
       return data as DatabaseTodo;
     } else {
+      // Para inserts, as recompensas são calculadas automaticamente pelo trigger
       const { data, error } = await supabase
         .from('todos')
         .insert({ 
@@ -378,8 +377,6 @@ export const useSupabaseData = (user: User | null) => {
           due_date: todo.due_date!,
           priority: todo.priority!,
           difficulty: todo.difficulty!,
-          xp_reward: todo.xp_reward || 20,
-          coin_reward: todo.coin_reward || 4,
           is_overdue: todo.is_overdue || false
         })
         .select()

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { X, Plus, Calendar, Target, CheckSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -40,19 +41,35 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
     { value: 'hard' as Difficulty, label: 'Difícil', color: 'bg-quest-epic/20 text-quest-epic' }
   ];
 
+  // Cálculo de recompensas baseado nos triggers do banco de dados
   const getRewards = (diff: Difficulty) => {
-    const baseRewards = {
-      easy: { xp: 10, coins: 2 },
-      medium: { xp: 15, coins: 3 },
-      hard: { xp: 20, coins: 4 }
-    };
-    
-    // Adjust rewards based on quest type
-    const multiplier = questType === 'habit' ? 1 : questType === 'daily' ? 1.5 : 2;
-    return {
-      xp: Math.floor(baseRewards[diff].xp * multiplier),
-      coins: Math.floor(baseRewards[diff].coins * multiplier)
-    };
+    if (questType === 'habit') {
+      const rewards = {
+        easy: { xp: 10, coins: 2 },
+        medium: { xp: 15, coins: 3 },
+        hard: { xp: 20, coins: 4 }
+      };
+      return rewards[diff];
+    } else if (questType === 'daily') {
+      const rewards = {
+        easy: { xp: 10, coins: 2 },
+        medium: { xp: 15, coins: 3 },
+        hard: { xp: 20, coins: 4 }
+      };
+      return rewards[diff];
+    } else { // todo
+      const baseRewards = {
+        easy: { xp: 15, coins: 3 },
+        medium: { xp: 20, coins: 4 },
+        hard: { xp: 25, coins: 5 }
+      };
+      
+      const multiplier = priority === 'low' ? 1.0 : priority === 'medium' ? 1.2 : 1.5;
+      return {
+        xp: Math.floor(baseRewards[diff].xp * multiplier),
+        coins: Math.floor(baseRewards[diff].coins * multiplier)
+      };
+    }
   };
 
   // Função para agendar notificação local
@@ -66,7 +83,7 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
     if (msUntilNotify > 0) {
       setTimeout(() => {
         new Notification('Lembrete de Quest', {
-          body: `Sua To-Do "${title}" vence em 10 minutos!`,
+          body: `Sua ${questType === 'daily' ? 'Daily' : 'To-Do'} "${title}" vence em 10 minutos!`,
         });
       }, msUntilNotify);
     }
@@ -93,8 +110,8 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
           title: title.trim(),
           streak: 0,
           difficulty,
-          xpReward: rewards.xp,
-          coinReward: rewards.coins,
+          xpReward: rewards.xp, // Será recalculado pelo trigger
+          coinReward: rewards.coins, // Será recalculado pelo trigger
           isPositive: true
         });
       } else if (questType === 'daily') {
@@ -103,8 +120,8 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
           completed: false,
           dueTime: dueTime || '09:00',
           difficulty,
-          xpReward: rewards.xp,
-          coinReward: rewards.coins,
+          xpReward: rewards.xp, // Será recalculado pelo trigger
+          coinReward: rewards.coins, // Será recalculado pelo trigger
           streak: 0
         });
         // Notificação local 10 minutos antes para Daily
@@ -141,8 +158,8 @@ export const NewQuestModal = ({ isOpen, onClose }: NewQuestModalProps) => {
           dueDate: dueDateTime || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           priority,
           difficulty,
-          xpReward: rewards.xp,
-          coinReward: rewards.coins,
+          xpReward: rewards.xp, // Será recalculado pelo trigger
+          coinReward: rewards.coins, // Será recalculado pelo trigger
           isOverdue: false
         });
         // Notificação local 10 minutos antes
