@@ -14,13 +14,275 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      dailies: {
+        Row: {
+          coin_reward: number
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          difficulty: string
+          due_time: string
+          id: string
+          streak: number
+          title: string
+          updated_at: string
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          coin_reward?: number
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          difficulty: string
+          due_time?: string
+          id?: string
+          streak?: number
+          title: string
+          updated_at?: string
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          coin_reward?: number
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string
+          due_time?: string
+          id?: string
+          streak?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      game_states: {
+        Row: {
+          coins: number
+          created_at: string
+          hp: number
+          id: string
+          level: number
+          max_hp: number
+          max_xp: number
+          streak: number
+          total_xp: number
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          coins?: number
+          created_at?: string
+          hp?: number
+          id: string
+          level?: number
+          max_hp?: number
+          max_xp?: number
+          streak?: number
+          total_xp?: number
+          updated_at?: string
+          xp?: number
+        }
+        Update: {
+          coins?: number
+          created_at?: string
+          hp?: number
+          id?: string
+          level?: number
+          max_hp?: number
+          max_xp?: number
+          streak?: number
+          total_xp?: number
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      habits: {
+        Row: {
+          coin_reward: number
+          created_at: string
+          difficulty: string
+          id: string
+          is_positive: boolean
+          streak: number
+          title: string
+          updated_at: string
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          coin_reward?: number
+          created_at?: string
+          difficulty: string
+          id?: string
+          is_positive?: boolean
+          streak?: number
+          title: string
+          updated_at?: string
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          coin_reward?: number
+          created_at?: string
+          difficulty?: string
+          id?: string
+          is_positive?: boolean
+          streak?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar: string
+          background_color: string
+          created_at: string
+          display_name: string
+          frame_border: string
+          id: string
+          name_color: string
+          updated_at: string
+        }
+        Insert: {
+          avatar?: string
+          background_color?: string
+          created_at?: string
+          display_name?: string
+          frame_border?: string
+          id: string
+          name_color?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar?: string
+          background_color?: string
+          created_at?: string
+          display_name?: string
+          frame_border?: string
+          id?: string
+          name_color?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          animated_xp_bar: boolean
+          created_at: string
+          daily_reminder: boolean
+          global_notifications: boolean
+          hardcore_mode: boolean
+          id: string
+          reminder_time: string
+          updated_at: string
+          vacation_mode: boolean
+        }
+        Insert: {
+          animated_xp_bar?: boolean
+          created_at?: string
+          daily_reminder?: boolean
+          global_notifications?: boolean
+          hardcore_mode?: boolean
+          id: string
+          reminder_time?: string
+          updated_at?: string
+          vacation_mode?: boolean
+        }
+        Update: {
+          animated_xp_bar?: boolean
+          created_at?: string
+          daily_reminder?: boolean
+          global_notifications?: boolean
+          hardcore_mode?: boolean
+          id?: string
+          reminder_time?: string
+          updated_at?: string
+          vacation_mode?: boolean
+        }
+        Relationships: []
+      }
+      todos: {
+        Row: {
+          coin_reward: number
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          difficulty: string
+          due_date: string
+          id: string
+          is_overdue: boolean
+          priority: string
+          title: string
+          updated_at: string
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          coin_reward?: number
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          difficulty: string
+          due_date: string
+          id?: string
+          is_overdue?: boolean
+          priority: string
+          title: string
+          updated_at?: string
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          coin_reward?: number
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string
+          due_date?: string
+          id?: string
+          is_overdue?: boolean
+          priority?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_daily_rewards: {
+        Args: { difficulty_level: string }
+        Returns: {
+          xp_reward: number
+          coin_reward: number
+        }[]
+      }
+      calculate_habit_rewards: {
+        Args: { difficulty_level: string }
+        Returns: {
+          xp_reward: number
+          coin_reward: number
+        }[]
+      }
+      calculate_todo_rewards: {
+        Args: { difficulty_level: string; priority_level: string }
+        Returns: {
+          xp_reward: number
+          coin_reward: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
