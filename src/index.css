@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -175,13 +176,13 @@
 
 @layer components {
   .quest-card {
-    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20;
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl transition-all duration-500 ease-out hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20;
     @apply p-4 rounded-xl; /* padrão */
     @apply max-[390px]:p-3 max-[390px]:rounded-lg;
   }
   
   .stat-badge {
-    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
+    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-out;
     @apply max-[390px]:px-2 max-[390px]:py-1 max-[390px]:text-xs max-[390px]:gap-1;
   }
   
@@ -191,25 +192,25 @@
   }
   
   .progress-fill {
-    @apply h-full transition-all duration-500 ease-out relative;
+    @apply h-full transition-all duration-700 ease-out relative;
   }
   
   .glow-effect {
-    @apply shadow-lg transition-shadow duration-300 hover:shadow-xl;
+    @apply shadow-lg transition-shadow duration-400 ease-out hover:shadow-xl;
   }
 
-  /* Classes para otimização mobile */
+  /* Classes para otimização mobile com animações suaves */
   .mobile-menu-transition {
-    @apply transition-all duration-200 ease-out will-change-transform;
+    @apply transition-all duration-300 ease-out will-change-transform;
   }
 
   .mobile-button-hover {
-    @apply transition-colors duration-150 active:scale-95;
+    @apply transition-all duration-200 ease-out active:scale-95;
   }
 
   /* Otimização para dropdowns mobile */
   .mobile-dropdown {
-    @apply transform origin-top-right mobile-menu-transition;
+    @apply transform origin-top-right transition-all duration-300 ease-in-out;
     contain: layout style paint;
   }
 
@@ -232,6 +233,133 @@
 
   .mobile-margin {
     @apply max-[390px]:m-2;
+  }
+
+  /* Animações melhoradas para notificações */
+  .toast-enter {
+    @apply opacity-0 transform translate-x-full scale-95;
+    animation: toast-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .toast-exit {
+    animation: toast-slide-out 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  /* Animações melhoradas para tabs */
+  .tab-content-enter {
+    @apply opacity-0 transform translate-y-2;
+    animation: tab-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .tab-content-exit {
+    animation: tab-fade-out 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  .tab-trigger-active {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Animações melhoradas para modais */
+  .modal-overlay {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .modal-content {
+    @apply transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Animações melhoradas para acordeões */
+  .accordion-trigger {
+    @apply transition-all duration-250 ease-out;
+  }
+
+  .accordion-content {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Hover effects melhorados */
+  .smooth-hover {
+    @apply transition-all duration-250 ease-out;
+  }
+
+  .button-hover {
+    @apply transition-all duration-200 ease-out hover:scale-105 active:scale-95;
+  }
+
+  /* Fade transitions melhoradas */
+  .fade-in {
+    animation: fade-in-smooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .fade-out {
+    animation: fade-out-smooth 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+}
+
+/* Keyframes para animações suaves */
+@keyframes toast-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-slide-out {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+}
+
+@keyframes tab-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tab-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes fade-in-smooth {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out-smooth {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
   }
 }
 
