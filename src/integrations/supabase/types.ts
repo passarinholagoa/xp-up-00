@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          achievement_id: string
+          created_at: string
+          id: string
+          unlocked: boolean
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          created_at?: string
+          id?: string
+          unlocked?: boolean
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          created_at?: string
+          id?: string
+          unlocked?: boolean
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       dailies: {
         Row: {
           coin_reward: number
@@ -35,7 +62,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           difficulty: string
-          due_time?: string
+          due_time: string
           id?: string
           streak?: number
           title: string
@@ -209,6 +236,33 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          owned: boolean
+          purchased_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          owned?: boolean
+          purchased_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          owned?: boolean
+          purchased_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       todos: {
         Row: {
           coin_reward: number
@@ -282,6 +336,14 @@ export type Database = {
           xp_reward: number
           coin_reward: number
         }[]
+      }
+      reset_dailies: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      update_overdue_todos: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
