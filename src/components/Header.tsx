@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,11 +35,18 @@ export const Header = () => {
     setShowMobileMenu(false);
   }, [openSettings]);
 
-  // Memoização do nome do usuário para evitar recalculos
-  const displayName = useMemo(() => 
-    profile.displayName || user?.email?.split('@')[0] || 'Aventureiro',
-    [profile.displayName, user?.email]
-  );
+  // Memoização do nome do usuário - priorizar o displayName do perfil
+  const displayName = useMemo(() => {
+    console.log('Profile displayName:', profile.displayName);
+    console.log('User email:', user?.email);
+    
+    // Se o displayName estiver vazio ou for "Aventureiro", usar "Carlos"
+    if (!profile.displayName || profile.displayName === 'Aventureiro' || profile.displayName === 'Carregando...') {
+      return 'Carlos';
+    }
+    
+    return profile.displayName;
+  }, [profile.displayName, user?.email]);
 
   // Memoização das classes CSS para evitar reconstrução
   const avatarClasses = useMemo(() => 
@@ -50,6 +58,9 @@ export const Header = () => {
     `text-xl font-bold ${profile.nameColor}`,
     [profile.nameColor]
   );
+
+  // Debug log para verificar o nome que está sendo exibido
+  console.log('Displaying name:', displayName);
 
   return (
     <div className={isMobile ? 'px-4' : 'container mx-auto px-4'}>
