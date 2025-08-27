@@ -16,6 +16,39 @@ export interface Task {
   due_time?: string;
 }
 
+export interface Habit {
+  id: string;
+  title: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  xpReward: number;
+  coinReward: number;
+  isPositive: boolean;
+  streak: number;
+}
+
+export interface Daily {
+  id: string;
+  title: string;
+  dueTime: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  xpReward: number;
+  coinReward: number;
+  streak: number;
+  completed: boolean;
+}
+
+export interface Todo {
+  id: string;
+  title: string;
+  dueDate: string;
+  priority: 'low' | 'medium' | 'high';
+  difficulty: 'easy' | 'medium' | 'hard';
+  xpReward: number;
+  coinReward: number;
+  isOverdue: boolean;
+  completed: boolean;
+}
+
 export interface Reward {
   xp: number;
   coins: number;
@@ -38,18 +71,45 @@ interface GameContextType {
   settings: Settings;
   achievements: Achievement[];
   shopItems: ShopItem[];
+  habits: Habit[];
+  dailies: Daily[];
+  todos: Todo[];
+  
+  // Profile and settings methods
   updateProfile: (newProfile: ProfileCustomization) => void;
   updateSettings: (newSettings: Settings) => void;
   buyShopItem: (itemId: string) => void;
-  openProfile: () => void;
-  openSettings: () => void;
-  openAchievements: () => void;
+  
+  // Modal state and methods
   isProfileModalOpen: boolean;
   isSettingsModalOpen: boolean;
   isAchievementsModalOpen: boolean;
+  isNewQuestModalOpen: boolean;
   setIsProfileModalOpen: (open: boolean) => void;
-  setIsSettingsModalOpen: (open: boolean) => void;
+  setIsSettingsModalOpen: (open: boolean) => void;  
   setIsAchievementsModalOpen: (open: boolean) => void;
+  openProfile: () => void;
+  openSettings: () => void;
+  openAchievements: () => void;
+  createNewQuest: () => void;
+  closeNewQuestModal: () => void;
+  closeAchievements: () => void;
+  closeProfile: () => void;
+  closeSettings: () => void;
+  
+  // Task management methods
+  addHabit: (habit: Omit<Habit, 'id'>) => void;
+  addDaily: (daily: Omit<Daily, 'id'>) => void;
+  addTodo: (todo: Omit<Todo, 'id'>) => void;
+  updateHabit: (id: string, habit: Partial<Habit>) => void;
+  updateDaily: (id: string, daily: Partial<Daily>) => void;
+  updateTodo: (id: string, todo: Partial<Todo>) => void;
+  completeHabit: (id: string, positive: boolean) => void;
+  completeDaily: (id: string) => void;
+  completeTodo: (id: string) => void;
+  deleteHabit: (id: string) => void;
+  deleteDaily: (id: string) => void;
+  deleteTodo: (id: string) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -88,10 +148,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [shopItems, setShopItems] = useState<ShopItem[]>(SHOP_ITEMS);
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [dailies, setDailies] = useState<Daily[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
+  const [isNewQuestModalOpen, setIsNewQuestModalOpen] = useState(false);
 
   // Carregar dados do usuário quando ele fizer login
   useEffect(() => {
@@ -229,9 +293,109 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     ));
   };
 
+  // Modal methods
   const openProfile = () => setIsProfileModalOpen(true);
   const openSettings = () => setIsSettingsModalOpen(true);
   const openAchievements = () => setIsAchievementsModalOpen(true);
+  const createNewQuest = () => setIsNewQuestModalOpen(true);
+  const closeNewQuestModal = () => setIsNewQuestModalOpen(false);
+  const closeAchievements = () => setIsAchievementsModalOpen(false);
+  const closeProfile = () => setIsProfileModalOpen(false);
+  const closeSettings = () => setIsSettingsModalOpen(false);
+
+  // Task management methods
+  const addHabit = (habit: Omit<Habit, 'id'>) => {
+    const newHabit = { ...habit, id: Math.random().toString(36).substr(2, 9) };
+    setHabits(prev => [...prev, newHabit]);
+  };
+
+  const addDaily = (daily: Omit<Daily, 'id'>) => {
+    const newDaily = { ...daily, id: Math.random().toString(36).substr(2, 9) };
+    setDailies(prev => [...prev, newDaily]);
+  };
+
+  const addTodo = (todo: Omit<Todo, 'id'>) => {
+    const newTodo = { ...todo, id: Math.random().toString(36).substr(2, 9) };
+    setTodos(prev => [...prev, newTodo]);
+  };
+
+  const updateHabit = (id: string, updates: Partial<Habit>) => {
+    setHabits(prev => prev.map(habit => 
+      habit.id === id ? { ...habit, ...updates } : habit
+    ));
+  };
+
+  const updateDaily = (id: string, updates: Partial<Daily>) => {
+    setDailies(prev => prev.map(daily => 
+      daily.id === id ? { ...daily, ...updates } : daily
+    ));
+  };
+
+  const updateTodo = (id: string, updates: Partial<Todo>) => {
+    setTodos(prev => prev.map(todo => 
+      todo.id === id ? { ...todo, ...updates } : todo
+    ));
+  };
+
+  const completeHabit = (id: string, positive: boolean) => {
+    const habit = habits.find(h => h.id === id);
+    if (habit) {
+      if (positive) {
+        setGameState(prev => ({
+          ...prev,
+          xp: prev.xp + habit.xpReward,
+          coins: prev.coins + habit.coinReward,
+        }));
+        setHabits(prev => prev.map(h => 
+          h.id === id ? { ...h, streak: h.streak + 1 } : h
+        ));
+      } else {
+        setHabits(prev => prev.map(h => 
+          h.id === id ? { ...h, streak: 0 } : h
+        ));
+      }
+    }
+  };
+
+  const completeDaily = (id: string) => {
+    const daily = dailies.find(d => d.id === id);
+    if (daily && !daily.completed) {
+      setGameState(prev => ({
+        ...prev,
+        xp: prev.xp + daily.xpReward,
+        coins: prev.coins + daily.coinReward,
+      }));
+      setDailies(prev => prev.map(d => 
+        d.id === id ? { ...d, completed: true, streak: d.streak + 1 } : d
+      ));
+    }
+  };
+
+  const completeTodo = (id: string) => {
+    const todo = todos.find(t => t.id === id);
+    if (todo && !todo.completed) {
+      setGameState(prev => ({
+        ...prev,
+        xp: prev.xp + todo.xpReward,
+        coins: prev.coins + todo.coinReward,
+      }));
+      setTodos(prev => prev.map(t => 
+        t.id === id ? { ...t, completed: true } : t
+      ));
+    }
+  };
+
+  const deleteHabit = (id: string) => {
+    setHabits(prev => prev.filter(habit => habit.id !== id));
+  };
+
+  const deleteDaily = (id: string) => {
+    setDailies(prev => prev.filter(daily => daily.id !== id));
+  };
+
+  const deleteTodo = (id: string) => {
+    setTodos(prev => prev.filter(todo => todo.id !== id));
+  };
 
   const value: GameContextType = {
     gameState,
@@ -239,18 +403,39 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     settings,
     achievements,
     shopItems,
+    habits,
+    dailies,
+    todos,
     updateProfile,
     updateSettings,
     buyShopItem,
     openProfile,
     openSettings,
     openAchievements,
+    createNewQuest,
+    closeNewQuestModal,
+    closeAchievements,
+    closeProfile,
+    closeSettings,
     isProfileModalOpen,
     isSettingsModalOpen,
     isAchievementsModalOpen,
+    isNewQuestModalOpen,
     setIsProfileModalOpen,
     setIsSettingsModalOpen,
     setIsAchievementsModalOpen,
+    addHabit,
+    addDaily,
+    addTodo,
+    updateHabit,
+    updateDaily,
+    updateTodo,
+    completeHabit,
+    completeDaily,
+    completeTodo,
+    deleteHabit,
+    deleteDaily,
+    deleteTodo,
   };
 
   return (

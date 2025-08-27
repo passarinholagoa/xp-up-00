@@ -1,4 +1,13 @@
 
+export interface Settings {
+  globalNotifications: boolean;
+  dailyReminder: boolean;
+  reminderTime: string;
+  hardcoreMode: boolean;
+  vacationMode: boolean;
+  animatedXpBar: boolean;
+}
+
 export interface XpUpSettings {
   // Personalização Visual
   darkMode: boolean;
