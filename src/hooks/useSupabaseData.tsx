@@ -64,6 +64,7 @@ export interface DatabaseProfile {
 
 export interface DatabaseSettings {
   id: string;
+  dark_mode: boolean;
   global_notifications: boolean;
   daily_reminder: boolean;
   reminder_time: string;
