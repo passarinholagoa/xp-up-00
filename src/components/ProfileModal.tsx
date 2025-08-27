@@ -60,7 +60,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                 </div>
                 <div>
                   <h4 className={`text-sm font-bold ${tempProfile.nameColor}`}>
-                    {tempProfile.displayName || 'Aventureiro'}
+                    {tempProfile.displayName || profile.displayName}
                   </h4>
                   <p className="text-xs text-gray-300">
                     Nível {gameState.level} • {gameState.coins} moedas • {gameState.totalXp.toLocaleString()} XP
