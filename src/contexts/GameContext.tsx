@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
@@ -130,7 +130,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const [profile, setProfile] = useState<ProfileCustomization>({
-    displayName: 'Carregando...',
+    displayName: 'Carlos',
     avatar: '👤',
     frameBorder: 'border-2 border-primary/50',
     nameColor: 'text-foreground',
@@ -138,6 +138,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const [settings, setSettings] = useState<XpUpSettings>(DEFAULT_SETTINGS);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [shopItems, setShopItems] = useState<ShopItem[]>(SHOP_ITEMS);
@@ -162,10 +163,15 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         backgroundColor: 'bg-card',
       });
       setSettings(DEFAULT_SETTINGS);
+      setIsLoading(false);
       return;
     }
 
+    // Evitar múltiplas chamadas se já estiver carregando
+    if (isLoading) return;
+
     const loadUserData = async () => {
+      setIsLoading(true);
       console.log('Carregando dados do usuário:', user.id);
       
       try {
@@ -175,7 +181,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         
         if (profileData) {
           setProfile({
-            displayName: profileData.display_name || 'Carlos', // Garantir que use Carlos como fallback
+            displayName: profileData.display_name || 'Carlos',
             avatar: profileData.avatar || '👤',
             frameBorder: profileData.frame_border || 'border-2 border-primary/50',
             nameColor: profileData.name_color || 'text-foreground',
@@ -238,13 +244,15 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         // Em caso de erro, garantir que o nome seja Carlos
         setProfile(prev => ({ ...prev, displayName: 'Carlos' }));
         setSettings(DEFAULT_SETTINGS);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadUserData();
-  }, [user, supabaseData]);
+  }, [user?.id]); // Dependência apenas do ID do usuário para evitar loops
 
-  const updateProfile = async (newProfile: ProfileCustomization) => {
+  const updateProfile = useCallback(async (newProfile: ProfileCustomization) => {
     console.log('Atualizando perfil:', newProfile);
     setProfile(newProfile);
     
@@ -262,9 +270,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         console.error('Erro ao salvar perfil:', error);
       }
     }
-  };
+  }, [user, supabaseData]);
 
-  const updateSettings = async (newSettings: XpUpSettings) => {
+  const updateSettings = useCallback(async (newSettings: XpUpSettings) => {
     setSettings(newSettings);
     
     if (user) {
@@ -282,7 +290,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         console.error('Erro ao salvar configurações:', error);
       }
     }
-  };
+  }, [user, supabaseData]);
 
   const buyShopItem = (itemId: string) => {
     setShopItems(prev => prev.map(item => 
