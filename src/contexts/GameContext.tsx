@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
 import { Achievement } from '@/types/achievements';
-import { Settings } from '@/types/settings';
+import { XpUpSettings, DEFAULT_SETTINGS } from '@/types/settings';
 
 export interface Task {
   id: string;
@@ -68,7 +68,7 @@ interface GameState {
 interface GameContextType {
   gameState: GameState;
   profile: ProfileCustomization;
-  settings: Settings;
+  settings: XpUpSettings;
   achievements: Achievement[];
   shopItems: ShopItem[];
   habits: Habit[];
@@ -77,7 +77,7 @@ interface GameContextType {
   
   // Profile and settings methods
   updateProfile: (newProfile: ProfileCustomization) => void;
-  updateSettings: (newSettings: Settings) => void;
+  updateSettings: (newSettings: XpUpSettings) => void;
   buyShopItem: (itemId: string) => void;
   
   // Modal state and methods
@@ -137,14 +137,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     backgroundColor: 'bg-card',
   });
 
-  const [settings, setSettings] = useState<Settings>({
-    globalNotifications: true,
-    dailyReminder: true,
-    reminderTime: '09:00',
-    hardcoreMode: false,
-    vacationMode: false,
-    animatedXpBar: true,
-  });
+  const [settings, setSettings] = useState<XpUpSettings>(DEFAULT_SETTINGS);
 
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [shopItems, setShopItems] = useState<ShopItem[]>(SHOP_ITEMS);
@@ -162,12 +155,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (!user) {
       // Reset para valores padrão quando não há usuário logado
       setProfile({
-        displayName: 'Aventureiro',
+        displayName: 'Carlos',
         avatar: '👤',
         frameBorder: 'border-2 border-primary/50',
         nameColor: 'text-foreground',
         backgroundColor: 'bg-card',
       });
+      setSettings(DEFAULT_SETTINGS);
       return;
     }
 
@@ -227,19 +221,23 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         const settingsData = await supabaseData.loadSettings();
         if (settingsData) {
           setSettings({
-            globalNotifications: settingsData.global_notifications,
-            dailyReminder: settingsData.daily_reminder,
-            reminderTime: settingsData.reminder_time,
-            hardcoreMode: settingsData.hardcore_mode,
-            vacationMode: settingsData.vacation_mode,
-            animatedXpBar: settingsData.animated_xp_bar,
+            darkMode: settingsData.dark_mode ?? DEFAULT_SETTINGS.darkMode,
+            animatedXpBar: settingsData.animated_xp_bar ?? DEFAULT_SETTINGS.animatedXpBar,
+            globalNotifications: settingsData.global_notifications ?? DEFAULT_SETTINGS.globalNotifications,
+            dailyReminder: settingsData.daily_reminder ?? DEFAULT_SETTINGS.dailyReminder,
+            reminderTime: settingsData.reminder_time ?? DEFAULT_SETTINGS.reminderTime,
+            hardcoreMode: settingsData.hardcore_mode ?? DEFAULT_SETTINGS.hardcoreMode,
+            vacationMode: settingsData.vacation_mode ?? DEFAULT_SETTINGS.vacationMode,
           });
+        } else {
+          setSettings(DEFAULT_SETTINGS);
         }
 
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         // Em caso de erro, garantir que o nome seja Carlos
         setProfile(prev => ({ ...prev, displayName: 'Carlos' }));
+        setSettings(DEFAULT_SETTINGS);
       }
     };
 
@@ -266,18 +264,19 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateSettings = async (newSettings: Settings) => {
+  const updateSettings = async (newSettings: XpUpSettings) => {
     setSettings(newSettings);
     
     if (user) {
       try {
         await supabaseData.saveSettings({
+          dark_mode: newSettings.darkMode,
+          animated_xp_bar: newSettings.animatedXpBar,
           global_notifications: newSettings.globalNotifications,
           daily_reminder: newSettings.dailyReminder,
           reminder_time: newSettings.reminderTime,
           hardcore_mode: newSettings.hardcoreMode,
           vacation_mode: newSettings.vacationMode,
-          animated_xp_bar: newSettings.animatedXpBar,
         });
       } catch (error) {
         console.error('Erro ao salvar configurações:', error);
