@@ -388,10 +388,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         coins: prev.coins + todo.coinReward,
       }));
       
-      // Marcar To-Do como concluído
-      setTodos(prev => prev.map(t => 
-        t.id === id ? { ...t, completed: true } : t
-      ));
+      // Remover To-Do da lista ao invés de marcar como concluído
+      setTodos(prev => prev.filter(t => t.id !== id));
     }
   };
 
