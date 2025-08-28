@@ -381,11 +381,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const completeTodo = (id: string) => {
     const todo = todos.find(t => t.id === id);
     if (todo && !todo.completed) {
+      // Atualizar estado do jogo com recompensas
       setGameState(prev => ({
         ...prev,
         xp: prev.xp + todo.xpReward,
         coins: prev.coins + todo.coinReward,
       }));
+      
+      // Marcar To-Do como concluído
       setTodos(prev => prev.map(t => 
         t.id === id ? { ...t, completed: true } : t
       ));

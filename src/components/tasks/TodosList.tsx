@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Clock, Coins, Zap, AlertTriangle, Edit2, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -21,12 +20,11 @@ import {
 
 export const TodosList = () => {
   const { todos, completeTodo, deleteTodo } = useGame();
-  const [completedTodos, setCompletedTodos] = useState<string[]>([]);
   const [editingTodo, setEditingTodo] = useState<typeof todos[0] | null>(null);
   const isMobile = useIsMobile();
 
   // Filtrar apenas To-Dos não concluídos
-  const pendingTodos = todos.filter(todo => !todo.completed && !completedTodos.includes(todo.id));
+  const pendingTodos = todos.filter(todo => !todo.completed);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -47,10 +45,7 @@ export const TodosList = () => {
   };
 
   const handleCompleteTodo = (todo: typeof todos[0]) => {
-    if (!completedTodos.includes(todo.id)) {
-      setCompletedTodos(prev => [...prev, todo.id]);
-      completeTodo(todo.id);
-    }
+    completeTodo(todo.id);
   };
 
   const handleEdit = (todo: typeof todos[0]) => {
@@ -59,7 +54,6 @@ export const TodosList = () => {
 
   const handleDelete = (todoId: string) => {
     deleteTodo(todoId);
-    setCompletedTodos(prev => prev.filter(id => id !== todoId));
   };
 
   // Se não há To-Dos pendentes, mostrar mensagem
