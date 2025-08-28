@@ -25,6 +25,9 @@ export const TodosList = () => {
   const [editingTodo, setEditingTodo] = useState<typeof todos[0] | null>(null);
   const isMobile = useIsMobile();
 
+  // Filtrar apenas To-Dos não concluídos
+  const pendingTodos = todos.filter(todo => !todo.completed && !completedTodos.includes(todo.id));
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'bg-red-500/20 text-red-400';
@@ -59,24 +62,31 @@ export const TodosList = () => {
     setCompletedTodos(prev => prev.filter(id => id !== todoId));
   };
 
-  const isCompleted = (todoId: string) => completedTodos.includes(todoId);
+  // Se não há To-Dos pendentes, mostrar mensagem
+  if (pendingTodos.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">
+          Nenhum To-Do pendente. Crie uma nova quest para começar!
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
-      {todos.map((todo) => {
-        const completed = isCompleted(todo.id);
-        
+      {pendingTodos.map((todo) => {
         return (
-          <Card key={todo.id} className={`quest-card ${completed ? 'opacity-75' : ''} ${todo.isOverdue ? 'border-red-500/50' : ''}`}>
+          <Card key={todo.id} className={`quest-card ${todo.isOverdue ? 'border-red-500/50' : ''}`}>
             <div className={isMobile ? 'space-y-3' : 'space-y-4'}>
               {/* Header com título e indicador de atraso */}
               <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'}`}>
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className={`font-semibold ${isMobile ? 'text-sm' : 'text-base'} ${completed ? 'line-through text-muted-foreground' : ''}`}>
+                    <h3 className={`font-semibold ${isMobile ? 'text-sm' : 'text-base'}`}>
                       {todo.title}
                     </h3>
-                    {todo.isOverdue && !completed && (
+                    {todo.isOverdue && (
                       <AlertTriangle className={`flex-shrink-0 text-red-400 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
                     )}
                   </div>
@@ -109,16 +119,14 @@ export const TodosList = () => {
 
               {/* Botões de ação */}
               <div className={`flex pt-2 border-t border-border/50 ${isMobile ? 'flex-col gap-2' : 'flex-col sm:flex-row gap-2'}`}>
-                {!completed && (
-                  <Button 
-                    size={isMobile ? "sm" : "sm"}
-                    className={`bg-quest-gradient hover:opacity-90 glow-effect ${isMobile ? 'w-full text-sm' : 'flex-1 sm:flex-initial'}`}
-                    onClick={() => handleCompleteTodo(todo)}
-                  >
-                    <CheckCircle className={`mr-2 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-                    Completar
-                  </Button>
-                )}
+                <Button 
+                  size={isMobile ? "sm" : "sm"}
+                  className={`bg-quest-gradient hover:opacity-90 glow-effect ${isMobile ? 'w-full text-sm' : 'flex-1 sm:flex-initial'}`}
+                  onClick={() => handleCompleteTodo(todo)}
+                >
+                  <CheckCircle className={`mr-2 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                  Completar
+                </Button>
                 
                 <div className={`flex gap-2 ${isMobile ? '' : 'sm:ml-auto'}`}>
                   <Button
