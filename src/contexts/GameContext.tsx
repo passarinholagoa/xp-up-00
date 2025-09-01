@@ -379,8 +379,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const completeTodo = (id: string) => {
+    console.log('Tentando completar To-Do com ID:', id);
     const todo = todos.find(t => t.id === id);
+    console.log('To-Do encontrado:', todo);
+    
     if (todo && !todo.completed) {
+      console.log('Aplicando recompensas e removendo To-Do');
+      
       // Atualizar estado do jogo com recompensas
       setGameState(prev => ({
         ...prev,
@@ -389,7 +394,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       }));
       
       // Remover To-Do da lista ao invés de marcar como concluído
-      setTodos(prev => prev.filter(t => t.id !== id));
+      setTodos(prev => {
+        const newTodos = prev.filter(t => t.id !== id);
+        console.log('To-Dos antes da remoção:', prev.length);
+        console.log('To-Dos após remoção:', newTodos.length);
+        return newTodos;
+      });
+    } else {
+      console.log('To-Do não encontrado ou já concluído');
     }
   };
 

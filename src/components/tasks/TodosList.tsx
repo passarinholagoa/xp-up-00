@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, Clock, Coins, Zap, AlertTriangle, Edit2, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,8 +23,18 @@ export const TodosList = () => {
   const [editingTodo, setEditingTodo] = useState<typeof todos[0] | null>(null);
   const isMobile = useIsMobile();
 
+  // Log para debug
+  useEffect(() => {
+    console.log('TodosList renderizou com', todos.length, 'todos');
+  }, [todos]);
+
   // Filtrar apenas To-Dos não concluídos
   const pendingTodos = todos.filter(todo => !todo.completed);
+
+  // Log adicional para debug
+  useEffect(() => {
+    console.log('To-Dos pendentes:', pendingTodos.length);
+  }, [pendingTodos.length]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -45,6 +55,7 @@ export const TodosList = () => {
   };
 
   const handleCompleteTodo = (todo: typeof todos[0]) => {
+    console.log('Botão completar clicado para:', todo.title);
     completeTodo(todo.id);
   };
 
