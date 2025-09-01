@@ -8,30 +8,32 @@ console.log('Starting application...');
 
 // Registrar service worker para PWA com auto-update
 if ('serviceWorker' in navigator) {
-  const { registerSW } = await import('virtual:pwa-register');
-  
-  registerSW({
-    immediate: true,
-    onNeedRefresh() {
-      console.log('Nova versão disponível, atualizando...');
-      // Recarrega automaticamente quando há uma nova versão
-      window.location.reload();
-    },
-    onOfflineReady() {
-      console.log('App pronto para uso offline');
-    },
-    onRegistered(r) {
-      console.log('SW Registrado:', r);
-      // Verifica por atualizações a cada 30 minutos
-      if (r) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registrado com sucesso:', registration);
+        
+        // Verifica por atualizações a cada 30 minutos
         setInterval(() => {
-          r.update();
-        }, 30 * 60 * 1000); // 30 minutos
-      }
-    },
-    onRegisterError(error) {
-      console.log('SW registration error', error);
-    },
+          registration.update();
+        }, 30 * 60 * 1000);
+        
+        // Escuta por atualizações
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('Nova versão disponível, atualizando...');
+                window.location.reload();
+              }
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        console.log('SW registration error:', error);
+      });
   });
 }
 
