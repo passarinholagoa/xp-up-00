@@ -163,6 +163,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         backgroundColor: 'bg-card',
       });
       setSettings(DEFAULT_SETTINGS);
+      setHabits([]);
+      setDailies([]);
+      setTodos([]);
       setIsLoading(false);
       return;
     }
@@ -239,6 +242,59 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           setSettings(DEFAULT_SETTINGS);
         }
 
+        // Carregar hábitos
+        const habitsData = await supabaseData.loadHabits();
+        console.log('Hábitos carregados:', habitsData);
+        if (habitsData) {
+          const mappedHabits = habitsData.map(habit => ({
+            id: habit.id,
+            title: habit.title,
+            difficulty: habit.difficulty,
+            xpReward: habit.xp_reward,
+            coinReward: habit.coin_reward,
+            isPositive: habit.is_positive,
+            streak: habit.streak,
+          }));
+          setHabits(mappedHabits);
+        }
+
+        // Carregar dailies
+        const dailiesData = await supabaseData.loadDailies();
+        console.log('Dailies carregados:', dailiesData);
+        if (dailiesData) {
+          const mappedDailies = dailiesData.map(daily => ({
+            id: daily.id,
+            title: daily.title,
+            dueTime: daily.due_time,
+            difficulty: daily.difficulty,
+            xpReward: daily.xp_reward,
+            coinReward: daily.coin_reward,
+            streak: daily.streak,
+            completed: daily.completed,
+          }));
+          setDailies(mappedDailies);
+        }
+
+        // Carregar todos
+        const todosData = await supabaseData.loadTodos();
+        console.log('To-Dos carregados:', todosData);
+        if (todosData) {
+          const mappedTodos = todosData
+            .filter(todo => !todo.completed) // Filtrar apenas não concluídos
+            .map(todo => ({
+              id: todo.id,
+              title: todo.title,
+              dueDate: todo.due_date,
+              priority: todo.priority,
+              difficulty: todo.difficulty,
+              xpReward: todo.xp_reward,
+              coinReward: todo.coin_reward,
+              isOverdue: todo.is_overdue,
+              completed: todo.completed,
+            }));
+          setTodos(mappedTodos);
+        }
+
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         // Em caso de erro, garantir que o nome seja Carlos
@@ -311,34 +367,163 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const closeSettings = () => setIsSettingsModalOpen(false);
 
   // Task management methods
-  const addHabit = (habit: Omit<Habit, 'id'>) => {
-    const newHabit = { ...habit, id: Math.random().toString(36).substr(2, 9) };
-    setHabits(prev => [...prev, newHabit]);
+  const addHabit = async (habit: Omit<Habit, 'id'>) => {
+    if (user) {
+      try {
+        const savedHabit = await supabaseData.saveHabit({
+          title: habit.title,
+          difficulty: habit.difficulty,
+          is_positive: habit.isPositive,
+          streak: habit.streak,
+        });
+        
+        if (savedHabit) {
+          const newHabit = {
+            id: savedHabit.id,
+            title: savedHabit.title,
+            difficulty: savedHabit.difficulty,
+            xpReward: savedHabit.xp_reward,
+            coinReward: savedHabit.coin_reward,
+            isPositive: savedHabit.is_positive,
+            streak: savedHabit.streak,
+          };
+          setHabits(prev => [...prev, newHabit]);
+        }
+      } catch (error) {
+        console.error('Erro ao salvar hábito:', error);
+      }
+    } else {
+      const newHabit = { ...habit, id: Math.random().toString(36).substr(2, 9) };
+      setHabits(prev => [...prev, newHabit]);
+    }
   };
 
-  const addDaily = (daily: Omit<Daily, 'id'>) => {
-    const newDaily = { ...daily, id: Math.random().toString(36).substr(2, 9) };
-    setDailies(prev => [...prev, newDaily]);
+  const addDaily = async (daily: Omit<Daily, 'id'>) => {
+    if (user) {
+      try {
+        const savedDaily = await supabaseData.saveDaily({
+          title: daily.title,
+          due_time: daily.dueTime,
+          difficulty: daily.difficulty,
+          streak: daily.streak,
+          completed: daily.completed,
+        });
+        
+        if (savedDaily) {
+          const newDaily = {
+            id: savedDaily.id,
+            title: savedDaily.title,
+            dueTime: savedDaily.due_time,
+            difficulty: savedDaily.difficulty,
+            xpReward: savedDaily.xp_reward,
+            coinReward: savedDaily.coin_reward,
+            streak: savedDaily.streak,
+            completed: savedDaily.completed,
+          };
+          setDailies(prev => [...prev, newDaily]);
+        }
+      } catch (error) {
+        console.error('Erro ao salvar daily:', error);
+      }
+    } else {
+      const newDaily = { ...daily, id: Math.random().toString(36).substr(2, 9) };
+      setDailies(prev => [...prev, newDaily]);
+    }
   };
 
-  const addTodo = (todo: Omit<Todo, 'id'>) => {
-    const newTodo = { ...todo, id: Math.random().toString(36).substr(2, 9) };
-    setTodos(prev => [...prev, newTodo]);
+  const addTodo = async (todo: Omit<Todo, 'id'>) => {
+    if (user) {
+      try {
+        const savedTodo = await supabaseData.saveTodo({
+          title: todo.title,
+          due_date: todo.dueDate,
+          priority: todo.priority,
+          difficulty: todo.difficulty,
+          is_overdue: todo.isOverdue,
+          completed: todo.completed,
+        });
+        
+        if (savedTodo) {
+          const newTodo = {
+            id: savedTodo.id,
+            title: savedTodo.title,
+            dueDate: savedTodo.due_date,
+            priority: savedTodo.priority,
+            difficulty: savedTodo.difficulty,
+            xpReward: savedTodo.xp_reward,
+            coinReward: savedTodo.coin_reward,
+            isOverdue: savedTodo.is_overdue,
+            completed: savedTodo.completed,
+          };
+          setTodos(prev => [...prev, newTodo]);
+        }
+      } catch (error) {
+        console.error('Erro ao salvar to-do:', error);
+      }
+    } else {
+      const newTodo = { ...todo, id: Math.random().toString(36).substr(2, 9) };
+      setTodos(prev => [...prev, newTodo]);
+    }
   };
 
-  const updateHabit = (id: string, updates: Partial<Habit>) => {
+  const updateHabit = async (id: string, updates: Partial<Habit>) => {
+    if (user) {
+      try {
+        await supabaseData.saveHabit({
+          id,
+          title: updates.title,
+          difficulty: updates.difficulty,
+          is_positive: updates.isPositive,
+          streak: updates.streak,
+        });
+      } catch (error) {
+        console.error('Erro ao atualizar hábito:', error);
+      }
+    }
+    
     setHabits(prev => prev.map(habit => 
       habit.id === id ? { ...habit, ...updates } : habit
     ));
   };
 
-  const updateDaily = (id: string, updates: Partial<Daily>) => {
+  const updateDaily = async (id: string, updates: Partial<Daily>) => {
+    if (user) {
+      try {
+        await supabaseData.saveDaily({
+          id,
+          title: updates.title,
+          due_time: updates.dueTime,
+          difficulty: updates.difficulty,
+          streak: updates.streak,
+          completed: updates.completed,
+        });
+      } catch (error) {
+        console.error('Erro ao atualizar daily:', error);
+      }
+    }
+    
     setDailies(prev => prev.map(daily => 
       daily.id === id ? { ...daily, ...updates } : daily
     ));
   };
 
-  const updateTodo = (id: string, updates: Partial<Todo>) => {
+  const updateTodo = async (id: string, updates: Partial<Todo>) => {
+    if (user) {
+      try {
+        await supabaseData.saveTodo({
+          id,
+          title: updates.title,
+          due_date: updates.dueDate,
+          priority: updates.priority,
+          difficulty: updates.difficulty,
+          is_overdue: updates.isOverdue,
+          completed: updates.completed,
+        });
+      } catch (error) {
+        console.error('Erro ao atualizar to-do:', error);
+      }
+    }
+    
     setTodos(prev => prev.map(todo => 
       todo.id === id ? { ...todo, ...updates } : todo
     ));
@@ -353,13 +538,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           xp: prev.xp + habit.xpReward,
           coins: prev.coins + habit.coinReward,
         }));
-        setHabits(prev => prev.map(h => 
-          h.id === id ? { ...h, streak: h.streak + 1 } : h
-        ));
+        updateHabit(id, { streak: habit.streak + 1 });
       } else {
-        setHabits(prev => prev.map(h => 
-          h.id === id ? { ...h, streak: 0 } : h
-        ));
+        updateHabit(id, { streak: 0 });
       }
     }
   };
@@ -372,13 +553,11 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         xp: prev.xp + daily.xpReward,
         coins: prev.coins + daily.coinReward,
       }));
-      setDailies(prev => prev.map(d => 
-        d.id === id ? { ...d, completed: true, streak: d.streak + 1 } : d
-      ));
+      updateDaily(id, { completed: true, streak: daily.streak + 1 });
     }
   };
 
-  const completeTodo = (id: string) => {
+  const completeTodo = async (id: string) => {
     console.log('Tentando completar To-Do com ID:', id);
     const todo = todos.find(t => t.id === id);
     console.log('To-Do encontrado:', todo);
@@ -393,7 +572,20 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         coins: prev.coins + todo.coinReward,
       }));
       
-      // Remover To-Do da lista ao invés de marcar como concluído
+      // Marcar como concluído no banco de dados
+      if (user) {
+        try {
+          await supabaseData.saveTodo({
+            id,
+            completed: true,
+            completed_at: new Date().toISOString(),
+          });
+        } catch (error) {
+          console.error('Erro ao marcar to-do como concluído:', error);
+        }
+      }
+      
+      // Remover To-Do da lista local
       setTodos(prev => {
         const newTodos = prev.filter(t => t.id !== id);
         console.log('To-Dos antes da remoção:', prev.length);
@@ -405,15 +597,36 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const deleteHabit = (id: string) => {
+  const deleteHabit = async (id: string) => {
+    if (user) {
+      try {
+        await supabaseData.deleteHabit(id);
+      } catch (error) {
+        console.error('Erro ao deletar hábito:', error);
+      }
+    }
     setHabits(prev => prev.filter(habit => habit.id !== id));
   };
 
-  const deleteDaily = (id: string) => {
+  const deleteDaily = async (id: string) => {
+    if (user) {
+      try {
+        await supabaseData.deleteDaily(id);
+      } catch (error) {
+        console.error('Erro ao deletar daily:', error);
+      }
+    }
     setDailies(prev => prev.filter(daily => daily.id !== id));
   };
 
-  const deleteTodo = (id: string) => {
+  const deleteTodo = async (id: string) => {
+    if (user) {
+      try {
+        await supabaseData.deleteTodo(id);
+      } catch (error) {
+        console.error('Erro ao deletar to-do:', error);
+      }
+    }
     setTodos(prev => prev.filter(todo => todo.id !== id));
   };
 
