@@ -308,6 +308,33 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     loadUserData();
   }, [user?.id]); // Dependência apenas do ID do usuário para evitar loops
 
+  // Salvar automaticamente o estado do jogo quando ele mudar
+  useEffect(() => {
+    if (!user || isLoading) return;
+
+    const saveGameState = async () => {
+      try {
+        await supabaseData.saveGameState({
+          hp: gameState.hp,
+          max_hp: gameState.maxHp,
+          xp: gameState.xp,
+          total_xp: gameState.totalXp,
+          max_xp: gameState.maxXp,
+          coins: gameState.coins,
+          level: gameState.level,
+          streak: gameState.streak,
+        });
+        console.log('Estado do jogo salvo automaticamente');
+      } catch (error) {
+        console.error('Erro ao salvar estado do jogo automaticamente:', error);
+      }
+    };
+
+    // Debounce para não salvar a cada mudança imediata
+    const timeoutId = setTimeout(saveGameState, 500);
+    return () => clearTimeout(timeoutId);
+  }, [gameState, user, isLoading, supabaseData]);
+
   const updateProfile = useCallback(async (newProfile: ProfileCustomization) => {
     console.log('Atualizando perfil:', newProfile);
     setProfile(newProfile);
@@ -529,15 +556,39 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     ));
   };
 
-  const completeHabit = (id: string, positive: boolean) => {
+  const completeHabit = async (id: string, positive: boolean) => {
     const habit = habits.find(h => h.id === id);
     if (habit) {
       if (positive) {
+        const newGameState = {
+          xp: gameState.xp + habit.xpReward,
+          totalXp: gameState.totalXp + habit.xpReward,
+          coins: gameState.coins + habit.coinReward,
+        };
+        
         setGameState(prev => ({
           ...prev,
-          xp: prev.xp + habit.xpReward,
-          coins: prev.coins + habit.coinReward,
+          ...newGameState,
         }));
+        
+        // Salvar estado do jogo no banco
+        if (user) {
+          try {
+            await supabaseData.saveGameState({
+              xp: newGameState.xp,
+              total_xp: newGameState.totalXp,
+              coins: newGameState.coins,
+              hp: gameState.hp,
+              max_hp: gameState.maxHp,
+              max_xp: gameState.maxXp,
+              level: gameState.level,
+              streak: gameState.streak,
+            });
+          } catch (error) {
+            console.error('Erro ao salvar estado do jogo:', error);
+          }
+        }
+        
         updateHabit(id, { streak: habit.streak + 1 });
       } else {
         updateHabit(id, { streak: 0 });
@@ -545,14 +596,38 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const completeDaily = (id: string) => {
+  const completeDaily = async (id: string) => {
     const daily = dailies.find(d => d.id === id);
     if (daily && !daily.completed) {
+      const newGameState = {
+        xp: gameState.xp + daily.xpReward,
+        totalXp: gameState.totalXp + daily.xpReward,
+        coins: gameState.coins + daily.coinReward,
+      };
+      
       setGameState(prev => ({
         ...prev,
-        xp: prev.xp + daily.xpReward,
-        coins: prev.coins + daily.coinReward,
+        ...newGameState,
       }));
+      
+      // Salvar estado do jogo no banco
+      if (user) {
+        try {
+          await supabaseData.saveGameState({
+            xp: newGameState.xp,
+            total_xp: newGameState.totalXp,
+            coins: newGameState.coins,
+            hp: gameState.hp,
+            max_hp: gameState.maxHp,
+            max_xp: gameState.maxXp,
+            level: gameState.level,
+            streak: gameState.streak,
+          });
+        } catch (error) {
+          console.error('Erro ao salvar estado do jogo:', error);
+        }
+      }
+      
       updateDaily(id, { completed: true, streak: daily.streak + 1 });
     }
   };
@@ -565,23 +640,41 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (todo && !todo.completed) {
       console.log('Aplicando recompensas e removendo To-Do');
       
+      const newGameState = {
+        xp: gameState.xp + todo.xpReward,
+        totalXp: gameState.totalXp + todo.xpReward,
+        coins: gameState.coins + todo.coinReward,
+      };
+      
       // Atualizar estado do jogo com recompensas
       setGameState(prev => ({
         ...prev,
-        xp: prev.xp + todo.xpReward,
-        coins: prev.coins + todo.coinReward,
+        ...newGameState,
       }));
       
-      // Marcar como concluído no banco de dados
+      // Salvar estado do jogo e marcar como concluído no banco de dados
       if (user) {
         try {
+          // Salvar estado do jogo
+          await supabaseData.saveGameState({
+            xp: newGameState.xp,
+            total_xp: newGameState.totalXp,
+            coins: newGameState.coins,
+            hp: gameState.hp,
+            max_hp: gameState.maxHp,
+            max_xp: gameState.maxXp,
+            level: gameState.level,
+            streak: gameState.streak,
+          });
+          
+          // Marcar to-do como concluído
           await supabaseData.saveTodo({
             id,
             completed: true,
             completed_at: new Date().toISOString(),
           });
         } catch (error) {
-          console.error('Erro ao marcar to-do como concluído:', error);
+          console.error('Erro ao salvar dados:', error);
         }
       }
       
