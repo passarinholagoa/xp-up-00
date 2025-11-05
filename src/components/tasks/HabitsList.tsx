@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export const HabitsList = () => {
-  const { habits, completeHabit, deleteHabit } = useGame();
+  const { habits, completeHabit, deleteHabit, gameState } = useGame();
   const [editingHabit, setEditingHabit] = useState<typeof habits[0] | null>(null);
 
   const getDifficultyColor = (difficulty: string) => {
@@ -69,18 +69,24 @@ export const HabitsList = () => {
             </div>
             
             {/* Recompensas */}
-            {habit.isPositive && (
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Zap className="h-3 w-3 text-xp-bar" />
-                  <span>+{habit.xpReward} XP</span>
+            {habit.isPositive && (() => {
+              const levelMultiplier = 1 + ((gameState.level - 1) * 0.1);
+              const adjustedXp = Math.floor(habit.xpReward * levelMultiplier);
+              const adjustedCoins = Math.floor(habit.coinReward * levelMultiplier);
+              
+              return (
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Zap className="h-3 w-3 text-xp-bar" />
+                    <span>+{adjustedXp} XP</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Coins className="h-3 w-3 text-quest-legendary" />
+                    <span>+{adjustedCoins}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Coins className="h-3 w-3 text-quest-legendary" />
-                  <span>+{habit.coinReward}</span>
-                </div>
-              </div>
-            )}
+              );
+            })()}
             
             {/* Botões de ação - Layout otimizado para mobile */}
             <div className="flex flex-col sm:flex-row gap-3">

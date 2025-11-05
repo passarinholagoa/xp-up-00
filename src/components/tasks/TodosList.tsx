@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export const TodosList = () => {
-  const { todos, completeTodo, deleteTodo } = useGame();
+  const { todos, completeTodo, deleteTodo, gameState } = useGame();
   const [editingTodo, setEditingTodo] = useState<typeof todos[0] | null>(null);
   const isMobile = useIsMobile();
 
@@ -109,16 +109,24 @@ export const TodosList = () => {
                     </div>
                   </div>
                   
-                  <div className={`flex items-center gap-4 text-muted-foreground flex-wrap ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                    <div className="flex items-center gap-1">
-                      <Zap className={`text-xp-bar ${isMobile ? 'h-3 w-3' : 'h-3 w-3'}`} />
-                      <span>+{todo.xpReward} XP</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Coins className={`text-quest-legendary ${isMobile ? 'h-3 w-3' : 'h-3 w-3'}`} />
-                      <span>+{todo.coinReward}</span>
-                    </div>
-                  </div>
+                  {(() => {
+                    const levelMultiplier = 1 + ((gameState.level - 1) * 0.1);
+                    const adjustedXp = Math.floor(todo.xpReward * levelMultiplier);
+                    const adjustedCoins = Math.floor(todo.coinReward * levelMultiplier);
+                    
+                    return (
+                      <div className={`flex items-center gap-4 text-muted-foreground flex-wrap ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                        <div className="flex items-center gap-1">
+                          <Zap className={`text-xp-bar ${isMobile ? 'h-3 w-3' : 'h-3 w-3'}`} />
+                          <span>+{adjustedXp} XP</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Coins className={`text-quest-legendary ${isMobile ? 'h-3 w-3' : 'h-3 w-3'}`} />
+                          <span>+{adjustedCoins}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 

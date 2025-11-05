@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export const DailiesList = () => {
-  const { dailies, completeDaily, deleteDaily } = useGame();
+  const { dailies, completeDaily, deleteDaily, gameState } = useGame();
   const [completedDailies, setCompletedDailies] = useState<string[]>([]);
   const [editingDaily, setEditingDaily] = useState<typeof dailies[0] | null>(null);
 
@@ -82,20 +82,28 @@ export const DailiesList = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
-                    <div className="flex items-center gap-1">
-                      <Zap className="h-3 w-3 text-xp-bar" />
-                      <span>+{daily.xpReward} XP</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Coins className="h-3 w-3 text-quest-legendary" />
-                      <span>+{daily.coinReward}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3 text-orange-400" />
-                      <span>{daily.streak} dias</span>
-                    </div>
-                  </div>
+                  {(() => {
+                    const levelMultiplier = 1 + ((gameState.level - 1) * 0.1);
+                    const adjustedXp = Math.floor(daily.xpReward * levelMultiplier);
+                    const adjustedCoins = Math.floor(daily.coinReward * levelMultiplier);
+                    
+                    return (
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                        <div className="flex items-center gap-1">
+                          <Zap className="h-3 w-3 text-xp-bar" />
+                          <span>+{adjustedXp} XP</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Coins className="h-3 w-3 text-quest-legendary" />
+                          <span>+{adjustedCoins}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 text-orange-400" />
+                          <span>{daily.streak} dias</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
               
