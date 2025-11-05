@@ -808,8 +808,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     const habit = habits.find(h => h.id === id);
     if (habit) {
       if (positive) {
-        const newTotalXp = gameState.totalXp + habit.xpReward;
-        const newCoins = gameState.coins + habit.coinReward;
+        // Aplicar multiplicador de nível (10% por nível acima de 1)
+        const levelMultiplier = 1 + ((gameState.level - 1) * 0.1);
+        const adjustedXp = Math.floor(habit.xpReward * levelMultiplier);
+        const adjustedCoins = Math.floor(habit.coinReward * levelMultiplier);
+        
+        const newTotalXp = gameState.totalXp + adjustedXp;
+        const newCoins = gameState.coins + adjustedCoins;
         
         // Salvar estado do jogo no banco (o trigger calculará o nível automaticamente)
         if (user) {
@@ -839,11 +844,16 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setGameState(prev => ({
             ...prev,
-            xp: prev.xp + habit.xpReward,
+            xp: prev.xp + adjustedXp,
             totalXp: newTotalXp,
             coins: newCoins,
           }));
         }
+        
+        toast({
+          title: `+${adjustedXp} XP, +${adjustedCoins} Moedas!`,
+          description: `Multiplicador de nível ${gameState.level}: ${Math.round(levelMultiplier * 100)}%`,
+        });
         
         updateHabit(id, { streak: habit.streak + 1 });
       } else {
@@ -855,8 +865,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const completeDaily = async (id: string) => {
     const daily = dailies.find(d => d.id === id);
     if (daily && !daily.completed) {
-      const newTotalXp = gameState.totalXp + daily.xpReward;
-      const newCoins = gameState.coins + daily.coinReward;
+      // Aplicar multiplicador de nível (10% por nível acima de 1)
+      const levelMultiplier = 1 + ((gameState.level - 1) * 0.1);
+      const adjustedXp = Math.floor(daily.xpReward * levelMultiplier);
+      const adjustedCoins = Math.floor(daily.coinReward * levelMultiplier);
+      
+      const newTotalXp = gameState.totalXp + adjustedXp;
+      const newCoins = gameState.coins + adjustedCoins;
       
       // Salvar estado do jogo no banco (o trigger calculará o nível automaticamente)
       if (user) {
@@ -886,11 +901,16 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setGameState(prev => ({
           ...prev,
-          xp: prev.xp + daily.xpReward,
+          xp: prev.xp + adjustedXp,
           totalXp: newTotalXp,
           coins: newCoins,
         }));
       }
+      
+      toast({
+        title: `+${adjustedXp} XP, +${adjustedCoins} Moedas!`,
+        description: `Multiplicador de nível ${gameState.level}: ${Math.round(levelMultiplier * 100)}%`,
+      });
       
       updateDaily(id, { completed: true, streak: daily.streak + 1 });
     }
@@ -904,8 +924,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (todo && !todo.completed) {
       console.log('Aplicando recompensas e removendo To-Do');
       
-      const newTotalXp = gameState.totalXp + todo.xpReward;
-      const newCoins = gameState.coins + todo.coinReward;
+      // Aplicar multiplicador de nível (10% por nível acima de 1)
+      const levelMultiplier = 1 + ((gameState.level - 1) * 0.1);
+      const adjustedXp = Math.floor(todo.xpReward * levelMultiplier);
+      const adjustedCoins = Math.floor(todo.coinReward * levelMultiplier);
+      
+      const newTotalXp = gameState.totalXp + adjustedXp;
+      const newCoins = gameState.coins + adjustedCoins;
       
       // Salvar estado do jogo e marcar como concluído no banco de dados
       if (user) {
@@ -941,6 +966,11 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           // Remover da lista local
           setTodos(prev => prev.filter(t => t.id !== id));
           
+          toast({
+            title: `+${adjustedXp} XP, +${adjustedCoins} Moedas!`,
+            description: `Multiplicador de nível ${gameState.level}: ${Math.round(levelMultiplier * 100)}%`,
+          });
+          
           console.log('To-Do completado e removido com sucesso');
         } catch (error) {
           console.error('Erro ao completar To-Do:', error);
@@ -949,10 +979,15 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         // Modo offline
         setGameState(prev => ({
           ...prev,
-          xp: prev.xp + todo.xpReward,
+          xp: prev.xp + adjustedXp,
           totalXp: newTotalXp,
           coins: newCoins,
         }));
+        
+        toast({
+          title: `+${adjustedXp} XP, +${adjustedCoins} Moedas!`,
+          description: `Multiplicador de nível ${gameState.level}: ${Math.round(levelMultiplier * 100)}%`,
+        });
         
         setTodos(prev => prev.filter(t => t.id !== id));
       }
