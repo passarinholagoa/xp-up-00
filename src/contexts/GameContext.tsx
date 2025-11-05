@@ -4,6 +4,7 @@ import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
 import { XpUpSettings, DEFAULT_SETTINGS } from '@/types/settings';
+import { toast } from '@/hooks/use-toast';
 
 export interface Task {
   id: string;
@@ -421,6 +422,144 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         : item
     ));
   };
+
+  // Verificar e desbloquear conquistas
+  const checkAchievements = useCallback(async () => {
+    if (!user) return;
+
+    const newlyUnlocked: Achievement[] = [];
+
+    // Criar um mapa com o total de cada tipo de tarefa
+    const totalTodos = todos.length; // Todos ativos
+    const totalHabits = habits.length;
+    const totalDailies = dailies.length;
+
+    achievements.forEach(async (achievement) => {
+      if (achievement.unlocked) return;
+
+      let shouldUnlock = false;
+
+      switch (achievement.id) {
+        // Conquistas de nível
+        case 'nivel-5':
+          shouldUnlock = gameState.level >= 5;
+          break;
+        case 'nivel-10':
+          shouldUnlock = gameState.level >= 10;
+          break;
+        case 'nivel-15':
+          shouldUnlock = gameState.level >= 15;
+          break;
+        case 'nivel-20':
+          shouldUnlock = gameState.level >= 20;
+          break;
+        case 'nivel-30':
+        case 'imortal':
+          shouldUnlock = gameState.level >= 30;
+          break;
+        case 'lenda-viva':
+          shouldUnlock = gameState.level >= 50;
+          break;
+
+        // Conquistas de XP
+        case 'xp-master':
+          shouldUnlock = gameState.totalXp >= 1000;
+          break;
+        case 'milionario-xp':
+          shouldUnlock = gameState.totalXp >= 10000;
+          break;
+
+        // Conquistas de moedas
+        case 'colecionador-moedas':
+          shouldUnlock = gameState.coins >= 1000;
+          break;
+        case 'rico':
+          shouldUnlock = gameState.coins >= 500;
+          break;
+        case 'imperador-moedas':
+          shouldUnlock = gameState.coins >= 5000;
+          break;
+
+        // Conquistas de streak
+        case 'foco-total':
+          shouldUnlock = gameState.streak >= 7;
+          break;
+        case 'maratonista':
+          shouldUnlock = gameState.streak >= 30;
+          break;
+        case 'mestre-da-disciplina':
+          shouldUnlock = gameState.streak >= 100;
+          break;
+
+        // Conquistas de criação
+        case 'primeiro-habito':
+          shouldUnlock = totalHabits >= 1;
+          break;
+        case 'mente-saudavel':
+          shouldUnlock = totalHabits >= 10;
+          break;
+        case 'guru-dos-habitos':
+          shouldUnlock = habits.filter(h => h.isPositive && h.streak >= 7).length >= 5;
+          break;
+        
+        case 'o-despertar':
+          shouldUnlock = totalDailies >= 1;
+          break;
+        case 'rotina-perfeita':
+          shouldUnlock = totalDailies >= 10;
+          break;
+
+        case 'primeira-missao':
+        case 'iniciante-dedicado':
+          shouldUnlock = totalTodos >= 1;
+          break;
+        case 'mestre-da-organizacao':
+          shouldUnlock = totalTodos >= 15;
+          break;
+        case 'organizador-supremo':
+          shouldUnlock = totalTodos >= 50;
+          break;
+      }
+
+      if (shouldUnlock) {
+        newlyUnlocked.push(achievement);
+        
+        // Atualizar no banco de dados
+        await supabaseData.saveAchievement({
+          achievement_id: achievement.id,
+          unlocked: true,
+          unlocked_at: new Date().toISOString(),
+        });
+      }
+    });
+
+    if (newlyUnlocked.length > 0) {
+      // Atualizar estado local
+      setAchievements(prev => prev.map(a => {
+        const unlocked = newlyUnlocked.find(nu => nu.id === a.id);
+        if (unlocked) {
+          return { ...a, unlocked: true, unlockedAt: new Date() };
+        }
+        return a;
+      }));
+
+      // Mostrar notificação para cada conquista
+      newlyUnlocked.forEach(achievement => {
+        toast({
+          title: `🏆 Conquista Desbloqueada!`,
+          description: `${achievement.icon} ${achievement.title} - ${achievement.description}`,
+          duration: 5000,
+        });
+      });
+    }
+  }, [user, gameState, achievements, todos, habits, dailies, supabaseData]);
+
+  // Verificar conquistas quando o estado mudar
+  useEffect(() => {
+    if (user && !isLoading) {
+      checkAchievements();
+    }
+  }, [gameState.level, gameState.totalXp, gameState.coins, gameState.streak, habits.length, dailies.length, todos.length, user, isLoading, checkAchievements]);
 
   // Modal methods
   const openProfile = () => setIsProfileModalOpen(true);
