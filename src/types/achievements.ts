@@ -260,5 +260,119 @@ export const ACHIEVEMENTS: Achievement[] = [
     rarity: 'legendary',
     unlocked: false,
     category: 'special'
+  },
+
+  // 10 NOVAS CONQUISTAS ADICIONADAS
+  
+  // 3 FÁCEIS
+  {
+    id: 'iniciante-dedicado',
+    title: 'Iniciante Dedicado',
+    description: 'Complete 5 quests',
+    icon: '🎓',
+    rarity: 'common',
+    unlocked: false,
+    category: 'main',
+    progress: 0,
+    maxProgress: 5
+  },
+  {
+    id: 'primeiro-comprador',
+    title: 'Primeiro Comprador',
+    description: 'Compre seu primeiro item na loja',
+    icon: '🛒',
+    rarity: 'common',
+    unlocked: false,
+    category: 'side'
+  },
+  {
+    id: 'consistencia-basica',
+    title: 'Consistência Básica',
+    description: 'Complete 3 dailies consecutivas',
+    icon: '📖',
+    rarity: 'uncommon',
+    unlocked: false,
+    category: 'main',
+    progress: 0,
+    maxProgress: 3
+  },
+
+  // 3 MÉDIAS
+  {
+    id: 'disciplinado',
+    title: 'Disciplinado',
+    description: 'Complete 20 quests no total',
+    icon: '🎖️',
+    rarity: 'rare',
+    unlocked: false,
+    category: 'main',
+    progress: 0,
+    maxProgress: 20
+  },
+  {
+    id: 'rico',
+    title: 'Rico',
+    description: 'Acumule 500 moedas',
+    icon: '💎',
+    rarity: 'rare',
+    unlocked: false,
+    category: 'side',
+    progress: 0,
+    maxProgress: 500
+  },
+  {
+    id: 'habitos-solidos',
+    title: 'Hábitos Sólidos',
+    description: 'Mantenha 3 hábitos com streak de 7 dias cada',
+    icon: '💪',
+    rarity: 'rare',
+    unlocked: false,
+    category: 'side',
+    progress: 0,
+    maxProgress: 3
+  },
+
+  // 4 DIFÍCEIS
+  {
+    id: 'guerreiro-incansavel',
+    title: 'Guerreiro Incansável',
+    description: 'Complete 100 quests no total',
+    icon: '⚔️',
+    rarity: 'epic',
+    unlocked: false,
+    category: 'main',
+    progress: 0,
+    maxProgress: 100
+  },
+  {
+    id: 'mestre-do-tempo',
+    title: 'Mestre do Tempo',
+    description: 'Complete 50 dailies',
+    icon: '⏰',
+    rarity: 'epic',
+    unlocked: false,
+    category: 'side',
+    progress: 0,
+    maxProgress: 50
+  },
+  {
+    id: 'imperador-moedas',
+    title: 'Imperador das Moedas',
+    description: 'Acumule 5000 moedas',
+    icon: '👑',
+    rarity: 'epic',
+    unlocked: false,
+    category: 'side',
+    progress: 0,
+    maxProgress: 5000
+  },
+  {
+    id: 'imortal',
+    title: 'Imortal',
+    description: 'Alcance o nível 30 sem perder toda a vida',
+    icon: '🛡️',
+    rarity: 'legendary',
+    unlocked: false,
+    category: 'special'
   }
 ];
