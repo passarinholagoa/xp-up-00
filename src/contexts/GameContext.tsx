@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode, useCa
 import { useAuth } from './AuthContext';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
-import { Achievement } from '@/types/achievements';
+import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
 import { XpUpSettings, DEFAULT_SETTINGS } from '@/types/settings';
 
 export interface Task {
@@ -293,6 +293,47 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
               completed: todo.completed,
             }));
           setTodos(mappedTodos);
+        }
+
+        // Carregar conquistas
+        const achievementsData = await supabaseData.loadAchievements();
+        console.log('Conquistas carregadas:', achievementsData);
+        
+        if (!achievementsData || achievementsData.length === 0) {
+          // Primeira vez - inicializar todas as conquistas
+          console.log('Inicializando conquistas pela primeira vez');
+          await supabaseData.initializeAchievements(ACHIEVEMENTS.map(a => a.id));
+          
+          // Carregar novamente após inicialização
+          const newAchievementsData = await supabaseData.loadAchievements();
+          const mappedAchievements = ACHIEVEMENTS.map(achievement => {
+            const dbAchievement = newAchievementsData?.find(
+              (a: any) => a.achievement_id === achievement.id
+            );
+            return {
+              ...achievement,
+              unlocked: dbAchievement?.unlocked || false,
+              unlockedAt: dbAchievement?.unlocked_at 
+                ? new Date(dbAchievement.unlocked_at) 
+                : undefined,
+            };
+          });
+          setAchievements(mappedAchievements);
+        } else {
+          // Mapear conquistas do banco com os dados estáticos
+          const mappedAchievements = ACHIEVEMENTS.map(achievement => {
+            const dbAchievement = achievementsData.find(
+              (a: any) => a.achievement_id === achievement.id
+            );
+            return {
+              ...achievement,
+              unlocked: dbAchievement?.unlocked || false,
+              unlockedAt: dbAchievement?.unlocked_at 
+                ? new Date(dbAchievement.unlocked_at) 
+                : undefined,
+            };
+          });
+          setAchievements(mappedAchievements);
         }
 
       } catch (error) {

@@ -405,6 +405,66 @@ export const useSupabaseData = (user: User | null) => {
     }
   };
 
+  // Achievements operations
+  const loadAchievements = async () => {
+    if (!user) return [];
+    
+    const { data, error } = await supabase
+      .from('achievements')
+      .select('*')
+      .eq('user_id', user.id);
+    
+    if (error) {
+      console.error('Error loading achievements:', error);
+      return [];
+    }
+    
+    return data || [];
+  };
+
+  const saveAchievement = async (achievement: {
+    achievement_id: string;
+    unlocked: boolean;
+    unlocked_at?: string;
+    progress?: number;
+  }) => {
+    if (!user) return;
+    
+    const { error } = await supabase
+      .from('achievements')
+      .upsert({ 
+        user_id: user.id,
+        achievement_id: achievement.achievement_id,
+        unlocked: achievement.unlocked,
+        unlocked_at: achievement.unlocked_at,
+      });
+    
+    if (error) {
+      console.error('Error saving achievement:', error);
+    }
+  };
+
+  const initializeAchievements = async (achievementIds: string[]) => {
+    if (!user) return;
+    
+    const achievementsToInsert = achievementIds.map(id => ({
+      user_id: user.id,
+      achievement_id: id,
+      unlocked: false,
+    }));
+    
+    const { error } = await supabase
+      .from('achievements')
+      .upsert(achievementsToInsert, { 
+        onConflict: 'user_id,achievement_id',
+        ignoreDuplicates: true 
+      });
+    
+    if (error) {
+      console.error('Error initializing achievements:', error);
+    }
+  };
+
   return {
     loading,
     loadGameState,
@@ -422,5 +482,8 @@ export const useSupabaseData = (user: User | null) => {
     loadTodos,
     saveTodo,
     deleteTodo,
+    loadAchievements,
+    saveAchievement,
+    initializeAchievements,
   };
 };
