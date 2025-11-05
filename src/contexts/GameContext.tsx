@@ -349,20 +349,18 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     loadUserData();
   }, [user?.id]); // Dependência apenas do ID do usuário para evitar loops
 
-  // Salvar automaticamente o estado do jogo quando ele mudar
+  // Salvar automaticamente o estado do jogo quando ele mudar (apenas campos que não são calculados)
   useEffect(() => {
     if (!user || isLoading) return;
 
     const saveGameState = async () => {
       try {
+        // Apenas salvamos total_xp, coins, hp e streak
+        // Os campos level, max_xp, max_hp e xp são calculados pelo trigger
         await supabaseData.saveGameState({
           hp: gameState.hp,
-          max_hp: gameState.maxHp,
-          xp: gameState.xp,
           total_xp: gameState.totalXp,
-          max_xp: gameState.maxXp,
           coins: gameState.coins,
-          level: gameState.level,
           streak: gameState.streak,
         });
         console.log('Estado do jogo salvo automaticamente');
@@ -374,7 +372,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     // Debounce para não salvar a cada mudança imediata
     const timeoutId = setTimeout(saveGameState, 500);
     return () => clearTimeout(timeoutId);
-  }, [gameState, user, isLoading, supabaseData]);
+  }, [gameState.hp, gameState.totalXp, gameState.coins, gameState.streak, user, isLoading, supabaseData]);
 
   const updateProfile = useCallback(async (newProfile: ProfileCustomization) => {
     console.log('Atualizando perfil:', newProfile);
@@ -601,33 +599,41 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     const habit = habits.find(h => h.id === id);
     if (habit) {
       if (positive) {
-        const newGameState = {
-          xp: gameState.xp + habit.xpReward,
-          totalXp: gameState.totalXp + habit.xpReward,
-          coins: gameState.coins + habit.coinReward,
-        };
+        const newTotalXp = gameState.totalXp + habit.xpReward;
+        const newCoins = gameState.coins + habit.coinReward;
         
-        setGameState(prev => ({
-          ...prev,
-          ...newGameState,
-        }));
-        
-        // Salvar estado do jogo no banco
+        // Salvar estado do jogo no banco (o trigger calculará o nível automaticamente)
         if (user) {
           try {
             await supabaseData.saveGameState({
-              xp: newGameState.xp,
-              total_xp: newGameState.totalXp,
-              coins: newGameState.coins,
-              hp: gameState.hp,
-              max_hp: gameState.maxHp,
-              max_xp: gameState.maxXp,
-              level: gameState.level,
-              streak: gameState.streak,
+              total_xp: newTotalXp,
+              coins: newCoins,
             });
+            
+            // Recarregar estado do jogo para pegar os valores calculados pelo trigger
+            const updatedGameState = await supabaseData.loadGameState();
+            if (updatedGameState) {
+              setGameState({
+                hp: updatedGameState.hp,
+                maxHp: updatedGameState.max_hp,
+                xp: updatedGameState.xp,
+                totalXp: updatedGameState.total_xp,
+                maxXp: updatedGameState.max_xp,
+                coins: updatedGameState.coins,
+                level: updatedGameState.level,
+                streak: updatedGameState.streak,
+              });
+            }
           } catch (error) {
             console.error('Erro ao salvar estado do jogo:', error);
           }
+        } else {
+          setGameState(prev => ({
+            ...prev,
+            xp: prev.xp + habit.xpReward,
+            totalXp: newTotalXp,
+            coins: newCoins,
+          }));
         }
         
         updateHabit(id, { streak: habit.streak + 1 });
@@ -640,33 +646,41 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const completeDaily = async (id: string) => {
     const daily = dailies.find(d => d.id === id);
     if (daily && !daily.completed) {
-      const newGameState = {
-        xp: gameState.xp + daily.xpReward,
-        totalXp: gameState.totalXp + daily.xpReward,
-        coins: gameState.coins + daily.coinReward,
-      };
+      const newTotalXp = gameState.totalXp + daily.xpReward;
+      const newCoins = gameState.coins + daily.coinReward;
       
-      setGameState(prev => ({
-        ...prev,
-        ...newGameState,
-      }));
-      
-      // Salvar estado do jogo no banco
+      // Salvar estado do jogo no banco (o trigger calculará o nível automaticamente)
       if (user) {
         try {
           await supabaseData.saveGameState({
-            xp: newGameState.xp,
-            total_xp: newGameState.totalXp,
-            coins: newGameState.coins,
-            hp: gameState.hp,
-            max_hp: gameState.maxHp,
-            max_xp: gameState.maxXp,
-            level: gameState.level,
-            streak: gameState.streak,
+            total_xp: newTotalXp,
+            coins: newCoins,
           });
+          
+          // Recarregar estado do jogo para pegar os valores calculados pelo trigger
+          const updatedGameState = await supabaseData.loadGameState();
+          if (updatedGameState) {
+            setGameState({
+              hp: updatedGameState.hp,
+              maxHp: updatedGameState.max_hp,
+              xp: updatedGameState.xp,
+              totalXp: updatedGameState.total_xp,
+              maxXp: updatedGameState.max_xp,
+              coins: updatedGameState.coins,
+              level: updatedGameState.level,
+              streak: updatedGameState.streak,
+            });
+          }
         } catch (error) {
           console.error('Erro ao salvar estado do jogo:', error);
         }
+      } else {
+        setGameState(prev => ({
+          ...prev,
+          xp: prev.xp + daily.xpReward,
+          totalXp: newTotalXp,
+          coins: newCoins,
+        }));
       }
       
       updateDaily(id, { completed: true, streak: daily.streak + 1 });
@@ -681,53 +695,58 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (todo && !todo.completed) {
       console.log('Aplicando recompensas e removendo To-Do');
       
-      const newGameState = {
-        xp: gameState.xp + todo.xpReward,
-        totalXp: gameState.totalXp + todo.xpReward,
-        coins: gameState.coins + todo.coinReward,
-      };
-      
-      // Atualizar estado do jogo com recompensas
-      setGameState(prev => ({
-        ...prev,
-        ...newGameState,
-      }));
+      const newTotalXp = gameState.totalXp + todo.xpReward;
+      const newCoins = gameState.coins + todo.coinReward;
       
       // Salvar estado do jogo e marcar como concluído no banco de dados
       if (user) {
         try {
-          // Salvar estado do jogo
+          // Salvar estado do jogo (o trigger calculará o nível automaticamente)
           await supabaseData.saveGameState({
-            xp: newGameState.xp,
-            total_xp: newGameState.totalXp,
-            coins: newGameState.coins,
-            hp: gameState.hp,
-            max_hp: gameState.maxHp,
-            max_xp: gameState.maxXp,
-            level: gameState.level,
-            streak: gameState.streak,
+            total_xp: newTotalXp,
+            coins: newCoins,
           });
           
-          // Marcar to-do como concluído
+          // Recarregar estado do jogo para pegar os valores calculados pelo trigger
+          const updatedGameState = await supabaseData.loadGameState();
+          if (updatedGameState) {
+            setGameState({
+              hp: updatedGameState.hp,
+              maxHp: updatedGameState.max_hp,
+              xp: updatedGameState.xp,
+              totalXp: updatedGameState.total_xp,
+              maxXp: updatedGameState.max_xp,
+              coins: updatedGameState.coins,
+              level: updatedGameState.level,
+              streak: updatedGameState.streak,
+            });
+          }
+          
+          // Marcar como concluído e remover da lista
           await supabaseData.saveTodo({
-            id,
+            id: todo.id,
             completed: true,
             completed_at: new Date().toISOString(),
           });
+          
+          // Remover da lista local
+          setTodos(prev => prev.filter(t => t.id !== id));
+          
+          console.log('To-Do completado e removido com sucesso');
         } catch (error) {
-          console.error('Erro ao salvar dados:', error);
+          console.error('Erro ao completar To-Do:', error);
         }
+      } else {
+        // Modo offline
+        setGameState(prev => ({
+          ...prev,
+          xp: prev.xp + todo.xpReward,
+          totalXp: newTotalXp,
+          coins: newCoins,
+        }));
+        
+        setTodos(prev => prev.filter(t => t.id !== id));
       }
-      
-      // Remover To-Do da lista local
-      setTodos(prev => {
-        const newTodos = prev.filter(t => t.id !== id);
-        console.log('To-Dos antes da remoção:', prev.length);
-        console.log('To-Dos após remoção:', newTodos.length);
-        return newTodos;
-      });
-    } else {
-      console.log('To-Do não encontrado ou já concluído');
     }
   };
 

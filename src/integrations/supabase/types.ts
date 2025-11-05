@@ -7,10 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
@@ -319,32 +319,26 @@ export type Database = {
       calculate_daily_rewards: {
         Args: { difficulty_level: string }
         Returns: {
-          xp_reward: number
           coin_reward: number
+          xp_reward: number
         }[]
       }
       calculate_habit_rewards: {
         Args: { difficulty_level: string }
         Returns: {
-          xp_reward: number
           coin_reward: number
+          xp_reward: number
         }[]
       }
       calculate_todo_rewards: {
         Args: { difficulty_level: string; priority_level: string }
         Returns: {
-          xp_reward: number
           coin_reward: number
+          xp_reward: number
         }[]
       }
-      reset_dailies: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      update_overdue_todos: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      reset_dailies: { Args: never; Returns: undefined }
+      update_overdue_todos: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
