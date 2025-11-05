@@ -581,6 +581,16 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           unlocked: true,
           unlocked_at: new Date().toISOString(),
         });
+
+        // Dar recompensa em moedas se houver
+        if (achievement.coinReward && achievement.coinReward > 0) {
+          const newCoins = gameState.coins + achievement.coinReward;
+          await supabaseData.saveGameState({
+            ...gameState,
+            coins: newCoins,
+          });
+          setGameState(prev => ({ ...prev, coins: newCoins }));
+        }
       }
     });
 
@@ -604,9 +614,10 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
       // Mostrar notificação para cada conquista desbloqueada
       newlyUnlocked.forEach(achievement => {
+        const coinRewardText = achievement.coinReward ? ` +${achievement.coinReward} moedas!` : '';
         toast({
           title: `🏆 Conquista Desbloqueada!`,
-          description: `${achievement.icon} ${achievement.title} - ${achievement.description}`,
+          description: `${achievement.icon} ${achievement.title} - ${achievement.description}${coinRewardText}`,
           duration: 5000,
         });
       });

@@ -11,6 +11,7 @@ export interface Achievement {
   category: 'main' | 'side' | 'special';
   progress?: number;
   maxProgress?: number;
+  coinReward?: number;
 }
 
 export const ACHIEVEMENT_CATEGORIES = {
@@ -100,7 +101,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '⭐',
     rarity: 'rare',
     unlocked: false,
-    category: 'main'
+    category: 'main',
+    coinReward: 75
   },
   {
     id: 'nivel-10',
@@ -109,7 +111,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🌟',
     rarity: 'rare',
     unlocked: false,
-    category: 'main'
+    category: 'main',
+    coinReward: 100
   },
   {
     id: 'xp-master',
@@ -118,7 +121,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '⚡',
     rarity: 'rare',
     unlocked: false,
-    category: 'side'
+    category: 'side',
+    coinReward: 100
   },
   {
     id: 'tarefa-epica',
@@ -127,7 +131,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '⚔️',
     rarity: 'epic',
     unlocked: false,
-    category: 'side'
+    category: 'side',
+    coinReward: 150
   },
   {
     id: 'transformacao',
@@ -136,7 +141,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🔥',
     rarity: 'legendary',
     unlocked: false,
-    category: 'special'
+    category: 'special',
+    coinReward: 500
   },
   
   // 5 NOVAS CONQUISTAS PRINCIPAIS
@@ -147,7 +153,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '💫',
     rarity: 'rare',
     unlocked: false,
-    category: 'main'
+    category: 'main',
+    coinReward: 150
   },
   {
     id: 'nivel-20',
@@ -156,7 +163,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🌠',
     rarity: 'epic',
     unlocked: false,
-    category: 'main'
+    category: 'main',
+    coinReward: 200
   },
   {
     id: 'primeira-semana',
@@ -165,7 +173,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '📆',
     rarity: 'uncommon',
     unlocked: false,
-    category: 'main'
+    category: 'main',
+    coinReward: 50
   },
   {
     id: 'primeiro-mes',
@@ -174,7 +183,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🗓️',
     rarity: 'rare',
     unlocked: false,
-    category: 'main'
+    category: 'main',
+    coinReward: 100
   },
   {
     id: 'milionario-xp',
@@ -183,7 +193,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '💰',
     rarity: 'epic',
     unlocked: false,
-    category: 'main'
+    category: 'main',
+    coinReward: 250
   },
 
   // 5 NOVAS CONQUISTAS SECUNDÁRIAS
@@ -194,7 +205,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🪙',
     rarity: 'uncommon',
     unlocked: false,
-    category: 'side'
+    category: 'side',
+    coinReward: 50
   },
   {
     id: 'maratonista',
@@ -203,7 +215,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🏃‍♂️',
     rarity: 'rare',
     unlocked: false,
-    category: 'side'
+    category: 'side',
+    coinReward: 100
   },
   {
     id: 'perfeccionista',
@@ -212,7 +225,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '✨',
     rarity: 'rare',
     unlocked: false,
-    category: 'side'
+    category: 'side',
+    coinReward: 100
   },
   {
     id: 'organizador-supremo',
@@ -221,7 +235,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '📋',
     rarity: 'epic',
     unlocked: false,
-    category: 'side'
+    category: 'side',
+    coinReward: 200
   },
   {
     id: 'guru-dos-habitos',
@@ -230,7 +245,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🧘‍♂️',
     rarity: 'rare',
     unlocked: false,
-    category: 'side'
+    category: 'side',
+    coinReward: 100
   },
 
   // 3 NOVAS CONQUISTAS ESPECIAIS
@@ -241,7 +257,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🔥',
     rarity: 'legendary',
     unlocked: false,
-    category: 'special'
+    category: 'special',
+    coinReward: 300
   },
   {
     id: 'lenda-viva',
@@ -250,7 +267,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '👑',
     rarity: 'legendary',
     unlocked: false,
-    category: 'special'
+    category: 'special',
+    coinReward: 500
   },
   {
     id: 'mestre-da-disciplina',
@@ -259,7 +277,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🏆',
     rarity: 'legendary',
     unlocked: false,
-    category: 'special'
+    category: 'special',
+    coinReward: 400
   },
 
   // 10 NOVAS CONQUISTAS ADICIONADAS
@@ -307,7 +326,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     unlocked: false,
     category: 'main',
     progress: 0,
-    maxProgress: 20
+    maxProgress: 20,
+    coinReward: 75
   },
   {
     id: 'rico',
@@ -318,7 +338,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     unlocked: false,
     category: 'side',
     progress: 0,
-    maxProgress: 500
+    maxProgress: 500,
+    coinReward: 100
   },
   {
     id: 'habitos-solidos',
@@ -329,7 +350,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     unlocked: false,
     category: 'side',
     progress: 0,
-    maxProgress: 3
+    maxProgress: 3,
+    coinReward: 75
   },
 
   // 4 DIFÍCEIS
@@ -342,7 +364,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     unlocked: false,
     category: 'main',
     progress: 0,
-    maxProgress: 100
+    maxProgress: 100,
+    coinReward: 250
   },
   {
     id: 'mestre-do-tempo',
@@ -353,7 +376,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     unlocked: false,
     category: 'side',
     progress: 0,
-    maxProgress: 50
+    maxProgress: 50,
+    coinReward: 200
   },
   {
     id: 'imperador-moedas',
@@ -364,7 +388,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     unlocked: false,
     category: 'side',
     progress: 0,
-    maxProgress: 5000
+    maxProgress: 5000,
+    coinReward: 500
   },
   {
     id: 'imortal',
@@ -373,6 +398,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '🛡️',
     rarity: 'legendary',
     unlocked: false,
-    category: 'special'
+    category: 'special',
+    coinReward: 400
   }
 ];

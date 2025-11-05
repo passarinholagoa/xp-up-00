@@ -92,6 +92,13 @@ export const AchievementsModal = ({ isOpen, onClose, achievements }: Achievement
                             {achievement.description}
                           </p>
                           
+                          {achievement.coinReward && (
+                            <div className="flex items-center gap-1 text-xs text-yellow-500">
+                              <span>🪙</span>
+                              <span>+{achievement.coinReward} moedas</span>
+                            </div>
+                          )}
+                          
                           {achievement.maxProgress && (
                             <div className="space-y-1">
                               <div className="flex justify-between text-xs">
