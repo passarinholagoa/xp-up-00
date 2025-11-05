@@ -298,7 +298,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
         // Carregar conquistas
         const achievementsData = await supabaseData.loadAchievements();
-        console.log('Conquistas carregadas:', achievementsData);
+        console.log('Conquistas carregadas do banco:', achievementsData);
+        console.log('Total de conquistas estáticas:', ACHIEVEMENTS.length);
         
         if (!achievementsData || achievementsData.length === 0) {
           // Primeira vez - inicializar todas as conquistas
@@ -311,6 +312,10 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             const dbAchievement = newAchievementsData?.find(
               (a: any) => a.achievement_id === achievement.id
             );
+            console.log(`Mapeando conquista ${achievement.id}:`, {
+              unlocked: dbAchievement?.unlocked,
+              unlockedAt: dbAchievement?.unlocked_at
+            });
             return {
               ...achievement,
               unlocked: dbAchievement?.unlocked || false,
@@ -319,6 +324,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
                 : undefined,
             };
           });
+          console.log('Conquistas mapeadas:', mappedAchievements.filter(a => a.unlocked).length, 'desbloqueadas');
           setAchievements(mappedAchievements);
         } else {
           // Mapear conquistas do banco com os dados estáticos
@@ -326,6 +332,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             const dbAchievement = achievementsData.find(
               (a: any) => a.achievement_id === achievement.id
             );
+            if (dbAchievement?.unlocked) {
+              console.log(`Conquista desbloqueada: ${achievement.id} (${achievement.title})`);
+            }
             return {
               ...achievement,
               unlocked: dbAchievement?.unlocked || false,
@@ -334,6 +343,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
                 : undefined,
             };
           });
+          console.log('Total de conquistas desbloqueadas:', mappedAchievements.filter(a => a.unlocked).length);
           setAchievements(mappedAchievements);
         }
 
