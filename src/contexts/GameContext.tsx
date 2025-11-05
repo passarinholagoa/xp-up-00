@@ -438,6 +438,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
 
     const newlyUnlocked: Achievement[] = [];
+    const updatedAchievements: Achievement[] = [];
 
     // Criar um mapa com o total de cada tipo de tarefa
     const totalTodos = todos.length; // Todos ativos
@@ -445,9 +446,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     const totalDailies = dailies.length;
 
     achievements.forEach(async (achievement) => {
-      if (achievement.unlocked) return;
-
       let shouldUnlock = false;
+      let currentProgress = achievement.progress || 0;
 
       switch (achievement.id) {
         // Conquistas de nível
@@ -476,6 +476,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           shouldUnlock = gameState.totalXp >= 1000;
           break;
         case 'milionario-xp':
+          currentProgress = gameState.totalXp;
           shouldUnlock = gameState.totalXp >= 10000;
           break;
 
@@ -484,9 +485,11 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           shouldUnlock = gameState.coins >= 1000;
           break;
         case 'rico':
+          currentProgress = gameState.coins;
           shouldUnlock = gameState.coins >= 500;
           break;
         case 'imperador-moedas':
+          currentProgress = gameState.coins;
           shouldUnlock = gameState.coins >= 5000;
           break;
 
@@ -509,7 +512,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           shouldUnlock = totalHabits >= 10;
           break;
         case 'guru-dos-habitos':
-          shouldUnlock = habits.filter(h => h.isPositive && h.streak >= 7).length >= 5;
+          currentProgress = habits.filter(h => h.isPositive && h.streak >= 7).length;
+          shouldUnlock = currentProgress >= 5;
           break;
         
         case 'o-despertar':
@@ -518,10 +522,26 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         case 'rotina-perfeita':
           shouldUnlock = totalDailies >= 10;
           break;
+        
+        case 'mestre-do-tempo':
+          currentProgress = totalDailies;
+          shouldUnlock = totalDailies >= 50;
+          break;
 
         case 'primeira-missao':
-        case 'iniciante-dedicado':
           shouldUnlock = totalTodos >= 1;
+          break;
+        case 'iniciante-dedicado':
+          currentProgress = totalTodos;
+          shouldUnlock = totalTodos >= 5;
+          break;
+        case 'disciplinado':
+          currentProgress = totalTodos;
+          shouldUnlock = totalTodos >= 20;
+          break;
+        case 'guerreiro-incansavel':
+          currentProgress = totalTodos;
+          shouldUnlock = totalTodos >= 100;
           break;
         case 'mestre-da-organizacao':
           shouldUnlock = totalTodos >= 15;
@@ -529,9 +549,30 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         case 'organizador-supremo':
           shouldUnlock = totalTodos >= 50;
           break;
+        
+        case 'consistencia-basica':
+          currentProgress = dailies.filter(d => d.completed).length;
+          shouldUnlock = currentProgress >= 3;
+          break;
+        case 'perfeccionista':
+          // Esta precisa de lógica mais complexa (7 dias seguidos)
+          shouldUnlock = false;
+          break;
+        case 'habitos-solidos':
+          currentProgress = habits.filter(h => h.streak >= 7).length;
+          shouldUnlock = currentProgress >= 3;
+          break;
       }
 
-      if (shouldUnlock) {
+      // Atualizar progresso mesmo se não desbloqueada
+      if (achievement.maxProgress && currentProgress !== achievement.progress) {
+        updatedAchievements.push({
+          ...achievement,
+          progress: currentProgress,
+        });
+      }
+
+      if (shouldUnlock && !achievement.unlocked) {
         newlyUnlocked.push(achievement);
         
         // Atualizar no banco de dados
@@ -543,17 +584,25 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    if (newlyUnlocked.length > 0) {
-      // Atualizar estado local
+    // Atualizar estado local com progresso
+    if (updatedAchievements.length > 0 || newlyUnlocked.length > 0) {
       setAchievements(prev => prev.map(a => {
+        // Verificar se foi desbloqueada
         const unlocked = newlyUnlocked.find(nu => nu.id === a.id);
         if (unlocked) {
-          return { ...a, unlocked: true, unlockedAt: new Date() };
+          return { ...a, unlocked: true, unlockedAt: new Date(), progress: a.maxProgress };
         }
+        
+        // Verificar se teve progresso atualizado
+        const updated = updatedAchievements.find(ua => ua.id === a.id);
+        if (updated) {
+          return updated;
+        }
+        
         return a;
       }));
 
-      // Mostrar notificação para cada conquista
+      // Mostrar notificação para cada conquista desbloqueada
       newlyUnlocked.forEach(achievement => {
         toast({
           title: `🏆 Conquista Desbloqueada!`,
