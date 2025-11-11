@@ -5,6 +5,7 @@ import { ProfileCustomization, ShopItem, SHOP_ITEMS } from '@/types/profile';
 import { Achievement, ACHIEVEMENTS } from '@/types/achievements';
 import { XpUpSettings, DEFAULT_SETTINGS } from '@/types/settings';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Task {
   id: string;
@@ -425,12 +426,51 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, supabaseData]);
 
-  const buyShopItem = (itemId: string) => {
-    setShopItems(prev => prev.map(item => 
-      item.id === itemId 
-        ? { ...item, owned: true }
-        : item
+  const buyShopItem = async (itemId: string) => {
+    const item = shopItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    // Descontar moedas
+    const newGameState = {
+      ...gameState,
+      coins: gameState.coins - item.price
+    };
+    
+    setGameState(newGameState);
+    setShopItems(prev => prev.map(i => 
+      i.id === itemId 
+        ? { ...i, owned: true }
+        : i
     ));
+
+    // Salvar no banco de dados
+    if (user) {
+      try {
+        await supabaseData.saveGameState({
+          xp: newGameState.xp,
+          total_xp: newGameState.totalXp,
+          max_xp: newGameState.maxXp,
+          coins: newGameState.coins,
+          level: newGameState.level,
+          streak: newGameState.streak,
+          hp: newGameState.hp,
+          max_hp: newGameState.maxHp,
+        });
+
+        await supabase
+          .from('shop_items')
+          .upsert({
+            user_id: user.id,
+            item_id: itemId,
+            owned: true,
+            purchased_at: new Date().toISOString(),
+          }, {
+            onConflict: 'user_id,item_id'
+          });
+      } catch (error) {
+        console.error('Erro ao salvar compra:', error);
+      }
+    }
   };
 
   // Verificar e desbloquear conquistas
