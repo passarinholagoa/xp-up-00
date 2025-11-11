@@ -465,6 +465,23 @@ export const useSupabaseData = (user: User | null) => {
     }
   };
 
+  // Shop items operations
+  const loadShopItems = async () => {
+    if (!user) return [];
+    
+    const { data, error } = await supabase
+      .from('shop_items')
+      .select('*')
+      .eq('user_id', user.id);
+    
+    if (error) {
+      console.error('Error loading shop items:', error);
+      return [];
+    }
+    
+    return data || [];
+  };
+
   return {
     loading,
     loadGameState,
@@ -485,5 +502,6 @@ export const useSupabaseData = (user: User | null) => {
     loadAchievements,
     saveAchievement,
     initializeAchievements,
+    loadShopItems,
   };
 };

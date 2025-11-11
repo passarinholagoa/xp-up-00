@@ -348,6 +348,20 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           setAchievements(mappedAchievements);
         }
 
+        // Carregar itens da loja comprados
+        const shopItemsData = await supabaseData.loadShopItems();
+        console.log('Itens da loja carregados:', shopItemsData);
+        if (shopItemsData && shopItemsData.length > 0) {
+          const ownedItemIds = shopItemsData.map((item: any) => item.item_id);
+          const updatedShopItems = SHOP_ITEMS.map(item => ({
+            ...item,
+            owned: ownedItemIds.includes(item.id),
+          }));
+          console.log('Itens owned:', ownedItemIds);
+          setShopItems(updatedShopItems);
+        } else {
+          setShopItems(SHOP_ITEMS);
+        }
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         // Em caso de erro, garantir que o nome seja Carlos
