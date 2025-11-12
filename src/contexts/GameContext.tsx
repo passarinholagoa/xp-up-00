@@ -192,13 +192,41 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             name_color: profileData.name_color,
             background_color: profileData.background_color
           });
-          setProfile({
-            displayName: profileData.display_name || 'Carlos',
-            avatar: profileData.avatar || '👤',
-            frameBorder: profileData.frame_border || 'border-2 border-primary/50',
-            nameColor: profileData.name_color || 'text-foreground',
-            backgroundColor: profileData.background_color || 'bg-card',
-          });
+          
+          // Resetar para padrão se tiver customizações mas nenhum item comprado
+          const shopItemsData = await supabaseData.loadShopItems();
+          const hasCustomizations = 
+            profileData.avatar !== '👤' || 
+            profileData.frame_border !== 'border-2 border-primary/50' ||
+            profileData.name_color !== 'text-foreground' ||
+            profileData.background_color !== 'bg-card';
+          
+          if (hasCustomizations && (!shopItemsData || shopItemsData.length === 0)) {
+            console.log('Resetando perfil para padrão (sem itens comprados)');
+            const defaultProfile = {
+              display_name: profileData.display_name || 'Carlos',
+              avatar: '👤',
+              frame_border: 'border-2 border-primary/50',
+              name_color: 'text-foreground',
+              background_color: 'bg-card',
+            };
+            await supabaseData.saveProfile(defaultProfile);
+            setProfile({
+              displayName: defaultProfile.display_name,
+              avatar: defaultProfile.avatar,
+              frameBorder: defaultProfile.frame_border,
+              nameColor: defaultProfile.name_color,
+              backgroundColor: defaultProfile.background_color,
+            });
+          } else {
+            setProfile({
+              displayName: profileData.display_name || 'Carlos',
+              avatar: profileData.avatar || '👤',
+              frameBorder: profileData.frame_border || 'border-2 border-primary/50',
+              nameColor: profileData.name_color || 'text-foreground',
+              backgroundColor: profileData.background_color || 'bg-card',
+            });
+          }
         } else {
           // Criar perfil padrão com nome Carlos
           console.log('Criando perfil padrão para o usuário');
