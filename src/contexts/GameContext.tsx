@@ -356,11 +356,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           const updatedShopItems = SHOP_ITEMS.map(item => ({
             ...item,
             owned: ownedItemIds.includes(item.id),
+            unlocked: true, // Todos os itens são desbloqueados por padrão
           }));
           console.log('Itens owned:', ownedItemIds);
           setShopItems(updatedShopItems);
         } else {
-          setShopItems(SHOP_ITEMS);
+          // Marcar todos como desbloqueados por padrão
+          setShopItems(SHOP_ITEMS.map(item => ({ ...item, unlocked: true })));
         }
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -383,6 +385,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       try {
         // Apenas salvamos total_xp, coins, hp e streak
         // Os campos level, max_xp, max_hp e xp são calculados pelo trigger
+        console.log('Salvando estado do jogo:', {
+          user_id: user.id,
+          hp: gameState.hp,
+          total_xp: gameState.totalXp,
+          coins: gameState.coins,
+          streak: gameState.streak,
+        });
         await supabaseData.saveGameState({
           hp: gameState.hp,
           total_xp: gameState.totalXp,
@@ -515,12 +524,29 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             description: 'Sua compra não foi salva. Tente novamente.',
             variant: 'destructive'
           });
+          // Reverter a compra no estado local
+          setGameState(gameState);
+          setShopItems(prev => prev.map(i => 
+            i.id === itemId 
+              ? { ...i, owned: false }
+              : i
+          ));
         } else {
           console.log('Item salvo com sucesso:', data);
           toast({
             title: '✨ Item comprado!',
             description: `Você comprou ${item.name} por ${item.price} moedas.`,
           });
+          
+          // Recarregar itens da loja para sincronizar
+          const shopItemsData = await supabaseData.loadShopItems();
+          if (shopItemsData && shopItemsData.length > 0) {
+            const ownedItemIds = shopItemsData.map((item: any) => item.item_id);
+            setShopItems(prev => prev.map(item => ({
+              ...item,
+              owned: ownedItemIds.includes(item.id),
+            })));
+          }
         }
       } catch (error) {
         console.error('Erro ao salvar compra:', error);
