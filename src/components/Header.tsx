@@ -71,7 +71,7 @@ export const Header = () => {
               {/* Avatar otimizado */}
               <div className={avatarClasses}>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 rounded-full bg-gray-800/50 flex items-center justify-center text-2xl">
                     {profile.avatar}
                   </div>
                   <div>

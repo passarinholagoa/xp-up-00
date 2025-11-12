@@ -185,6 +185,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         console.log('Dados do perfil carregados:', profileData);
         
         if (profileData) {
+          console.log('Aplicando dados do perfil:', {
+            display_name: profileData.display_name,
+            avatar: profileData.avatar,
+            frame_border: profileData.frame_border,
+            name_color: profileData.name_color,
+            background_color: profileData.background_color
+          });
           setProfile({
             displayName: profileData.display_name || 'Carlos',
             avatar: profileData.avatar || '👤',

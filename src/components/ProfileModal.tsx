@@ -55,7 +55,7 @@ export const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
             <div className={`relative p-3 rounded-lg ${tempProfile.backgroundColor} ${tempProfile.frameBorder}`}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-base">
+                <div className="w-10 h-10 rounded-full bg-gray-800/50 flex items-center justify-center text-base">
                   {tempProfile.avatar}
                 </div>
                 <div>
