@@ -442,7 +442,30 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
   const buyShopItem = async (itemId: string) => {
     const item = shopItems.find(i => i.id === itemId);
-    if (!item) return;
+    if (!item) {
+      console.error('Item não encontrado:', itemId);
+      return;
+    }
+
+    if (gameState.coins < item.price) {
+      toast({
+        title: 'Moedas insuficientes',
+        description: `Você precisa de ${item.price} moedas para comprar este item.`,
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (item.owned) {
+      toast({
+        title: 'Item já possui',
+        description: 'Você já possui este item.',
+        variant: 'default'
+      });
+      return;
+    }
+
+    console.log('Comprando item:', itemId, item.name);
 
     // Descontar moedas
     const newGameState = {
@@ -460,6 +483,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     // Salvar no banco de dados
     if (user) {
       try {
+        console.log('Salvando estado do jogo...');
         await supabaseData.saveGameState({
           xp: newGameState.xp,
           total_xp: newGameState.totalXp,
@@ -471,7 +495,8 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
           max_hp: newGameState.maxHp,
         });
 
-        await supabase
+        console.log('Salvando compra do item:', { user_id: user.id, item_id: itemId });
+        const { data, error } = await supabase
           .from('shop_items')
           .upsert({
             user_id: user.id,
@@ -480,9 +505,30 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
             purchased_at: new Date().toISOString(),
           }, {
             onConflict: 'user_id,item_id'
+          })
+          .select();
+
+        if (error) {
+          console.error('Erro ao salvar item na tabela shop_items:', error);
+          toast({
+            title: 'Erro ao salvar compra',
+            description: 'Sua compra não foi salva. Tente novamente.',
+            variant: 'destructive'
           });
+        } else {
+          console.log('Item salvo com sucesso:', data);
+          toast({
+            title: '✨ Item comprado!',
+            description: `Você comprou ${item.name} por ${item.price} moedas.`,
+          });
+        }
       } catch (error) {
         console.error('Erro ao salvar compra:', error);
+        toast({
+          title: 'Erro ao salvar compra',
+          description: 'Ocorreu um erro. Tente novamente.',
+          variant: 'destructive'
+        });
       }
     }
   };
